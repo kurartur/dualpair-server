@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -23,11 +25,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -38,6 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         DirtiesContextTestExecutionListener.class,
         TransactionalTestExecutionListener.class,
         DbUnitTestExecutionListener.class })
+@Rollback
+@Transactional
 @DatabaseSetup("userTest.xml")
 public class ITUserControllerTest {
 
@@ -48,6 +54,9 @@ public class ITUserControllerTest {
 
     @Autowired
     private OAuthHelper helper;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Before
     public void setUp() throws Exception {
@@ -72,5 +81,26 @@ public class ITUserControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         UserDTO userDTO = objectMapper.readValue(content, UserDTO.class);
         assertEquals("Artur", userDTO.getName());
+    }
+
+    @Test
+    public void testSetSociotypes_unauthorized() throws Exception {
+        mockMvc.perform(post("/api/user/sociotypes"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DatabaseSetup("userTest_setSociotypes.xml")
+    public void testSetSociotypes_ok() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
+        String data = "[{\"code1\": \"EII\"}]";
+        mockMvc.perform(post("/api/user/sociotypes")
+                    .with(bearerToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(data.getBytes()))
+                .andExpect(status().isOk());
+        jdbcTemplate.query("select s.code1 as code from users_sociotypes us inner join sociotypes s on s.id = us.sociotype_id where us.user_id=1", rs -> {
+            assertEquals("EII", rs.getString("code"));
+        });
     }
 }

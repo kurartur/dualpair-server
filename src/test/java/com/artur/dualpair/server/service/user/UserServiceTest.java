@@ -8,10 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -75,7 +72,40 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdateUserSociotypes() throws Exception {
+    public void testSetUserSociotypes_nullParameters() throws Exception {
+        try {
+            userService.setUserSociotypes(null, null);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("User id is mandatory", iae.getMessage());
+        }
+        
+        try {
+            userService.setUserSociotypes("1", null);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("Sociotype codes are mandatory", iae.getMessage());
+        }
+    }
+
+    @Test
+    public void testSetUserSociotypes_sociotypesNotFound() throws Exception {
+        Set<Sociotype.Code1> codes = new HashSet<>();
+        codes.add(Sociotype.Code1.EII);
+        List<Sociotype.Code1> codeList = new ArrayList<>(codes);
+        User user = createUser(1L, "username", null);
+        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
+        when(sociotypeRepository.findByCode1List(codeList)).thenReturn(new HashSet<>());
+        try {
+            userService.setUserSociotypes("username", codes);
+            fail();
+        } catch (IllegalStateException ise) {
+            assertEquals("Zero sociotypes found", ise.getMessage());
+        }
+    }
+
+    @Test
+    public void testSetUserSociotypes() throws Exception {
         Set<Sociotype> sociotypes = new HashSet<>();
         sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.EII).build());
         Set<Sociotype.Code1> codes = new HashSet<>();
@@ -90,41 +120,28 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testUpdateUserSociotypes_invalidCount() throws Exception {
-        Set<Sociotype> sociotypes = new HashSet<>();
+    public void testSetUserSociotypes_invalidCount() throws Exception {
         Set<Sociotype.Code1> codes = new HashSet<>();
-        ArrayList<Sociotype.Code1> codeList = new ArrayList<>(codes);
-        User user = createUser(1L, "username", null);
-        Set<Sociotype> userSociotypes = new HashSet<>();
-        userSociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.LSE).build());
-        user.setSociotypes(userSociotypes);
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
-        when(sociotypeRepository.findByCode1List(codeList)).thenReturn(sociotypes);
 
         try {
             userService.setUserSociotypes("username", codes);
             fail();
         } catch (IllegalArgumentException iae) {
-            assertEquals("User must have 1 or 2 sociotypes", iae.getMessage());
+            assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
         }
-        assertEquals(userSociotypes, user.getSociotypes());
-        verify(userRepository, never()).save(user);
+        verify(userRepository, never()).save(any(User.class));
 
         codes.add(Sociotype.Code1.EII);
         codes.add(Sociotype.Code1.LSE);
         codes.add(Sociotype.Code1.IEI);
-        sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.EII).build());
-        sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.LSE).build());
-        sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.IEI).build());
 
         try {
             userService.setUserSociotypes("username", codes);
             fail();
         } catch (IllegalArgumentException iae) {
-            assertEquals("User must have 1 or 2 sociotypes", iae.getMessage());
+            assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
         }
-        assertEquals(userSociotypes, user.getSociotypes());
-        verify(userRepository, never()).save(user);
+        verify(userRepository, never()).save(any(User.class));
 
     }
 

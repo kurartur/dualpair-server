@@ -4,6 +4,7 @@ import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.social.security.SocialUserDetails;
+import org.thymeleaf.util.Validate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -127,6 +128,7 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public void setSociotypes(Set<Sociotype> sociotypes) {
+        Validate.notNull(sociotypes, "Sociotypes are mandatory");
         if (sociotypes.size() > 2 || sociotypes.size() == 0) {
             throw new IllegalArgumentException("User must have 1 or 2 sociotypes");
         }

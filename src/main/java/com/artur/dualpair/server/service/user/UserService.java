@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.util.Validate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -72,9 +73,18 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void setUserSociotypes(String userId, Set<Sociotype.Code1> codeList) {
+    public void setUserSociotypes(String userId, Set<Sociotype.Code1> codes) {
+        Validate.notNull(userId, "User id is mandatory");
+        Validate.notNull(codes, "Sociotype codes are mandatory");
+        if (codes.size() < 1 || codes.size() > 2) {
+            throw new IllegalArgumentException("Invalid sociotype code count. Must be 1 or 2");
+        }
+
         User user = findByUsername(userId);
-        Set<Sociotype> sociotypes = sociotypeRepository.findByCode1List(new ArrayList<>(codeList));
+        Set<Sociotype> sociotypes = sociotypeRepository.findByCode1List(new ArrayList<>(codes));
+        if (sociotypes.isEmpty()) {
+            throw new IllegalStateException("Zero sociotypes found");
+        }
         user.setSociotypes(sociotypes);
         updateUser(user);
     }

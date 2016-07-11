@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+
+    <sociotypes id="1" code1="EII"/>
+    <users id="1" username="1" gender="M" age="25" name="Artur"/>
+
+</dataset>
