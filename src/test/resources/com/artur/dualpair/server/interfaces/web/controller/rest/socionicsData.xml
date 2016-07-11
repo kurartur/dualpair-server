@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+
+    <sociotypes id="1"  code1="LII" code2="INTJ"/>
+    <sociotypes id="2"  code1="ILE" code2="ENTP"/>
+    <sociotypes id="3"  code1="ESE" code2="ESFJ"/>
+    <sociotypes id="4"  code1="SEI" code2="ISFP"/>
+    <sociotypes id="5"  code1="LSI" code2="ISTJ"/>
+    <sociotypes id="6"  code1="SLE" code2="ESTP"/>
+    <sociotypes id="7"  code1="EIE" code2="ENFJ"/>
+    <sociotypes id="8"  code1="IEI" code2="INFP"/>
+    <sociotypes id="9"  code1="ESI" code2="ISFJ"/>
+    <sociotypes id="10" code1="SEE" code2="ESFP"/>
+    <sociotypes id="11" code1="LIE" code2="ENTJ"/>
+    <sociotypes id="12" code1="ILI" code2="INTP"/>
+    <sociotypes id="13" code1="EII" code2="INFJ"/>
+    <sociotypes id="14" code1="IEE" code2="ENFP"/>
+    <sociotypes id="15" code1="LSE" code2="ESTJ"/>
+    <sociotypes id="16" code1="SLI" code2="ISTP"/>
+
+    <socionic_relation_types id="1" code="DUAL"/>
+
+    <sociotype_relations id="1"  sociotype="2"  opposite="4"  relation_type_id="1"/>
+    <sociotype_relations id="2"  sociotype="4"  opposite="2"  relation_type_id="1"/>
+    <sociotype_relations id="3"  sociotype="1"  opposite="3"  relation_type_id="1"/>
+    <sociotype_relations id="4"  sociotype="3"  opposite="1"  relation_type_id="1"/>
+    <sociotype_relations id="5"  sociotype="7"  opposite="5"  relation_type_id="1"/>
+    <sociotype_relations id="6"  sociotype="5"  opposite="7"  relation_type_id="1"/>
+    <sociotype_relations id="7"  sociotype="8"  opposite="6"  relation_type_id="1"/>
+    <sociotype_relations id="8"  sociotype="6"  opposite="8"  relation_type_id="1"/>
+    <sociotype_relations id="9"  sociotype="11" opposite="9"  relation_type_id="1"/>
+    <sociotype_relations id="10" sociotype="9"  opposite="11" relation_type_id="1"/>
+    <sociotype_relations id="11" sociotype="10" opposite="12" relation_type_id="1"/>
+    <sociotype_relations id="12" sociotype="12" opposite="10" relation_type_id="1"/>
+    <sociotype_relations id="13" sociotype="16" opposite="14" relation_type_id="1"/>
+    <sociotype_relations id="14" sociotype="14" opposite="16" relation_type_id="1"/>
+    <sociotype_relations id="15" sociotype="15" opposite="13" relation_type_id="1"/>
+    <sociotype_relations id="16" sociotype="13" opposite="15" relation_type_id="1"/>
+
+    <!-- dual pairs - Beatrice, Lucia, Kate
+    <users id="1" username="1" gender="0" age="25" name="Artur"/>
+    <users_sociotypes user_id="1" sociotype_id="15"/>
+    <search_parameters user_id="1" min_age="20" max_age="25"/>
+
+    &lt;!&ndash; dual pairs - Beatrice, Lilian, Angela &ndash;&gt;
+    <users id="2" username="2" gender="0" age="30" name="Kyle"/>
+    <users_sociotypes user_id="2" sociotype_id="16"/>
+    <search_parameters user_id="2" min_age="25" max_age="25"/>
+
+    &lt;!&ndash; no dual pairs &ndash;&gt;
+    <users id="3" username="3" gender="0" age="20" name="Stephen"/>
+    <users_sociotypes user_id="3" sociotype_id="10"/>
+    <search_parameters user_id="3" min_age="20" max_age="25"/>
+
+    &lt;!&ndash; dual pairs - Artur, Kyle &ndash;&gt;
+    <users id="4" username="4" gender="1" age="25" name="Beatrice"/>
+    <users_sociotypes user_id="4" sociotype_id="13"/>
+    <users_sociotypes user_id="4" sociotype_id="14"/>
+    <search_parameters user_id="4" min_age="30" max_age="30"/>
+
+    <users id="5" username="5" gender="1" age="30" name="Lucia"/>
+    <users_sociotypes user_id="5" sociotype_id="13"/>
+    <search_parameters user_id="5" min_age="25" max_age="25"/>
+
+    <users id="6" username="6" gender="1" age="20" name="Kate"/>
+    <users_sociotypes user_id="6" sociotype_id="13"/>
+    <search_parameters user_id="6" min_age="25" max_age="25"/>
+
+    &lt;!&ndash; dual pairs - Beatrice, Lilian, Angela; age fw - Lilian, Angela; age bw - Lilian, Angela &ndash;&gt;
+    <users id="7" username="7" gender="1" age="25" name="Melanie"/>
+    <users_sociotypes user_id="7" sociotype_id="16"/>
+    <search_parameters user_id="7" min_age="26" max_age="26"/>
+
+    &lt;!&ndash; dual pairs - Kyle, Melanie; age fw - Melanie; age bw - Melanie &ndash;&gt;
+    <users id="8" username="8" gender="1" age="26" name="Lilian"/>
+    <users_sociotypes user_id="8" sociotype_id="14"/>
+    <search_parameters user_id="8" min_age="25" max_age="25"/>
+
+    &lt;!&ndash; dual pairs - Kyle, Melanie; age fw - Kyle, Melanie; age bw - Melanie &ndash;&gt;
+    <users id="9" username="9" gender="1" age="26" name="Angela"/>
+    <users_sociotypes user_id="9" sociotype_id="14"/>
+    <search_parameters user_id="9" min_age="25" max_age="30"/>-->
+
+</dataset>
