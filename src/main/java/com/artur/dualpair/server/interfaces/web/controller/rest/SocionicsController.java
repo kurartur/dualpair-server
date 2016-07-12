@@ -25,7 +25,7 @@ public class SocionicsController {
             Sociotype sociotype = socionicsTestService.evaluate(choices);
             return ResponseEntity.ok(new SociotypeDTOAssembler().toDTO(sociotype));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("evaluation_error", e.getMessage()));
+            return ResponseEntity.badRequest().body(ErrorResponse.from(e));
         }
     }
 

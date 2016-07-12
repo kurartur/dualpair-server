@@ -9,6 +9,8 @@ import com.artur.dualpair.server.service.user.SocialUserService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -56,7 +58,23 @@ public class UserControllerTest {
         sociotypes[0] = dto;
         Set<Sociotype.Code1> sociotypeCodes = new HashSet<>();
         sociotypeCodes.add(Sociotype.Code1.EII);
-        userController.setSociotypes(sociotypes);
+        ResponseEntity<Void> response = userController.setSociotypes(sociotypes);
         verify(socialUserService, times(1)).setUserSociotypes("1", sociotypeCodes);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals("/api/user", response.getHeaders().getLocation().toString());
+    }
+
+    @Test
+    public void testSetSociotypes_error() throws Exception {
+        SociotypeDTO dto = new SociotypeDTO();
+        dto.setCode1("EII");
+        SociotypeDTO[] sociotypes = new SociotypeDTO[1];
+        sociotypes[0] = dto;
+        Set<Sociotype.Code1> sociotypeCodes = new HashSet<>();
+        sociotypeCodes.add(Sociotype.Code1.EII);
+        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSociotypes("1", sociotypeCodes);
+        ResponseEntity<ErrorResponse> response = userController.setSociotypes(sociotypes);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Error", response.getBody().getErrorDescription());
     }
 }

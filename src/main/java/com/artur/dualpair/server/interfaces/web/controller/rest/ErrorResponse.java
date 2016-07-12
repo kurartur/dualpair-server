@@ -10,17 +10,21 @@ public class ErrorResponse {
     @JsonProperty("error_description")
     private String errorDescription;
 
-    public ErrorResponse(String error, String errorDescription) {
-        this.errorId = error;
+    public ErrorResponse(String errorDescription, String errorId) {
         this.errorDescription = errorDescription;
-    }
-
-    public String getError() {
-        return errorId;
+        this.errorId = errorId;
     }
 
     public String getErrorDescription() {
         return errorDescription;
+    }
+
+    public String getErrorId() {
+        return errorId;
+    }
+
+    public static ErrorResponse from(Exception e) {
+        return new ErrorResponse(e.getMessage(), e.getMessage());
     }
 
 }

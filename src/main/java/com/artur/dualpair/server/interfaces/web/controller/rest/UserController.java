@@ -7,12 +7,15 @@ import com.artur.dualpair.server.interfaces.dto.UserDTO;
 import com.artur.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
 import com.artur.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -40,9 +43,14 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/user/sociotypes")
-    public void setSociotypes(@RequestBody SociotypeDTO[] sociotypes) {
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        socialUserService.setUserSociotypes(user.getUserId(), convertToCodes(sociotypes));
+    public ResponseEntity setSociotypes(@RequestBody SociotypeDTO[] sociotypes) throws URISyntaxException {
+        try {
+            User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            socialUserService.setUserSociotypes(user.getUserId(), convertToCodes(sociotypes));
+            return ResponseEntity.created(new URI("/api/user")).build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ErrorResponse.from(e));
+        }
     }
 
     private Set<Sociotype.Code1> convertToCodes(SociotypeDTO[] sociotypes) {

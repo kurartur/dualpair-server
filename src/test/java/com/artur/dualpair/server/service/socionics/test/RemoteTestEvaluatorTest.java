@@ -7,6 +7,7 @@ import com.artur.dualpair.server.persistence.repository.ChoicePairRepository;
 import com.artur.dualpair.server.persistence.repository.ChoiceRepository;
 import com.artur.dualpair.server.persistence.repository.SociotypeRepository;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -60,7 +61,7 @@ public class RemoteTestEvaluatorTest {
     public void testEvaluate_noMatchInResponse() throws Exception {
         when(evaluateRequest.post(any(String.class))).thenReturn("<td valign=top><p class=zz>Ва социотип: <a href=http://socionika.info/tip/lse.html><u>логико-сенсорный экстраверт - \"Штирлиц\"</u></a></p><p><b>Социотип Вашего <a href=http://socionika.info/tip/dual.html><u>дуала</u></a>: <a href=http://socionika.info/tip/eii.html><u>этико-интуитивный интроверт - \"Достоевский\"</u></a></b></p><p><font color=red>");
         try {
-            remoteTestEvaluator.evaluate(new HashMap<String, String>());
+            remoteTestEvaluator.evaluate(new HashMap<>());
             fail();
         } catch (SocionicsTestException ste) {
             assertEquals(SocionicsTestException.codeNotFoundInResponse, ste.getMessage());
@@ -71,7 +72,7 @@ public class RemoteTestEvaluatorTest {
     public void testEvaluate_sociotypeNotFound() throws Exception {
         when(evaluateRequest.post(any(String.class))).thenReturn("<td valign=top><p class=zz>Ваш социотип: <a href=http://socionika.info/tip/eii.html><u>логико-сенсорный экстраверт - \"Штирлиц\"</u></a></p><p><b>Социотип Вашего <a href=http://socionika.info/tip/dual.html><u>дуала</u></a>: <a href=http://socionika.info/tip/eii.html><u>этико-интуитивный интроверт - \"Достоевский\"</u></a></b></p><p><font color=red>");
         try {
-            remoteTestEvaluator.evaluate(new HashMap<String, String>());
+            remoteTestEvaluator.evaluate(new HashMap<>());
             fail();
         } catch (SocionicsTestException ste) {
             assertEquals(SocionicsTestException.sociotypeNotFound, ste.getMessage());
@@ -82,7 +83,7 @@ public class RemoteTestEvaluatorTest {
     public void testEvalute_requestError() throws Exception {
         when(evaluateRequest.post(any(String.class))).thenThrow(new SocionicsTestException(SocionicsTestException.evaluateRequestError));
         try {
-            remoteTestEvaluator.evaluate(new HashMap<String, String>());
+            remoteTestEvaluator.evaluate(new HashMap<>());
             fail();
         } catch (SocionicsTestException ste) {
             assertEquals(SocionicsTestException.evaluateRequestError, ste.getMessage());
@@ -90,6 +91,7 @@ public class RemoteTestEvaluatorTest {
     }
 
     @Test
+    @Ignore
     public void testEvaluateRequest() throws Exception {
         RemoteTestEvaluator.EvaluateRequest evaluateRequest = new RemoteTestEvaluator.EvaluateRequest();
         String response = evaluateRequest.post("w1=on&w2=on&w4=on&w3=on&r1=10&r2=10&r3=10&r4=10&r5=10&r6=10&r7=10&l1=10&l2=10&l3=10&l4=10&l5=10&l6=10&l7=10&s1=10&s2=10&s3=10&s4=10&s5=10&s6=10&s7=10&e1=10&e2=10&e3=10&e4=10&e5=10&e6=10&e7=10&tip=cheb");

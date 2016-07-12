@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(Application.class)
@@ -98,9 +98,23 @@ public class ITUserControllerTest {
                     .with(bearerToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(data.getBytes()))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/api/user"))
+                .andExpect(content().string(""));
         jdbcTemplate.query("select s.code1 as code from users_sociotypes us inner join sociotypes s on s.id = us.sociotype_id where us.user_id=1", rs -> {
             assertEquals("EII", rs.getString("code"));
         });
+    }
+
+    @Test
+    public void testSetSociotypes_noCodes() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
+        String data = "[]";
+        mockMvc.perform(post("/api/user/sociotypes")
+                      .with(bearerToken)
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(data.getBytes()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string("{\"error_id\":\"Invalid sociotype code count. Must be 1 or 2\",\"error_description\":\"Invalid sociotype code count. Must be 1 or 2\"}"));
     }
 }
