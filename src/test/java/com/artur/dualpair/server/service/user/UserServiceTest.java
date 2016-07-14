@@ -142,7 +142,16 @@ public class UserServiceTest {
             assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
         }
         verify(userRepository, never()).save(any(User.class));
+    }
 
+    @Test
+    public void testSetUserDateOfBirth() throws Exception {
+        User user = new User();
+        Date date = new Date();
+        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
+        userService.setUserDateOfBirth("username", date);
+        verify(userRepository, times(1)).save(user);
+        assertEquals(date, user.getDateOfBirth());
     }
 
     private User createUser(Long id, String username, String email) {

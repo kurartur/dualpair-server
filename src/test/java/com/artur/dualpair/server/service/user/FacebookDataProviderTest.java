@@ -9,8 +9,10 @@ import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.UserOperations;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -38,7 +40,8 @@ public class FacebookDataProviderTest {
     @Test
     public void testEnhanceUser() throws Exception {
         when(facebookUser.getFirstName()).thenReturn("firstName");
-        when(facebookUser.getBirthday()).thenReturn(createFacebookUserBirthDate(false));
+        LocalDate dateOfBirth = createFacebookUserDateOfBirth(false);
+        when(facebookUser.getBirthday()).thenReturn(dateOfBirthToString(dateOfBirth, false));
         when(facebookUser.getGender()).thenReturn("male");
 
         User user = new User();
@@ -46,6 +49,7 @@ public class FacebookDataProviderTest {
         assertEquals("firstName", user.getName());
         assertEquals("email", user.getEmail());
         assertEquals((Integer) 5, user.getAge());
+        assertEquals(Date.from(dateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant()), user.getDateOfBirth());
         assertEquals(User.Gender.MALE, user.getGender());
     }
 
@@ -80,21 +84,26 @@ public class FacebookDataProviderTest {
     @Test
     public void testEnhanceUser_dateYearOnly() throws Exception {
         when(facebookUser.getGender()).thenReturn("male");
-        when(facebookUser.getBirthday()).thenReturn(createFacebookUserBirthDate(true));
+        LocalDate dateOfBirth = createFacebookUserDateOfBirth(true);
+        when(facebookUser.getBirthday()).thenReturn(dateOfBirthToString(dateOfBirth, true));
 
         User user = new User();
         facebookDataProvider.enhanceUser(user);
         assertEquals((Integer) 5, user.getAge());
     }
 
-    private String createFacebookUserBirthDate(boolean yearOnly) {
+    private LocalDate createFacebookUserDateOfBirth(boolean yearOnly) {
         LocalDate date = LocalDate.now().minus(5, ChronoUnit.YEARS);
         if (yearOnly) {
             date.withMonth(1).withDayOfMonth(1);
         } else {
             date.minus(1, ChronoUnit.DAYS);
         }
+        return date;
+    }
+
+    private String dateOfBirthToString(LocalDate dateOfBirth, boolean yearOnly) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(yearOnly ? "yyyy" : "MM/dd/yyyy");
-        return date.format(formatter);
+        return dateOfBirth.format(formatter);
     }
 }

@@ -10,6 +10,7 @@ import org.junit.Test;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
@@ -30,7 +31,7 @@ public class UserRepositoryImplTest {
     @Test
     public void testFindOpponent() throws Exception {
         User user = new User();
-        user.setAge(25);
+        user.setDateOfBirth(new Date());
         user.setGender(User.Gender.MALE);
         Sociotype sociotype = new Sociotype.Builder().code2(Sociotype.Code2.ISFJ).build();
         SearchParameters searchParameters = new SearchParameters();
@@ -49,14 +50,14 @@ public class UserRepositoryImplTest {
         verify(query, times(1)).setParameter("genders", genders);
         verify(query, times(1)).setParameter("sociotype", sociotype);
         verify(query, times(1)).setParameter("countryCode", "LT");
-        verify(query, times(1)).setParameter("userAge", 25);
+        verify(query, times(1)).setParameter("userAge", 0);
         verify(query, times(1)).setParameter("userGenderCode", "M");
     }
 
     @Test
     public void testFindOpponent_searchForMale() throws Exception {
         User user = new User();
-        user.setAge(25);
+        user.setDateOfBirth(new Date());
         user.setGender(User.Gender.MALE);
         Sociotype sociotype = new Sociotype.Builder().code2(Sociotype.Code2.ISFJ).build();
         SearchParameters searchParameters = new SearchParameters();
@@ -74,14 +75,14 @@ public class UserRepositoryImplTest {
         verify(query, times(1)).setParameter("genders", genders);
         verify(query, times(1)).setParameter("sociotype", sociotype);
         verify(query, times(1)).setParameter("countryCode", "LT");
-        verify(query, times(1)).setParameter("userAge", 25);
+        verify(query, times(1)).setParameter("userAge", 0);
         verify(query, times(1)).setParameter("userGenderCode", "M");
     }
 
     @Test
     public void testFindOpponent_searchForFemale() throws Exception {
         User user = new User();
-        user.setAge(25);
+        user.setDateOfBirth(new Date());
         user.setGender(User.Gender.MALE);
         Sociotype sociotype = new Sociotype.Builder().code2(Sociotype.Code2.ISFJ).build();
         SearchParameters searchParameters = new SearchParameters();
@@ -99,7 +100,7 @@ public class UserRepositoryImplTest {
         verify(query, times(1)).setParameter("genders", genders);
         verify(query, times(1)).setParameter("sociotype", sociotype);
         verify(query, times(1)).setParameter("countryCode", "LT");
-        verify(query, times(1)).setParameter("userAge", 25);
+        verify(query, times(1)).setParameter("userAge", 0);
         verify(query, times(1)).setParameter("userGenderCode", "M");
     }
 

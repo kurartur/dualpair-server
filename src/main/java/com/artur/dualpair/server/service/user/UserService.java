@@ -89,6 +89,12 @@ public class UserService implements UserDetailsService {
         updateUser(user);
     }
 
+    public void setUserDateOfBirth(String userId, Date date) {
+        User user = loadUserByUserId(userId);
+        user.setDateOfBirth(date);
+        updateUser(user);
+    }
+
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;

@@ -26,7 +26,7 @@ public class UserRepositoryImpl implements CustomUserRepository {
                 "where opp not in (\n" +
                 "   select m.opponent from Match as m where m.user = :user\n" +
                 ")\n" +
-                "   and opp.age >= :minAge and opp.age <= :maxAge\n" +
+                "   and opp.ageInfo.age >= :minAge and opp.ageInfo.age <= :maxAge\n" +
                 "   and opp.gender in :genders\n" +
                 "   and :sociotype member of opp.sociotypes\n" +
                 "   and opp <> :user\n" +

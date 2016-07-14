@@ -50,7 +50,8 @@ public class User implements SocialUserDetails, Serializable {
 
     private String name;
 
-    private Integer age;
+    @Embedded
+    private AgeInfo ageInfo = new AgeInfo(null);
 
     private Gender gender;
 
@@ -152,11 +153,15 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public Integer getAge() {
-        return age;
+        return ageInfo == null ? null : ageInfo.getAge(); // TODO why ageInfo is null?
     }
 
-    public void setAge(Integer age) {
-        this.age = age;
+    public Date getDateOfBirth() {
+        return ageInfo == null ? null : ageInfo.getDateOfBirth(); // TODO why ageInfo is null?
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.ageInfo = new AgeInfo(dateOfBirth);
     }
 
     public Gender getGender() {

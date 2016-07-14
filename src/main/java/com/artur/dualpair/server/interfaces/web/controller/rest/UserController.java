@@ -7,20 +7,16 @@ import com.artur.dualpair.server.interfaces.dto.UserDTO;
 import com.artur.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
 import com.artur.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -60,6 +56,17 @@ public class UserController {
             codes.add(code);
         }
         return codes;
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/user/date-of-birth")
+    public ResponseEntity setDateOfBirth(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth) {
+        try {
+            User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            socialUserService.setUserDateOfBirth(user.getUserId(), dateOfBirth);
+            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/user")).build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ErrorResponse.from(e));
+        }
     }
 
     @Autowired

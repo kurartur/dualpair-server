@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -76,5 +77,24 @@ public class UserControllerTest {
         ResponseEntity<ErrorResponse> response = userController.setSociotypes(sociotypes);
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Error", response.getBody().getErrorDescription());
+    }
+
+    @Test
+    public void testSetDateOfBirth() throws Exception {
+        Date dateOfBirth = new Date();
+        ResponseEntity responseEntity = userController.setDateOfBirth(dateOfBirth);
+        verify(socialUserService, times(1)).setUserDateOfBirth("1", dateOfBirth);
+        assertEquals(HttpStatus.SEE_OTHER, responseEntity.getStatusCode());
+        assertEquals("/api/user", responseEntity.getHeaders().getLocation().toString());
+    }
+
+    @Test
+    public void testSetDateOfBirth_exception() throws Exception {
+        Date dateOfBirth = new Date();
+        doThrow(new RuntimeException("Error")).when(socialUserService).setUserDateOfBirth("1", dateOfBirth);
+        ResponseEntity<ErrorResponse> responseEntity = userController.setDateOfBirth(dateOfBirth);
+        verify(socialUserService, times(1)).setUserDateOfBirth("1", dateOfBirth);
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Error", responseEntity.getBody().getErrorDescription());
     }
 }

@@ -20,6 +20,7 @@ public class UserDTOAssembler extends DTOAssembler<User, UserDTO> {
     public UserDTO toDTO(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setName(user.getName());
+        userDTO.setDateOfBirth(user.getDateOfBirth());
         userDTO.setAge(user.getAge());
         userDTO.setSociotypes(sociotypeDTOAssembler.toDTOSet(user.getSociotypes()));
         return userDTO;

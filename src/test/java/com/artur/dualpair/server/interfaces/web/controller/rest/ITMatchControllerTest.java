@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -251,9 +252,8 @@ public class ITMatchControllerTest {
                 .andExpect(status().isSeeOther())
                 .andExpect(header().string("Location", "/api/match/1"));
         flushPersistenceContext();
-        jdbcTemplate.query("select response from matches where user_id=1", rs -> {
-            assertEquals("2", rs.getString("response"));
-        });
+        Map<String, Object> rs = jdbcTemplate.queryForMap("select response from matches where user_id=1");
+        assertEquals(2, rs.get("response"));
     }
 
     @Test
@@ -264,9 +264,8 @@ public class ITMatchControllerTest {
                  .andExpect(status().isSeeOther())
                  .andExpect(header().string("Location", "/api/match/1"));
         flushPersistenceContext();
-        jdbcTemplate.query("select response from matches where user_id=1", rs -> {
-            assertEquals("1", rs.getString("response"));
-        });
+        Map<String, Object> rs = jdbcTemplate.queryForMap("select response from matches where user_id=1");
+        assertEquals(1, rs.get("response"));
     }
 
     @Test

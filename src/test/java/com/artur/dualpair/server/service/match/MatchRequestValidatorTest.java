@@ -6,6 +6,7 @@ import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
 import org.junit.Test;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +40,7 @@ public class MatchRequestValidatorTest {
             assertEquals("User must provide age", mre.getMessage());
         }
 
-        user.setAge(25);
+        user.setDateOfBirth(new Date());
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();

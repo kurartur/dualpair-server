@@ -1,11 +1,16 @@
 package com.artur.dualpair.server.interfaces.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 public class UserDTO {
 
     private String name;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private Date dateOfBirth;
     private Integer age;
     private String description;
     private Set<SociotypeDTO> sociotypes = new HashSet<>();
@@ -16,6 +21,14 @@ public class UserDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public Integer getAge() {
