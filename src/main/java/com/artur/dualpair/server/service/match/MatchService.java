@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Set;
 
 @Service
 public class MatchService {
@@ -49,6 +50,19 @@ public class MatchService {
         if (match == null)
             throw new IllegalArgumentException("Match #" + matchId + " not found");
         return match;
+    }
+
+    public Match getUserMatch(Long matchId, String username) {
+        Match match = findNotNullMatch(matchId);
+        if (!match.getUser().getUsername().equals(username)) {
+            throw new IllegalArgumentException("Invalid user");
+        }
+        return match;
+    }
+
+    public Set<Match> getUserMatches(String username) {
+        User user = userService.loadUserByUsername(username);
+        return matchRepository.findByUser(user);
     }
 
     @Autowired

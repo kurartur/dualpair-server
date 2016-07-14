@@ -35,6 +35,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -230,8 +231,7 @@ public class ITMatchControllerTest {
 
     @Test
     public void testResponse_unauthorized() throws Exception {
-        mockMvc.perform(post("/api/match/1/response?response=YES")
-                .content("YES"))
+        mockMvc.perform(post("/api/match/1/response?response=YES"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -248,7 +248,8 @@ public class ITMatchControllerTest {
     public void testResponse_undefinedToYes() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L));
         mockMvc.perform(post("/api/match/1/response?response=YES").with(bearerToken))
-                .andExpect(status().isOk());
+                .andExpect(status().isSeeOther())
+                .andExpect(header().string("Location", "/api/match/1"));
         flushPersistenceContext();
         jdbcTemplate.query("select response from matches where user_id=1", rs -> {
             assertEquals("2", rs.getString("response"));
@@ -260,11 +261,39 @@ public class ITMatchControllerTest {
     public void testResponse_undefinedToNo() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L));
         mockMvc.perform(post("/api/match/1/response?response=NO").with(bearerToken))
-                .andExpect(status().isOk());
+                 .andExpect(status().isSeeOther())
+                 .andExpect(header().string("Location", "/api/match/1"));
         flushPersistenceContext();
         jdbcTemplate.query("select response from matches where user_id=1", rs -> {
             assertEquals("1", rs.getString("response"));
         });
+    }
+
+    @Test
+    public void testMatch_unauthorized() throws Exception {
+        mockMvc.perform(get("/api/match/1"))
+          .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DatabaseSetup(value = "matchTest_match.xml")
+    public void testMatch_forbidden() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(2L));
+        mockMvc.perform(get("/api/match/1").with(bearerToken))
+          .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DatabaseSetup(value = "matchTest_match.xml")
+    public void testMatch() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L));
+        MvcResult result = mockMvc.perform(get("/api/match/1").with(bearerToken))
+          .andExpect(status().isOk())
+          .andReturn();
+        String content = result.getResponse().getContentAsString();
+        MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
+        assertEquals("Artur", matchDTO.getUser().getName());
+        assertEquals("Linda", matchDTO.getOpponent().getName());
     }
 
     private void flushPersistenceContext() {

@@ -3,11 +3,20 @@ package com.artur.dualpair.server.domain.model.match;
 import com.artur.dualpair.server.domain.model.user.User;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "search_parameters")
-public class SearchParameters {
+public class SearchParameters implements Serializable {
 
     @Id @GeneratedValue(generator = "customForeignGenerator")
     @org.hibernate.annotations.GenericGenerator(

@@ -14,8 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class MatchControllerTest {
@@ -38,24 +41,36 @@ public class MatchControllerTest {
 
     @Test
     public void testResponse() throws Exception {
-        matchController.response(1L, "YES");
+        ResponseEntity responseEntity = matchController.response(1L, "YES");
         verify(matchService, times(1)).responseByUser(1L, Match.Response.YES, "username");
+        assertEquals(HttpStatus.SEE_OTHER, responseEntity.getStatusCode());
+        assertEquals("/api/match/1", responseEntity.getHeaders().getLocation().toString());
     }
 
     @Test
     public void testResponse_invalidUser() throws Exception {
         doThrow(new IllegalArgumentException("Invalid user")).when(matchService).responseByUser(1L, Match.Response.YES, "username");
-        try {
-            matchController.response(1L, "YES");
-            fail();
-        } catch (InsufficientPrivilegesException ipe) {
-            assertEquals(InsufficientPrivilegesException.illegalAccess, ipe.getMessage());
-        }
+        ResponseEntity<ErrorResponse> responseEntity = matchController.response(1L, "YES");
+        verify(matchService, times(1)).responseByUser(1L, Match.Response.YES, "username");
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+        assertEquals("Invalid user", responseEntity.getBody().getErrorDescription());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void testResponse_exception() throws Exception {
+        doThrow(new RuntimeException("Error")).when(matchService).responseByUser(1L, Match.Response.YES, "username");
+        ResponseEntity<ErrorResponse> responseEntity = matchController.response(1L, "YES");
+        verify(matchService, times(1)).responseByUser(1L, Match.Response.YES, "username");
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertEquals("Error", responseEntity.getBody().getErrorDescription());
+    }
+
+    @Test
     public void testResponse_invalidResponseValue() throws Exception {
-        matchController.response(1L, "INVALID");
+        ResponseEntity<ErrorResponse> responseEntity = matchController.response(1L, "INVALID");
+        verify(matchService, times(0)).responseByUser(any(Long.class), any(Match.Response.class), any(String.class));
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        assertTrue(responseEntity.getBody().getErrorDescription().contains("No enum constant"));
     }
 
     @Test
@@ -85,8 +100,46 @@ public class MatchControllerTest {
     }
 
     @Test
-    public void testList() throws Exception {
+    public void testMatch_exception() throws Exception {
+        doThrow(new RuntimeException("Error")).when(matchService).getUserMatch(1L, "username");
+        ResponseEntity<ErrorResponse> response = matchController.match(1L);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Error", response.getBody().getErrorDescription());
+    }
 
+    @Test
+    public void testMatch_forbidden() throws Exception {
+        doThrow(new IllegalArgumentException("Invalid user")).when(matchService).getUserMatch(1L, "username");
+        ResponseEntity<ErrorResponse> response = matchController.match(1L);
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals("Invalid user", response.getBody().getErrorDescription());
+    }
+
+    @Test
+    public void testMatch() throws Exception {
+        MatchDTO matchDTO = new MatchDTO();
+        Match match = new Match();
+        doReturn(match).when(matchService).getUserMatch(1L, "username");
+        doReturn(matchDTO).when(matchDTOAssembler).toDTO(match);
+        ResponseEntity<MatchDTO> response = matchController.match(1L);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(matchDTO, response.getBody());
+    }
+
+    @Test
+    public void testMatches() throws Exception {
+        MatchDTO matchDTO = new MatchDTO();
+        Set<MatchDTO> matchDTOs = new HashSet<>();
+        matchDTOs.add(matchDTO);
+        Match match = new Match();
+        Set<Match> matches = new HashSet<>();
+        matches.add(match);
+        doReturn(matches).when(matchService).getUserMatches("username");
+        doReturn(matchDTOs).when(matchDTOAssembler).toDTOSet(matches);
+        ResponseEntity<Set<MatchDTO>> response = matchController.matches();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(matchDTOs, response.getBody());
+        assertEquals(1, response.getBody().size());
     }
 
     private User crateUser(Long id, String username) {

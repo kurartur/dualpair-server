@@ -12,4 +12,7 @@ public interface MatchRepository extends CrudRepository<Match, Long> {
     @Query("select m from Match m where m.opponent = ?1")
     Set<Match> findByOpponent(User opponent);
 
+    @Query("select m from Match m where m.user = ?1")
+    Set<Match> findByUser(User user);
+
 }

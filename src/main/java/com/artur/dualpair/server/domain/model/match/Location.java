@@ -2,9 +2,10 @@ package com.artur.dualpair.server.domain.model.match;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.io.Serializable;
 
 @Embeddable
-public class Location {
+public class Location implements Serializable {
 
     private double latitude;
 
