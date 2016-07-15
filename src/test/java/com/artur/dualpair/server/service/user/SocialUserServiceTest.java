@@ -1,5 +1,6 @@
 package com.artur.dualpair.server.service.user;
 
+import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.domain.model.user.UserAccount;
 import com.artur.dualpair.server.persistence.repository.UserRepository;
@@ -7,6 +8,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.Connection;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -67,7 +72,13 @@ public class SocialUserServiceTest {
     @Test
     public void testLoadOrCreate() throws Exception {
         FacebookDataProvider facebookDataProvider = mock(FacebookDataProvider.class);
-        when(facebookDataProvider.enhanceUser(any(User.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
+        Date dateOfBirth = Date.from(LocalDate.now().minus(5, ChronoUnit.YEARS).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        when(facebookDataProvider.enhanceUser(any(User.class))).thenAnswer(invocation -> {
+            User user = (User)invocation.getArguments()[0];
+            user.setDateOfBirth(dateOfBirth);
+            user.setGender(User.Gender.MALE);
+            return user;
+        });
         when(facebookDataProvider.getAccountId()).thenReturn("111");
         when(socialDataProviderFactory.getProvider(any(Connection.class))).thenReturn(facebookDataProvider);
         when(userRepository.findByAccountId("111", UserAccount.Type.FACEBOOK)).thenReturn(Optional.<User>empty());
@@ -81,5 +92,11 @@ public class SocialUserServiceTest {
         assertNotNull(resultUser.getUserId());
         assertNotNull(resultUser.getCreated());
         assertNotNull(resultUser.getUpdated());
+        SearchParameters searchParameters = resultUser.getSearchParameters();
+        assertNotNull(searchParameters);
+        assertEquals(2, searchParameters.getMinAge());
+        assertEquals(8, searchParameters.getMaxAge());
+        assertTrue(searchParameters.getSearchFemale());
+        assertFalse(searchParameters.getSearchMale());
     }
 }

@@ -1,5 +1,6 @@
 package com.artur.dualpair.server.service.user;
 
+import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.domain.model.user.UserAccount;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import java.util.Set;
 public class SocialUserService extends UserService implements SocialUserDetailsService {
 
     private static final Logger logger = LoggerFactory.getLogger(SocialUserService.class.getName());
+    private static final Integer DEFAULT_SEARCH_AGE_GAP = 3;
 
     private SocialDataProviderFactory socialDataProviderFactory;
 
@@ -48,8 +50,24 @@ public class SocialUserService extends UserService implements SocialUserDetailsS
         } else {
             User newUser = buildUser(accountId, accountType);
             newUser = socialDataProvider.enhanceUser(newUser);
+            setDefaultSearchParameters(newUser);
             userRepository.save(newUser);
             return newUser;
+        }
+    }
+
+    private void setDefaultSearchParameters(User user) {
+        SearchParameters searchParameters = user.getSearchParameters();
+        if (user.getAge() != null) {
+            searchParameters.setMinAge(user.getAge() - DEFAULT_SEARCH_AGE_GAP);
+            searchParameters.setMaxAge(user.getAge() + DEFAULT_SEARCH_AGE_GAP);
+        }
+        if (user.getGender() == User.Gender.MALE) {
+            searchParameters.setSearchFemale(true);
+            searchParameters.setSearchMale(false);
+        } else {
+            searchParameters.setSearchMale(true);
+            searchParameters.setSearchFemale(false);
         }
     }
 
