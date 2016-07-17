@@ -11,9 +11,12 @@ public class UserDTOAssembler extends DTOAssembler<User, UserDTO> {
 
     private SociotypeDTOAssembler sociotypeDTOAssembler;
 
+    private SearchParametersDTOAssembler searchParametersDTOAssembler;
+
     @Inject
-    public UserDTOAssembler(SociotypeDTOAssembler sociotypeDTOAssembler) {
+    public UserDTOAssembler(SociotypeDTOAssembler sociotypeDTOAssembler, SearchParametersDTOAssembler searchParametersDTOAssembler) {
         this.sociotypeDTOAssembler = sociotypeDTOAssembler;
+        this.searchParametersDTOAssembler = searchParametersDTOAssembler;
     }
 
     @Override
@@ -23,6 +26,9 @@ public class UserDTOAssembler extends DTOAssembler<User, UserDTO> {
         userDTO.setDateOfBirth(user.getDateOfBirth());
         userDTO.setAge(user.getAge());
         userDTO.setSociotypes(sociotypeDTOAssembler.toDTOSet(user.getSociotypes()));
+        if (user.getSearchParameters() != null) {
+            userDTO.setSearchParameters(searchParametersDTOAssembler.toDTO(user.getSearchParameters()));
+        }
         return userDTO;
     }
 

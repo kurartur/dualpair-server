@@ -83,11 +83,8 @@ public class ITMatchControllerTest {
     @DatabaseSetup(value = "matchTest_next_noMatches.xml")
     public void testNext_noMatches() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L));
-        MvcResult result = mockMvc.perform(get("/api/match/next").with(bearerToken))
-                .andExpect(status().isOk())
-                .andReturn();
-        String content = result.getResponse().getContentAsString();
-        assertEquals("No matches", content);
+        mockMvc.perform(get("/api/match/next").with(bearerToken))
+                .andExpect(status().isNotFound());
     }
 
     @Test

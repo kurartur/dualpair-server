@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -37,7 +38,11 @@ public class SocionicsControllerTest {
     @Test
     public void testEvaluateTest_exception() throws Exception {
         doThrow(new IllegalArgumentException("Error")).when(socionicsTestService).evaluate(any(Map.class));
-        ResponseEntity response = socionicsController.evaluateTest(new HashMap<>());
-        assertEquals("Error", ((ErrorResponse)response.getBody()).getErrorDescription());
+        try {
+            socionicsController.evaluateTest(new HashMap<>());
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("Error", iae.getMessage());
+        }
     }
 }

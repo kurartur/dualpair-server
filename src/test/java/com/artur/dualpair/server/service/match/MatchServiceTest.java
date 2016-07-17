@@ -5,6 +5,7 @@ import com.artur.dualpair.server.domain.model.match.DefaultMatchFinder;
 import com.artur.dualpair.server.domain.model.match.RepositoryMatchFinder;
 import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.user.User;
+import com.artur.dualpair.server.interfaces.web.controller.rest.ForbiddenException;
 import com.artur.dualpair.server.persistence.repository.MatchRepository;
 import com.artur.dualpair.server.service.user.UserService;
 import org.junit.Before;
@@ -110,8 +111,8 @@ public class MatchServiceTest {
         try {
             matchService.responseByUser(1L, Match.Response.YES, "otherUserId");
             fail();
-        } catch (IllegalArgumentException iae) {
-            assertEquals("Invalid user", iae.getMessage());
+        } catch (ForbiddenException fe) {
+            assertEquals("Invalid user", fe.getMessage());
         }
         verify(matchRepository, never()).save(match);
         assertEquals(Match.Response.UNDEFINED, match.getResponse());
@@ -126,8 +127,8 @@ public class MatchServiceTest {
         try {
             matchService.getUserMatch(1L, "username");
             fail();
-        } catch (IllegalArgumentException iae) {
-            assertEquals("Invalid user", iae.getMessage());
+        } catch (ForbiddenException fe) {
+            assertEquals("Invalid user", fe.getMessage());
         }
     }
 

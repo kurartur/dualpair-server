@@ -1,5 +1,6 @@
 package com.artur.dualpair.server.service.user;
 
+import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.persistence.repository.SociotypeRepository;
@@ -152,6 +153,17 @@ public class UserServiceTest {
         userService.setUserDateOfBirth("username", date);
         verify(userRepository, times(1)).save(user);
         assertEquals(date, user.getDateOfBirth());
+    }
+
+    @Test
+    public void testSetUserSearchParameters() throws Exception {
+        User user = new User();
+        SearchParameters searchParameters = new SearchParameters();
+        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
+        userService.setUserSearchParameters("username", searchParameters);
+        assertEquals(searchParameters, user.getSearchParameters());
+        assertEquals(user, searchParameters.getUser());
+        verify(userRepository, times(1)).save(user);
     }
 
     private User createUser(Long id, String username, String email) {

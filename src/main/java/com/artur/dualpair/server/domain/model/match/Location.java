@@ -7,26 +7,26 @@ import java.io.Serializable;
 @Embeddable
 public class Location implements Serializable {
 
-    private double latitude;
+    private Double latitude;
 
-    private double longitude;
+    private Double longitude;
 
     @Column(name = "country_code")
     private String countryCode;
 
     private Location() {}
 
-    public Location(double latitude, double longitude, String countryCode) {
+    public Location(Double latitude, Double longitude, String countryCode) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.countryCode = countryCode;
     }
 
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 

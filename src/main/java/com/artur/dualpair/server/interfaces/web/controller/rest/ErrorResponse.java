@@ -1,30 +1,26 @@
 package com.artur.dualpair.server.interfaces.web.controller.rest;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.http.HttpStatus;
 
 public class ErrorResponse {
 
-    @JsonProperty("error_id")
-    private String errorId;
+    private int statusCode;
+    private String message;
 
-    @JsonProperty("error_description")
-    private String errorDescription;
-
-    public ErrorResponse(String errorDescription, String errorId) {
-        this.errorDescription = errorDescription;
-        this.errorId = errorId;
+    public ErrorResponse(String message, int statusCode) {
+        this.message = message;
+        this.statusCode = statusCode;
     }
 
-    public String getErrorDescription() {
-        return errorDescription;
+    public int getStatusCode() {
+        return statusCode;
     }
 
-    public String getErrorId() {
-        return errorId;
+    public String getMessage() {
+        return message;
     }
 
-    public static ErrorResponse from(Exception e) {
-        return new ErrorResponse(e.getMessage(), e.getMessage());
+    public static ErrorResponse from(Exception e, HttpStatus httpStatus) {
+        return new ErrorResponse(e.getMessage(), httpStatus.value());
     }
-
 }

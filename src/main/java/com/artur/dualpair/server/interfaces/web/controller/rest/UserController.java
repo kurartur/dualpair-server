@@ -2,8 +2,10 @@ package com.artur.dualpair.server.interfaces.web.controller.rest;
 
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
+import com.artur.dualpair.server.interfaces.dto.SearchParametersDTO;
 import com.artur.dualpair.server.interfaces.dto.SociotypeDTO;
 import com.artur.dualpair.server.interfaces.dto.UserDTO;
+import com.artur.dualpair.server.interfaces.dto.assembler.SearchParametersDTOAssembler;
 import com.artur.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
 import com.artur.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +26,11 @@ public class UserController {
 
     private SocialUserService socialUserService;
     private UserDTOAssembler userDTOAssembler;
+    private SearchParametersDTOAssembler searchParametersDTOAssembler;
 
     @RequestMapping(method = RequestMethod.GET, value = "/user")
     public UserDTO getUser() {
-        User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userDTOAssembler.toDTO(socialUserService.getUser(user.getUserId()));
+        return userDTOAssembler.toDTO(socialUserService.getUser(getUserPrincipal().getUserId()));
     }
 
     @RequestMapping("/api/me")
@@ -40,13 +42,8 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST, value = "/user/sociotypes")
     public ResponseEntity setSociotypes(@RequestBody SociotypeDTO[] sociotypes) throws URISyntaxException {
-        try {
-            User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            socialUserService.setUserSociotypes(user.getUserId(), convertToCodes(sociotypes));
-            return ResponseEntity.created(new URI("/api/user")).build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ErrorResponse.from(e));
-        }
+        socialUserService.setUserSociotypes(getUserPrincipal().getUserId(), convertToCodes(sociotypes));
+        return ResponseEntity.created(new URI("/api/user")).build();
     }
 
     private Set<Sociotype.Code1> convertToCodes(SociotypeDTO[] sociotypes) {
@@ -59,14 +56,19 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/user/date-of-birth")
-    public ResponseEntity setDateOfBirth(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth) {
-        try {
-            User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            socialUserService.setUserDateOfBirth(user.getUserId(), dateOfBirth);
-            return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/user")).build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ErrorResponse.from(e));
-        }
+    public ResponseEntity setDateOfBirth(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth) throws URISyntaxException {
+        socialUserService.setUserDateOfBirth(getUserPrincipal().getUserId(), dateOfBirth);
+        return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/user")).build();
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/user/search-parameters")
+    public ResponseEntity setSearchParameters(@RequestBody SearchParametersDTO searchParameters) throws URISyntaxException {
+        socialUserService.setUserSearchParameters(getUserPrincipal().getUsername(), searchParametersDTOAssembler.toEntity(searchParameters));
+        return ResponseEntity.created(new URI("/api/user")).build();
+    }
+
+    private User getUserPrincipal() {
+        return (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @Autowired
@@ -77,5 +79,10 @@ public class UserController {
     @Autowired
     public void setUserDTOAssembler(UserDTOAssembler userDTOAssembler) {
         this.userDTOAssembler = userDTOAssembler;
+    }
+
+    @Autowired
+    public void setSearchParametersDTOAssembler(SearchParametersDTOAssembler searchParametersDTOAssembler) {
+        this.searchParametersDTOAssembler = searchParametersDTOAssembler;
     }
 }

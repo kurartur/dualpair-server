@@ -14,6 +14,7 @@ public class UserDTO {
     private Integer age;
     private String description;
     private Set<SociotypeDTO> sociotypes = new HashSet<>();
+    private SearchParametersDTO searchParameters;
 
     public String getName() {
         return name;
@@ -53,5 +54,13 @@ public class UserDTO {
 
     public void setSociotypes(Set<SociotypeDTO> sociotypes) {
         this.sociotypes = sociotypes;
+    }
+
+    public SearchParametersDTO getSearchParameters() {
+        return searchParameters;
+    }
+
+    public void setSearchParameters(SearchParametersDTO searchParameters) {
+        this.searchParameters = searchParameters;
     }
 }

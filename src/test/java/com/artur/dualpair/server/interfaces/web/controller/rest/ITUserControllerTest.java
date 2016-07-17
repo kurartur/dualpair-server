@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -129,7 +130,7 @@ public class ITUserControllerTest {
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(data.getBytes()))
                     .andExpect(status().isBadRequest())
-                    .andExpect(content().string("{\"error_id\":\"Invalid sociotype code count. Must be 1 or 2\",\"error_description\":\"Invalid sociotype code count. Must be 1 or 2\"}"));
+                    .andExpect(content().string("{\"statusCode\":400,\"message\":\"Invalid sociotype code count. Must be 1 or 2\"}"));
     }
 
     @Test
@@ -144,6 +145,27 @@ public class ITUserControllerTest {
         flushPersistenceContext();
         Date persistedDate = jdbcTemplate.queryForObject("select date_of_birth from users where id=1", Date.class);
         assertEquals(Date.from(LocalDate.of(1990, 2, 3).atStartOfDay(ZoneId.systemDefault()).toInstant()), persistedDate);
+    }
+
+    @Test
+    @DatabaseSetup("userTest_setSearchParameters.xml")
+    public void testSetSearchParameters() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
+        String data = "{\"searchMale\":true,\"searchFemale\":true,\"minAge\":\"20\",\"maxAge\":\"30\"}";
+        mockMvc.perform(post("/api/user/search-parameters")
+                    .with(bearerToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(data.getBytes()))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/api/user"))
+                .andExpect(content().string(""));
+        flushPersistenceContext();
+        Map<String, Object> searchParameters = jdbcTemplate.queryForMap("select * from search_parameters where user_id=1");
+        assertFalse(searchParameters.isEmpty());
+        assertEquals("Y", searchParameters.get("search_male"));
+        assertEquals("Y", searchParameters.get("search_female"));
+        assertEquals(20, searchParameters.get("min_age"));
+        assertEquals(30, searchParameters.get("max_age"));
     }
 
     private void flushPersistenceContext() {

@@ -81,7 +81,7 @@ public class MatchRequestValidatorTest {
             assertEquals("Invalid search parameters: location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(0, 0, ""));
+        searchParameters.setLocation(new Location(0.0, 0.0, ""));
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();
@@ -89,7 +89,7 @@ public class MatchRequestValidatorTest {
             assertEquals("Invalid search parameters: location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(0, 0, "LT"));
+        searchParameters.setLocation(new Location(0.0, 0.0, "LT"));
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();
@@ -97,7 +97,7 @@ public class MatchRequestValidatorTest {
             assertEquals("Invalid search parameters: location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(1, 0, "LT"));
+        searchParameters.setLocation(new Location(1.0, 0.0, "LT"));
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();
@@ -105,7 +105,7 @@ public class MatchRequestValidatorTest {
             assertEquals("Invalid search parameters: location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(1, 1, "LT"));
+        searchParameters.setLocation(new Location(1.0, 1.0, "LT"));
         validator.validateMatchRequest(user, searchParameters);
     }
 }

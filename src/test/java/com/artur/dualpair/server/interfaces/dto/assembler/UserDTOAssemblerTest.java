@@ -1,5 +1,6 @@
 package com.artur.dualpair.server.interfaces.dto.assembler;
 
+import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.interfaces.dto.UserDTO;
@@ -18,7 +19,7 @@ public class UserDTOAssemblerTest {
 
     @Before
     public void setUp() throws Exception {
-        userDTOAssembler = new UserDTOAssembler(new SociotypeDTOAssembler());
+        userDTOAssembler = new UserDTOAssembler(new SociotypeDTOAssembler(), new SearchParametersDTOAssembler());
     }
 
     @Test
@@ -28,11 +29,15 @@ public class UserDTOAssemblerTest {
         Date birthday = new Date();
         user.setDateOfBirth(birthday);
         user.setSociotypes(createSociotypes(Sociotype.Code1.EII));
+        SearchParameters searchParameters = new SearchParameters();
+        searchParameters.setMinAge(20);
+        user.setSearchParameters(searchParameters);
         UserDTO userDTO = userDTOAssembler.toDTO(user);
         assertEquals("name", userDTO.getName());
         assertEquals((Integer)0, userDTO.getAge());
         assertEquals("EII", userDTO.getSociotypes().iterator().next().getCode1());
         assertEquals(birthday, userDTO.getDateOfBirth());
+        assertEquals((Integer)20, userDTO.getSearchParameters().getMinAge());
     }
 
     private Set<Sociotype> createSociotypes(Sociotype.Code1 code1) {

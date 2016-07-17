@@ -1,5 +1,6 @@
 package com.artur.dualpair.server.service.user;
 
+import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.persistence.repository.SociotypeRepository;
@@ -92,6 +93,13 @@ public class UserService implements UserDetailsService {
     public void setUserDateOfBirth(String userId, Date date) {
         User user = loadUserByUserId(userId);
         user.setDateOfBirth(date);
+        updateUser(user);
+    }
+
+    public void setUserSearchParameters(String username, SearchParameters searchParameters) {
+        User user = loadUserByUsername(username);
+        user.setSearchParameters(searchParameters);
+        searchParameters.setUser(user);
         updateUser(user);
     }
 

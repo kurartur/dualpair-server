@@ -1,9 +1,12 @@
 package com.artur.dualpair.server.interfaces.web.controller.rest;
 
+import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
+import com.artur.dualpair.server.interfaces.dto.SearchParametersDTO;
 import com.artur.dualpair.server.interfaces.dto.SociotypeDTO;
 import com.artur.dualpair.server.interfaces.dto.UserDTO;
+import com.artur.dualpair.server.interfaces.dto.assembler.SearchParametersDTOAssembler;
 import com.artur.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
 import com.artur.dualpair.server.service.user.SocialUserService;
 import org.junit.After;
@@ -19,6 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 public class UserControllerTest {
@@ -26,11 +30,13 @@ public class UserControllerTest {
     private UserController userController = new UserController();
     private SocialUserService socialUserService = mock(SocialUserService.class);
     private UserDTOAssembler userDTOAssembler = mock(UserDTOAssembler.class);
+    private SearchParametersDTOAssembler searchParametersDTOAssembler = mock(SearchParametersDTOAssembler.class);
 
     @Before
     public void setUp() throws Exception {
         userController.setSocialUserService(socialUserService);
         userController.setUserDTOAssembler(userDTOAssembler);
+        userController.setSearchParametersDTOAssembler(searchParametersDTOAssembler);
         User user = new User();
         user.setId(1L);
         user.setUsername("1");
@@ -59,7 +65,7 @@ public class UserControllerTest {
         sociotypes[0] = dto;
         Set<Sociotype.Code1> sociotypeCodes = new HashSet<>();
         sociotypeCodes.add(Sociotype.Code1.EII);
-        ResponseEntity<Void> response = userController.setSociotypes(sociotypes);
+        ResponseEntity response = userController.setSociotypes(sociotypes);
         verify(socialUserService, times(1)).setUserSociotypes("1", sociotypeCodes);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("/api/user", response.getHeaders().getLocation().toString());
@@ -74,9 +80,12 @@ public class UserControllerTest {
         Set<Sociotype.Code1> sociotypeCodes = new HashSet<>();
         sociotypeCodes.add(Sociotype.Code1.EII);
         doThrow(new RuntimeException("Error")).when(socialUserService).setUserSociotypes("1", sociotypeCodes);
-        ResponseEntity<ErrorResponse> response = userController.setSociotypes(sociotypes);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Error", response.getBody().getErrorDescription());
+        try {
+            userController.setSociotypes(sociotypes);
+            fail();
+        } catch (RuntimeException re) {
+            assertEquals("Error", re.getMessage());
+        }
     }
 
     @Test
@@ -92,9 +101,35 @@ public class UserControllerTest {
     public void testSetDateOfBirth_exception() throws Exception {
         Date dateOfBirth = new Date();
         doThrow(new RuntimeException("Error")).when(socialUserService).setUserDateOfBirth("1", dateOfBirth);
-        ResponseEntity<ErrorResponse> responseEntity = userController.setDateOfBirth(dateOfBirth);
+        try {
+            userController.setDateOfBirth(dateOfBirth);
+            fail();
+        } catch (RuntimeException re) {
+            assertEquals("Error", re.getMessage());
+        }
         verify(socialUserService, times(1)).setUserDateOfBirth("1", dateOfBirth);
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals("Error", responseEntity.getBody().getErrorDescription());
+    }
+
+    @Test
+    public void testSetSearchParameters_exception() throws Exception {
+        SearchParameters searchParameters = new SearchParameters();
+        SearchParametersDTO searchParametersDTO = new SearchParametersDTO();
+        when(searchParametersDTOAssembler.toEntity(searchParametersDTO)).thenReturn(searchParameters);
+        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSearchParameters("1", searchParameters);
+        try {
+            userController.setSearchParameters(searchParametersDTO);
+            fail();
+        } catch (RuntimeException re) {
+            assertEquals("Error", re.getMessage());
+        }
+    }
+
+    @Test
+    public void testSetSearchParameters() throws Exception {
+        SearchParameters searchParameters = new SearchParameters();
+        SearchParametersDTO searchParametersDTO = new SearchParametersDTO();
+        when(searchParametersDTOAssembler.toEntity(searchParametersDTO)).thenReturn(searchParameters);
+        userController.setSearchParameters(searchParametersDTO);
+        verify(socialUserService, times(1)).setUserSearchParameters("1", searchParameters);
     }
 }

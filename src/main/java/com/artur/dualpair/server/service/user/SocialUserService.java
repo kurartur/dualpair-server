@@ -19,7 +19,7 @@ import java.util.Set;
 @Service("socialUserService")
 public class SocialUserService extends UserService implements SocialUserDetailsService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SocialUserService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(SocialUserService.class);
     private static final Integer DEFAULT_SEARCH_AGE_GAP = 3;
 
     private SocialDataProviderFactory socialDataProviderFactory;
@@ -69,6 +69,8 @@ public class SocialUserService extends UserService implements SocialUserDetailsS
             searchParameters.setSearchMale(true);
             searchParameters.setSearchFemale(false);
         }
+        searchParameters.setUser(user);
+        user.setSearchParameters(searchParameters);
     }
 
     private User buildUser(String accountId, UserAccount.Type accountType) {

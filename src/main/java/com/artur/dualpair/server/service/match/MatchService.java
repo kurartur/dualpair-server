@@ -4,6 +4,7 @@ import com.artur.dualpair.server.domain.model.Match;
 import com.artur.dualpair.server.domain.model.match.DefaultMatchFinder;
 import com.artur.dualpair.server.domain.model.match.RepositoryMatchFinder;
 import com.artur.dualpair.server.domain.model.user.User;
+import com.artur.dualpair.server.interfaces.web.controller.rest.ForbiddenException;
 import com.artur.dualpair.server.persistence.repository.MatchRepository;
 import com.artur.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class MatchService {
     public void responseByUser(Long matchId, Match.Response response, String userId) {
         Match match = findNotNullMatch(matchId);
         if (!match.getUser().getUserId().equals(userId)) {
-            throw new IllegalArgumentException("Invalid user");
+            throw new ForbiddenException("Invalid user");
         }
         match.setResponse(response);
         matchRepository.save(match);
@@ -55,7 +56,7 @@ public class MatchService {
     public Match getUserMatch(Long matchId, String username) {
         Match match = findNotNullMatch(matchId);
         if (!match.getUser().getUsername().equals(username)) {
-            throw new IllegalArgumentException("Invalid user");
+            throw new ForbiddenException("Invalid user");
         }
         return match;
     }

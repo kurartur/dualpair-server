@@ -3,15 +3,7 @@ package com.artur.dualpair.server.domain.model.match;
 import com.artur.dualpair.server.domain.model.user.User;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
@@ -27,7 +19,7 @@ public class SearchParameters implements Serializable {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @PrimaryKeyJoinColumn
     private User user;
 

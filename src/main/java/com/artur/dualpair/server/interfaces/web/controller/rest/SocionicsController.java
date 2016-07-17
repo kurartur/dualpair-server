@@ -21,12 +21,8 @@ public class SocionicsController {
 
     @RequestMapping(value = "/test/evaluate", method = RequestMethod.POST)
     public ResponseEntity evaluateTest(@RequestParam Map<String, String> choices) throws SocionicsTestException {
-        try {
-            Sociotype sociotype = socionicsTestService.evaluate(choices);
-            return ResponseEntity.ok(new SociotypeDTOAssembler().toDTO(sociotype));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ErrorResponse.from(e));
-        }
+        Sociotype sociotype = socionicsTestService.evaluate(choices);
+        return ResponseEntity.ok(new SociotypeDTOAssembler().toDTO(sociotype));
     }
 
     @Autowired

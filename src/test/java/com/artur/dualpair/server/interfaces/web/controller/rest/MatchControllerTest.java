@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 public class MatchControllerTest {
@@ -48,37 +48,37 @@ public class MatchControllerTest {
     }
 
     @Test
-    public void testResponse_invalidUser() throws Exception {
-        doThrow(new IllegalArgumentException("Invalid user")).when(matchService).responseByUser(1L, Match.Response.YES, "username");
-        ResponseEntity<ErrorResponse> responseEntity = matchController.response(1L, "YES");
-        verify(matchService, times(1)).responseByUser(1L, Match.Response.YES, "username");
-        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
-        assertEquals("Invalid user", responseEntity.getBody().getErrorDescription());
-    }
-
-    @Test
     public void testResponse_exception() throws Exception {
         doThrow(new RuntimeException("Error")).when(matchService).responseByUser(1L, Match.Response.YES, "username");
-        ResponseEntity<ErrorResponse> responseEntity = matchController.response(1L, "YES");
+        try {
+            matchController.response(1L, "YES");
+            fail();
+        } catch (RuntimeException re) {
+            assertEquals("Error", re.getMessage());
+        }
         verify(matchService, times(1)).responseByUser(1L, Match.Response.YES, "username");
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals("Error", responseEntity.getBody().getErrorDescription());
     }
 
     @Test
     public void testResponse_invalidResponseValue() throws Exception {
-        ResponseEntity<ErrorResponse> responseEntity = matchController.response(1L, "INVALID");
+        try {
+            matchController.response(1L, "INVALID");
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("No enum constant com.artur.dualpair.server.domain.model.Match.Response.INVALID", iae.getMessage());
+        }
         verify(matchService, times(0)).responseByUser(any(Long.class), any(Match.Response.class), any(String.class));
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertTrue(responseEntity.getBody().getErrorDescription().contains("No enum constant"));
     }
 
     @Test
     public void testNext_exception() throws Exception {
         doThrow(new MatchRequestException("Error")).when(matchService).nextFor("username");
-        ResponseEntity responseEntity = matchController.next();
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-        assertEquals("Error", responseEntity.getBody());
+        try {
+            matchController.next();
+            fail();
+        } catch (MatchRequestException mre) {
+            assertEquals("Error", mre.getMessage());
+        }
     }
 
     @Test
@@ -95,24 +95,17 @@ public class MatchControllerTest {
     @Test
     public void testNext_noMatches() throws Exception {
         ResponseEntity responseEntity = matchController.next();
-        assertEquals("No matches", responseEntity.getBody());
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
 
     @Test
     public void testMatch_exception() throws Exception {
         doThrow(new RuntimeException("Error")).when(matchService).getUserMatch(1L, "username");
-        ResponseEntity<ErrorResponse> response = matchController.match(1L);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Error", response.getBody().getErrorDescription());
-    }
-
-    @Test
-    public void testMatch_forbidden() throws Exception {
-        doThrow(new IllegalArgumentException("Invalid user")).when(matchService).getUserMatch(1L, "username");
-        ResponseEntity<ErrorResponse> response = matchController.match(1L);
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        assertEquals("Invalid user", response.getBody().getErrorDescription());
+        try {
+            matchController.match(1L);
+        } catch (RuntimeException re) {
+            assertEquals("Error", re.getMessage());
+        }
     }
 
     @Test

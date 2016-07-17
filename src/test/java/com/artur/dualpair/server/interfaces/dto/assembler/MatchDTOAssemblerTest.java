@@ -14,7 +14,7 @@ public class MatchDTOAssemblerTest {
 
     @Before
     public void setUp() throws Exception {
-        matchDTOAssembler = new MatchDTOAssembler(new UserDTOAssembler(new SociotypeDTOAssembler()));
+        matchDTOAssembler = new MatchDTOAssembler(new UserDTOAssembler(new SociotypeDTOAssembler(), new SearchParametersDTOAssembler()));
     }
 
     @Test
