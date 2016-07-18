@@ -1,6 +1,6 @@
 package com.artur.dualpair.server.persistence.repository;
 
-import com.artur.dualpair.server.domain.model.match.Location;
+import com.artur.dualpair.server.domain.model.geo.Location;
 import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
@@ -39,7 +39,7 @@ public class UserRepositoryImplTest {
         searchParameters.setMaxAge(25);
         searchParameters.setSearchMale(true);
         searchParameters.setSearchFemale(true);
-        searchParameters.setLocation(new Location(10.0, 10.0, "LT"));
+        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "city"));
         userRepository.findOpponent(user, sociotype, searchParameters);
         verify(query, times(1)).setParameter("user", user);
         verify(query, times(1)).setParameter("minAge", 20);
@@ -65,7 +65,7 @@ public class UserRepositoryImplTest {
         searchParameters.setMaxAge(25);
         searchParameters.setSearchMale(true);
         searchParameters.setSearchFemale(false);
-        searchParameters.setLocation(new Location(10.0, 10.0, "LT"));
+        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "city"));
         userRepository.findOpponent(user, sociotype, searchParameters);
         verify(query, times(1)).setParameter("user", user);
         verify(query, times(1)).setParameter("minAge", 20);
@@ -90,7 +90,7 @@ public class UserRepositoryImplTest {
         searchParameters.setMaxAge(25);
         searchParameters.setSearchMale(false);
         searchParameters.setSearchFemale(true);
-        searchParameters.setLocation(new Location(10.0, 10.0, "LT"));
+        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "city"));
         userRepository.findOpponent(user, sociotype, searchParameters);
         verify(query, times(1)).setParameter("user", user);
         verify(query, times(1)).setParameter("minAge", 20);

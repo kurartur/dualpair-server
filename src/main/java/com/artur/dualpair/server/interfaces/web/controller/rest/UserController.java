@@ -1,7 +1,12 @@
 package com.artur.dualpair.server.interfaces.web.controller.rest;
 
+import com.artur.dualpair.server.domain.model.geo.Location;
+import com.artur.dualpair.server.domain.model.geo.LocationProvider;
+import com.artur.dualpair.server.domain.model.geo.LocationProviderException;
+import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
+import com.artur.dualpair.server.interfaces.dto.LocationDTO;
 import com.artur.dualpair.server.interfaces.dto.SearchParametersDTO;
 import com.artur.dualpair.server.interfaces.dto.SociotypeDTO;
 import com.artur.dualpair.server.interfaces.dto.UserDTO;
@@ -9,6 +14,7 @@ import com.artur.dualpair.server.interfaces.dto.assembler.SearchParametersDTOAss
 import com.artur.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
 import com.artur.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +33,11 @@ public class UserController {
     private SocialUserService socialUserService;
     private UserDTOAssembler userDTOAssembler;
     private SearchParametersDTOAssembler searchParametersDTOAssembler;
+    private LocationProvider locationProvider;
 
     @RequestMapping(method = RequestMethod.GET, value = "/user")
     public UserDTO getUser() {
-        return userDTOAssembler.toDTO(socialUserService.getUser(getUserPrincipal().getUserId()));
+        return userDTOAssembler.toDTO(socialUserService.getUser(getUserPrincipal().getUsername()));
     }
 
     @RequestMapping("/api/me")
@@ -67,6 +74,21 @@ public class UserController {
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/user/location")
+    public ResponseEntity setLocation(@RequestBody LocationDTO locationDTO) throws LocationProviderException, URISyntaxException {
+        Location location;
+        if (locationDTO.getLatitude() != null && locationDTO.getLongitude() != null) {
+            location = locationProvider.getLocation(locationDTO.getLatitude(), locationDTO.getLongitude());
+        } else {
+            throw new IllegalArgumentException("\"latitude\" and \"longitude\" must be provided");
+        }
+        User user = socialUserService.getUser(getUserPrincipal().getUsername());
+        SearchParameters searchParameters = user.getSearchParameters();
+        searchParameters.setLocation(location);
+        socialUserService.setUserSearchParameters(user.getUsername(), searchParameters);
+        return ResponseEntity.created(new URI("/api/user")).build();
+    }
+
     private User getUserPrincipal() {
         return (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
@@ -84,5 +106,11 @@ public class UserController {
     @Autowired
     public void setSearchParametersDTOAssembler(SearchParametersDTOAssembler searchParametersDTOAssembler) {
         this.searchParametersDTOAssembler = searchParametersDTOAssembler;
+    }
+
+    @Autowired
+    @Qualifier("multipleServiceLocationProvider")
+    public void setLocationProvider(LocationProvider locationProvider) {
+        this.locationProvider = locationProvider;
     }
 }

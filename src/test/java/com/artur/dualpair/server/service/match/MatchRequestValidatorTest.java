@@ -1,6 +1,6 @@
 package com.artur.dualpair.server.service.match;
 
-import com.artur.dualpair.server.domain.model.match.Location;
+import com.artur.dualpair.server.domain.model.geo.Location;
 import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
@@ -81,7 +81,7 @@ public class MatchRequestValidatorTest {
             assertEquals("Invalid search parameters: location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(0.0, 0.0, ""));
+        searchParameters.setLocation(new Location(0.0, 0.0, "", "city"));
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();
@@ -89,7 +89,7 @@ public class MatchRequestValidatorTest {
             assertEquals("Invalid search parameters: location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(0.0, 0.0, "LT"));
+        searchParameters.setLocation(new Location(0.0, 0.0, "LT", "city"));
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();
@@ -97,7 +97,7 @@ public class MatchRequestValidatorTest {
             assertEquals("Invalid search parameters: location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(1.0, 0.0, "LT"));
+        searchParameters.setLocation(new Location(1.0, 0.0, "LT", "city"));
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();
@@ -105,7 +105,7 @@ public class MatchRequestValidatorTest {
             assertEquals("Invalid search parameters: location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(1.0, 1.0, "LT"));
+        searchParameters.setLocation(new Location(1.0, 1.0, "LT", "city"));
         validator.validateMatchRequest(user, searchParameters);
     }
 }

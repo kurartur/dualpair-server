@@ -1,8 +1,12 @@
 package com.artur.dualpair.server.interfaces.web.controller.rest;
 
+import com.artur.dualpair.server.domain.model.geo.Location;
+import com.artur.dualpair.server.domain.model.geo.LocationProvider;
+import com.artur.dualpair.server.domain.model.geo.LocationProviderException;
 import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
+import com.artur.dualpair.server.interfaces.dto.LocationDTO;
 import com.artur.dualpair.server.interfaces.dto.SearchParametersDTO;
 import com.artur.dualpair.server.interfaces.dto.SociotypeDTO;
 import com.artur.dualpair.server.interfaces.dto.UserDTO;
@@ -31,12 +35,14 @@ public class UserControllerTest {
     private SocialUserService socialUserService = mock(SocialUserService.class);
     private UserDTOAssembler userDTOAssembler = mock(UserDTOAssembler.class);
     private SearchParametersDTOAssembler searchParametersDTOAssembler = mock(SearchParametersDTOAssembler.class);
+    private LocationProvider locationProvider = mock(LocationProvider.class);
 
     @Before
     public void setUp() throws Exception {
         userController.setSocialUserService(socialUserService);
         userController.setUserDTOAssembler(userDTOAssembler);
         userController.setSearchParametersDTOAssembler(searchParametersDTOAssembler);
+        userController.setLocationProvider(locationProvider);
         User user = new User();
         user.setId(1L);
         user.setUsername("1");
@@ -131,5 +137,102 @@ public class UserControllerTest {
         when(searchParametersDTOAssembler.toEntity(searchParametersDTO)).thenReturn(searchParameters);
         userController.setSearchParameters(searchParametersDTO);
         verify(socialUserService, times(1)).setUserSearchParameters("1", searchParameters);
+    }
+
+    @Test
+    public void testSetLocation_noLatLon() throws Exception {
+        LocationDTO locationDTO = new LocationDTO();
+        try {
+            userController.setLocation(locationDTO);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("\"latitude\" and \"longitude\" must be provided", iae.getMessage());
+        }
+
+        locationDTO.setLatitude(1.0);
+        try {
+            userController.setLocation(locationDTO);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("\"latitude\" and \"longitude\" must be provided", iae.getMessage());
+        }
+
+        locationDTO.setLatitude(null);
+        locationDTO.setLongitude(1.0);
+        try {
+            userController.setLocation(locationDTO);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("\"latitude\" and \"longitude\" must be provided", iae.getMessage());
+        }
+    }
+
+    @Test
+    public void testSetLocation_locationProviderException() throws Exception {
+        LocationDTO locationDTO = new LocationDTO();
+        locationDTO.setLatitude(1.0);
+        locationDTO.setLongitude(2.0);
+        when(locationProvider.getLocation(1.0, 2.0)).thenThrow(new LocationProviderException("Error"));
+        try {
+            userController.setLocation(locationDTO);
+            fail();
+        } catch (LocationProviderException lpe) {
+            assertEquals("Error", lpe.getMessage());
+        }
+        verify(socialUserService, never()).setUserSearchParameters(any(String.class), any(SearchParameters.class));
+    }
+
+    @Test
+    public void testSetLocation_loadUserException() throws Exception {
+        LocationDTO locationDTO = new LocationDTO();
+        locationDTO.setLatitude(1.0);
+        locationDTO.setLongitude(2.0);
+        doThrow(new IllegalArgumentException("Error")).when(socialUserService).getUser("1");
+        try {
+            userController.setLocation(locationDTO);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("Error", iae.getMessage());
+        }
+        verify(locationProvider, times(1)).getLocation(1.0, 2.0);
+        verify(socialUserService, never()).setUserSearchParameters(any(String.class), any(SearchParameters.class));
+    }
+
+    @Test
+    public void testSetLocation_setSearchParametersException() throws Exception {
+        LocationDTO locationDTO = new LocationDTO();
+        locationDTO.setLatitude(1.0);
+        locationDTO.setLongitude(2.0);
+        User user = new User();
+        user.setUsername("username");
+        SearchParameters searchParameters = new SearchParameters();
+        user.setSearchParameters(searchParameters);
+        when(socialUserService.getUser("1")).thenReturn(user);
+        when(locationProvider.getLocation(1.0, 2.0)).thenReturn(new Location(1.0, 2.0, "LT", "Vilnius"));
+        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSearchParameters("username", searchParameters);
+        try {
+            userController.setLocation(locationDTO);
+            fail();
+        } catch (RuntimeException re) {
+            assertEquals("Error", re.getMessage());
+        }
+    }
+
+    @Test
+    public void testSetLocation() throws Exception {
+        LocationDTO locationDTO = new LocationDTO();
+        locationDTO.setLatitude(1.0);
+        locationDTO.setLongitude(2.0);
+        User user = new User();
+        SearchParameters searchParameters = new SearchParameters();
+        user.setSearchParameters(searchParameters);
+        when(socialUserService.getUser("1")).thenReturn(user);
+        when(locationProvider.getLocation(1.0, 2.0)).thenReturn(new Location(1.0, 2.0, "LT", "Vilnius"));
+        userController.setLocation(locationDTO);
+        verify(socialUserService, times(1)).setUserSearchParameters(any(String.class), any(SearchParameters.class));
+        assertEquals(new Double(1.0), searchParameters.getLocation().getLatitude());
+        assertEquals(new Double(2.0), searchParameters.getLocation().getLongitude());
+        assertEquals("LT", searchParameters.getLocation().getCountryCode());
+        assertEquals("Vilnius", searchParameters.getLocation().getCity());
     }
 }

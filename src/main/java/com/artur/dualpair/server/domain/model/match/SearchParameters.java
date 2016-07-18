@@ -1,5 +1,6 @@
 package com.artur.dualpair.server.domain.model.match;
 
+import com.artur.dualpair.server.domain.model.geo.Location;
 import com.artur.dualpair.server.domain.model.user.User;
 import org.hibernate.annotations.Type;
 

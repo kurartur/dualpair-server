@@ -2,6 +2,7 @@ package com.artur.dualpair.server.domain.model.match;
 
 import com.artur.dualpair.server.domain.model.Match;
 import com.artur.dualpair.server.domain.model.geo.DistanceCalculator;
+import com.artur.dualpair.server.domain.model.geo.Location;
 import com.artur.dualpair.server.domain.model.socionics.RelationType;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;

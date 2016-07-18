@@ -1,6 +1,6 @@
 package com.artur.dualpair.server.service.match;
 
-import com.artur.dualpair.server.domain.model.match.Location;
+import com.artur.dualpair.server.domain.model.geo.Location;
 import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.user.User;
 import org.springframework.stereotype.Component;

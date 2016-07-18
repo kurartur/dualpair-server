@@ -2,6 +2,7 @@ package com.artur.dualpair.server.domain.model.match;
 
 import com.artur.dualpair.server.domain.model.Match;
 import com.artur.dualpair.server.domain.model.geo.DistanceCalculator;
+import com.artur.dualpair.server.domain.model.geo.Location;
 import com.artur.dualpair.server.domain.model.socionics.RelationType;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
@@ -114,7 +115,7 @@ public class DefaultMatchFinderTest {
 
     private SearchParameters createSearchParameters(double latLon, String country) {
         SearchParameters searchParameters = new SearchParameters();
-        searchParameters.setLocation(new Location(latLon, latLon, country));
+        searchParameters.setLocation(new Location(latLon, latLon, country, "city"));
         return searchParameters;
     }
 

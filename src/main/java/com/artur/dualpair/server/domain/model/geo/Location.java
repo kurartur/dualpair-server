@@ -1,4 +1,4 @@
-package com.artur.dualpair.server.domain.model.match;
+package com.artur.dualpair.server.domain.model.geo;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -14,12 +14,15 @@ public class Location implements Serializable {
     @Column(name = "country_code")
     private String countryCode;
 
+    private String city;
+
     private Location() {}
 
-    public Location(Double latitude, Double longitude, String countryCode) {
+    public Location(Double latitude, Double longitude, String countryCode, String city) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.countryCode = countryCode;
+        this.city = city;
     }
 
     public Double getLatitude() {
@@ -34,7 +37,7 @@ public class Location implements Serializable {
         return countryCode;
     }
 
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
+    public String getCity() {
+        return city;
     }
 }

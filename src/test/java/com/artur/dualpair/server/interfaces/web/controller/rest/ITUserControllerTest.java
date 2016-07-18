@@ -168,6 +168,27 @@ public class ITUserControllerTest {
         assertEquals(30, searchParameters.get("max_age"));
     }
 
+    @Test
+    @DatabaseSetup("userTest_setLocation.xml")
+    public void testSetLocation() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
+        String data = "{\"latitude\":54.63, \"longitude\":25.32}";
+        mockMvc.perform(post("/api/user/location")
+                    .with(bearerToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(data.getBytes()))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/api/user"))
+                .andExpect(content().string(""));
+        flushPersistenceContext();
+        Map<String, Object> searchParameters = jdbcTemplate.queryForMap("select * from search_parameters where user_id=1");
+        assertFalse(searchParameters.isEmpty());
+        assertEquals(54.63, searchParameters.get("latitude"));
+        assertEquals(25.32, searchParameters.get("longitude"));
+        assertEquals("LT", searchParameters.get("country_code"));
+        assertEquals("Vilnius", searchParameters.get("city"));
+    }
+
     private void flushPersistenceContext() {
         EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory).flush();
     }
