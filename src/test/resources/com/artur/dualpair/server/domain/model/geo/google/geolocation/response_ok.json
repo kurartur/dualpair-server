@@ -1,0 +1,550 @@
+{
+  "results" : [
+    {
+      "address_components" : [
+        {
+          "long_name" : "11",
+          "short_name" : "11",
+          "types" : [ "street_number" ]
+        },
+        {
+          "long_name" : "Gedimino prospektas",
+          "short_name" : "Gedimino pr.",
+          "types" : [ "route" ]
+        },
+        {
+          "long_name" : "Vilnius",
+          "short_name" : "Vilnius",
+          "types" : [ "locality", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus miesto savivaldybė",
+          "short_name" : "Vilniaus m. sav.",
+          "types" : [ "administrative_area_level_2", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus apskritis",
+          "short_name" : "Vilniaus apskr.",
+          "types" : [ "administrative_area_level_1", "political" ]
+        },
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        },
+        {
+          "long_name" : "01103",
+          "short_name" : "01103",
+          "types" : [ "postal_code" ]
+        }
+      ],
+      "formatted_address" : "Gedimino pr. 11, Vilnius 01103, Lithuania",
+      "geometry" : {
+        "bounds" : {
+          "northeast" : {
+            "lat" : 54.6871667,
+            "lng" : 25.2797581
+          },
+          "southwest" : {
+            "lat" : 54.6871243,
+            "lng" : 25.2795474
+          }
+        },
+        "location" : {
+          "lat" : 54.68715839999999,
+          "lng" : 25.279653
+        },
+        "location_type" : "RANGE_INTERPOLATED",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 54.6884944802915,
+            "lng" : 25.2810017302915
+          },
+          "southwest" : {
+            "lat" : 54.6857965197085,
+            "lng" : 25.2783037697085
+          }
+        }
+      },
+      "place_id" : "EidHZWRpbWlubyBwci4gMTEsIFZpbG5pdXMgMDExMDMsIExpZXR1dmE",
+      "types" : [ "street_address" ]
+    },
+    {
+      "address_components" : [
+        {
+          "long_name" : "Paminklas Vincui Kudirkai",
+          "short_name" : "Paminklas Vincui Kudirkai",
+          "types" : [ "premise" ]
+        },
+        {
+          "long_name" : "Senamiestis",
+          "short_name" : "Senamiestis",
+          "types" : [ "neighborhood", "political" ]
+        },
+        {
+          "long_name" : "Vilnius",
+          "short_name" : "Vilnius",
+          "types" : [ "locality", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus miesto savivaldybė",
+          "short_name" : "Vilniaus m. sav.",
+          "types" : [ "administrative_area_level_2", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus apskritis",
+          "short_name" : "Vilniaus apskr.",
+          "types" : [ "administrative_area_level_1", "political" ]
+        },
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        },
+        {
+          "long_name" : "01103",
+          "short_name" : "01103",
+          "types" : [ "postal_code" ]
+        }
+      ],
+      "formatted_address" : "Paminklas Vincui Kudirkai, Vilnius 01103, Lithuania",
+      "geometry" : {
+        "location" : {
+          "lat" : 54.6874769,
+          "lng" : 25.2805683
+        },
+        "location_type" : "ROOFTOP",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 54.6888258802915,
+            "lng" : 25.2819172802915
+          },
+          "southwest" : {
+            "lat" : 54.6861279197085,
+            "lng" : 25.2792193197085
+          }
+        }
+      },
+      "place_id" : "ChIJX_XGPxCU3UYRV0v52yLflS0",
+      "types" : [ "premise" ]
+    },
+    {
+      "address_components" : [
+        {
+          "long_name" : "Vinco Kudirkos aikštė",
+          "short_name" : "Vinco Kudirkos aikštė",
+          "types" : [ "establishment", "point_of_interest" ]
+        },
+        {
+          "long_name" : "Vilnius",
+          "short_name" : "Vilnius",
+          "types" : [ "locality", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus miesto savivaldybė",
+          "short_name" : "Vilniaus m. sav.",
+          "types" : [ "administrative_area_level_2", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus apskritis",
+          "short_name" : "Vilniaus apskr.",
+          "types" : [ "administrative_area_level_1", "political" ]
+        },
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        },
+        {
+          "long_name" : "01103",
+          "short_name" : "01103",
+          "types" : [ "postal_code" ]
+        }
+      ],
+      "formatted_address" : "Vinco Kudirkos aikštė, Vilnius 01103, Lithuania",
+      "geometry" : {
+        "location" : {
+          "lat" : 54.68753,
+          "lng" : 25.2798
+        },
+        "location_type" : "APPROXIMATE",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 54.68887898029151,
+            "lng" : 25.2811489802915
+          },
+          "southwest" : {
+            "lat" : 54.68618101970851,
+            "lng" : 25.2784510197085
+          }
+        }
+      },
+      "place_id" : "ChIJI-BePBCU3UYRuPFma2g-klc",
+      "types" : [
+        "bus_station",
+        "establishment",
+        "point_of_interest",
+        "transit_station"
+      ]
+    },
+    {
+      "address_components" : [
+        {
+          "long_name" : "Senamiestis",
+          "short_name" : "Senamiestis",
+          "types" : [ "neighborhood", "political" ]
+        },
+        {
+          "long_name" : "Vilnius",
+          "short_name" : "Vilnius",
+          "types" : [ "locality", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus miesto savivaldybė",
+          "short_name" : "Vilniaus m. sav.",
+          "types" : [ "administrative_area_level_2", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus apskritis",
+          "short_name" : "Vilniaus apskr.",
+          "types" : [ "administrative_area_level_1", "political" ]
+        },
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        }
+      ],
+      "formatted_address" : "Senamiestis, Vilnius, Lithuania",
+      "geometry" : {
+        "bounds" : {
+          "northeast" : {
+            "lat" : 54.694591,
+            "lng" : 25.314393
+          },
+          "southwest" : {
+            "lat" : 54.669622,
+            "lng" : 25.272586
+          }
+        },
+        "location" : {
+          "lat" : 54.6783931,
+          "lng" : 25.2865091
+        },
+        "location_type" : "APPROXIMATE",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 54.694591,
+            "lng" : 25.314393
+          },
+          "southwest" : {
+            "lat" : 54.669622,
+            "lng" : 25.272586
+          }
+        }
+      },
+      "place_id" : "ChIJa3z2sROU3UYRQUVFTI3RACY",
+      "types" : [ "neighborhood", "political" ]
+    },
+    {
+      "address_components" : [
+        {
+          "long_name" : "Vilnius",
+          "short_name" : "Vilnius",
+          "types" : [ "locality", "political" ]
+        },
+        {
+          "long_name" : "Vilnius city municipality",
+          "short_name" : "Vilnius city municipality",
+          "types" : [ "administrative_area_level_2", "political" ]
+        },
+        {
+          "long_name" : "Vilnius County",
+          "short_name" : "Vilnius County",
+          "types" : [ "administrative_area_level_1", "political" ]
+        },
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        }
+      ],
+      "formatted_address" : "Vilnius, Lithuania",
+      "geometry" : {
+        "bounds" : {
+          "northeast" : {
+            "lat" : 54.8325439,
+            "lng" : 25.4814883
+          },
+          "southwest" : {
+            "lat" : 54.567798,
+            "lng" : 25.0243761
+          }
+        },
+        "location" : {
+          "lat" : 54.6871555,
+          "lng" : 25.2796514
+        },
+        "location_type" : "APPROXIMATE",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 54.8325439,
+            "lng" : 25.4814883
+          },
+          "southwest" : {
+            "lat" : 54.567798,
+            "lng" : 25.0243761
+          }
+        }
+      },
+      "place_id" : "ChIJ9QhkXPuT3UYRQNzpcIzRAAQ",
+      "types" : [ "locality", "political" ]
+    },
+    {
+      "address_components" : [
+        {
+          "long_name" : "01103",
+          "short_name" : "01103",
+          "types" : [ "postal_code" ]
+        },
+        {
+          "long_name" : "Vilnius",
+          "short_name" : "Vilnius",
+          "types" : [ "locality", "political" ]
+        },
+        {
+          "long_name" : "Vilnius city municipality",
+          "short_name" : "Vilnius city municipality",
+          "types" : [ "administrative_area_level_2", "political" ]
+        },
+        {
+          "long_name" : "Vilnius County",
+          "short_name" : "Vilnius County",
+          "types" : [ "administrative_area_level_1", "political" ]
+        },
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        }
+      ],
+      "formatted_address" : "Vilnius 01103, Lithuania",
+      "geometry" : {
+        "bounds" : {
+          "northeast" : {
+            "lat" : 54.6890699,
+            "lng" : 25.2864422
+          },
+          "southwest" : {
+            "lat" : 54.6851931,
+            "lng" : 25.2759807
+          }
+        },
+        "location" : {
+          "lat" : 54.686701,
+          "lng" : 25.2830344
+        },
+        "location_type" : "APPROXIMATE",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 54.6890699,
+            "lng" : 25.2864422
+          },
+          "southwest" : {
+            "lat" : 54.6851931,
+            "lng" : 25.2759807
+          }
+        }
+      },
+      "place_id" : "ChIJ3aFFWhCU3UYRAkMsLozRABM",
+      "types" : [ "postal_code" ]
+    },
+    {
+      "address_components" : [
+        {
+          "long_name" : "Senamiesčio seniūnija",
+          "short_name" : "Senamiesčio sen.",
+          "types" : [ "administrative_area_level_3", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus miesto savivaldybė",
+          "short_name" : "Vilniaus m. sav.",
+          "types" : [ "administrative_area_level_2", "political" ]
+        },
+        {
+          "long_name" : "Vilniaus apskritis",
+          "short_name" : "Vilniaus apskr.",
+          "types" : [ "administrative_area_level_1", "political" ]
+        },
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        }
+      ],
+      "formatted_address" : "Senamiesčio sen., Lithuania",
+      "geometry" : {
+        "bounds" : {
+          "northeast" : {
+            "lat" : 54.6947659,
+            "lng" : 25.3132871
+          },
+          "southwest" : {
+            "lat" : 54.6710168,
+            "lng" : 25.2725429
+          }
+        },
+        "location" : {
+          "lat" : 54.68408410000001,
+          "lng" : 25.2898397
+        },
+        "location_type" : "APPROXIMATE",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 54.6947659,
+            "lng" : 25.3132871
+          },
+          "southwest" : {
+            "lat" : 54.6710168,
+            "lng" : 25.2725429
+          }
+        }
+      },
+      "place_id" : "ChIJK8bcLhaU3UYR-4CUnOniW0s",
+      "types" : [ "administrative_area_level_3", "political" ]
+    },
+    {
+      "address_components" : [
+        {
+          "long_name" : "Vilnius city municipality",
+          "short_name" : "Vilnius city municipality",
+          "types" : [ "administrative_area_level_2", "political" ]
+        },
+        {
+          "long_name" : "Vilnius County",
+          "short_name" : "Vilnius County",
+          "types" : [ "administrative_area_level_1", "political" ]
+        },
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        }
+      ],
+      "formatted_address" : "Vilnius city municipality, Lithuania",
+      "geometry" : {
+        "bounds" : {
+          "northeast" : {
+            "lat" : 54.8325439,
+            "lng" : 25.4814883
+          },
+          "southwest" : {
+            "lat" : 54.567798,
+            "lng" : 25.0243761
+          }
+        },
+        "location" : {
+          "lat" : 54.6759715,
+          "lng" : 25.2867413
+        },
+        "location_type" : "APPROXIMATE",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 54.8325439,
+            "lng" : 25.4814883
+          },
+          "southwest" : {
+            "lat" : 54.567798,
+            "lng" : 25.0243761
+          }
+        }
+      },
+      "place_id" : "ChIJ7epZQvuT3UYRg4dk0tyVXHU",
+      "types" : [ "administrative_area_level_2", "political" ]
+    },
+    {
+      "address_components" : [
+        {
+          "long_name" : "Vilnius County",
+          "short_name" : "Vilnius County",
+          "types" : [ "administrative_area_level_1", "political" ]
+        },
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        }
+      ],
+      "formatted_address" : "Vilnius County, Lithuania",
+      "geometry" : {
+        "bounds" : {
+          "northeast" : {
+            "lat" : 55.5174369,
+            "lng" : 26.760213
+          },
+          "southwest" : {
+            "lat" : 54.1276599,
+            "lng" : 24.386375
+          }
+        },
+        "location" : {
+          "lat" : 54.8086502,
+          "lng" : 25.2182138
+        },
+        "location_type" : "APPROXIMATE",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 55.5174369,
+            "lng" : 26.760213
+          },
+          "southwest" : {
+            "lat" : 54.1276599,
+            "lng" : 24.386375
+          }
+        }
+      },
+      "place_id" : "ChIJH4KkkAKi3UYRsNjpcIzRAAM",
+      "types" : [ "administrative_area_level_1", "political" ]
+    },
+    {
+      "address_components" : [
+        {
+          "long_name" : "Lithuania",
+          "short_name" : "LT",
+          "types" : [ "country", "political" ]
+        }
+      ],
+      "formatted_address" : "Lithuania",
+      "geometry" : {
+        "bounds" : {
+          "northeast" : {
+            "lat" : 56.45032089999999,
+            "lng" : 26.8355914
+          },
+          "southwest" : {
+            "lat" : 53.89687869999999,
+            "lng" : 20.9540117
+          }
+        },
+        "location" : {
+          "lat" : 55.169438,
+          "lng" : 23.881275
+        },
+        "location_type" : "APPROXIMATE",
+        "viewport" : {
+          "northeast" : {
+            "lat" : 56.45032089999999,
+            "lng" : 26.8355914
+          },
+          "southwest" : {
+            "lat" : 53.89687869999999,
+            "lng" : 20.9540117
+          }
+        }
+      },
+      "place_id" : "ChIJE74zDxSU3UYRubpdpdNUCvM",
+      "types" : [ "country", "political" ]
+    }
+  ],
+  "status" : "OK"
+}

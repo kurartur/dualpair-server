@@ -1,5 +1,6 @@
 package com.artur.dualpair.server.domain.model.geo;
 
+import com.artur.dualpair.server.domain.model.geo.google.geolocation.GoogleLocationProvider;
 import org.junit.Before;
 import org.junit.Test;
 
