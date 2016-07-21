@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driverClassName: org.hsqldb.jdbc.JDBCDriver
+    url: jdbc:hsqldb:mem:itdb
+    username: SA
+    password:
+  jpa:
+    database: HSQL
+  hibernate:
+    dialect: org.hibernate.dialect.HSQLDialect

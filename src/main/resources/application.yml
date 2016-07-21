@@ -4,13 +4,11 @@ logging:
     org.hibernate: ERROR
     org.springframework.jdbc: DEBUG
     org.hibernate.type: TRACE
+    org.springframework.web: DEBUG
 
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/dualpair
-    username: root
-    password: doYourwork
   jpa:
     database: MYSQL
     show-sql: true
@@ -22,27 +20,4 @@ spring:
       appId: 454804811371783
       appSecret: 593c01a75ec0c4eba76f96abff6a069e
 
----
-
-spring:
-  profiles: it
-  datasource:
-    driverClassName: org.hsqldb.jdbc.JDBCDriver
-    url: jdbc:hsqldb:mem:itdb
-    username: SA
-    password:
-  jpa:
-    database: HSQL
-  hibernate:
-    dialect: org.hibernate.dialect.HSQLDialect
-
-
-
-
-    #server.port: 8443
-    #server.ssl.key-store: classpath:keystore.p12
-    #server.ssl.key-store-password: keystore
-    #server.ssl.keyStoreType: PKCS12
-    #server.ssl.keyAlias: dualpair
-
-    #logging.level.org.springframework.web: DEBUG
+googleApiKey: fakeKey

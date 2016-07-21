@@ -32,10 +32,6 @@ dependencies {
     testCompile group: 'com.github.springtestdbunit', name: 'spring-test-dbunit', version: '1.3.0'// https://mvnrepository.com/artifact/org.dbunit/dbunit
     testCompile group: 'org.dbunit', name: 'dbunit', version: '2.5.2'
 
-    //testCompile group: 'junit', name: 'junit', version: '4.12'
-    //testCompile "org.mockito:mockito-core:1.+"
-    //testCompile group: 'org.springframework', name: 'spring-test', version: '4.3.0.RELEASE'
-
     runtime('org.hsqldb:hsqldb:2.0.0')
 
 }
@@ -43,4 +39,8 @@ dependencies {
 jar {
     baseName = 'dualpair-server'
     version =  '0.1.0'
+}
+
+bootRun {
+    systemProperties = System.properties
 }

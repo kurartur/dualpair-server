@@ -21,7 +21,7 @@ public class GoogleLocationProvider extends LocationProvider {
 
     private static final String ENDPOINT_URL = "https://maps.googleapis.com/maps/api/geocode/json";
 
-    @Value("googleApiKey")
+    @Value("${googleApiKey}")
     protected String apiKey;
 
     @Override
