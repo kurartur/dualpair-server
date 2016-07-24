@@ -1,6 +1,6 @@
 package com.artur.dualpair.server.interfaces.web.controller.rest;
 
-import com.artur.dualpair.server.domain.model.Match;
+import com.artur.dualpair.server.domain.model.match.Match;
 import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.interfaces.dto.MatchDTO;
 import com.artur.dualpair.server.interfaces.dto.assembler.MatchDTOAssembler;
@@ -65,7 +65,7 @@ public class MatchControllerTest {
             matchController.response(1L, "INVALID");
             fail();
         } catch (IllegalArgumentException iae) {
-            assertEquals("No enum constant com.artur.dualpair.server.domain.model.Match.Response.INVALID", iae.getMessage());
+            assertEquals("No enum constant com.artur.dualpair.server.domain.model.match.Match.Response.INVALID", iae.getMessage());
         }
         verify(matchService, times(0)).responseByUser(any(Long.class), any(Match.Response.class), any(String.class));
     }

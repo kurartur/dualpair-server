@@ -1,23 +1,25 @@
 package com.artur.dualpair.server.service.user;
 
+import com.artur.dualpair.server.domain.model.photo.Photo;
 import com.artur.dualpair.server.domain.model.user.User;
+import com.artur.dualpair.server.domain.model.user.UserAccount;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.UserOperations;
+import org.springframework.social.facebook.api.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class FacebookDataProviderTest {
 
@@ -25,6 +27,7 @@ public class FacebookDataProviderTest {
     private Connection<Facebook> facebookConnection = mock(Connection.class);
     private Facebook facebook = mock(Facebook.class);
     private UserOperations userOperations = mock(UserOperations.class);
+    private MediaOperations mediaOperations = mock(MediaOperations.class);
     private org.springframework.social.facebook.api.User facebookUser = mock(org.springframework.social.facebook.api.User.class);
     private UserProfile userProfile = new UserProfile("id", "name", "firstName", "lastName", "email", "username");
 
@@ -34,6 +37,7 @@ public class FacebookDataProviderTest {
         when(facebookConnection.getApi()).thenReturn(facebook);
         when(facebookConnection.fetchUserProfile()).thenReturn(userProfile);
         when(facebook.userOperations()).thenReturn(userOperations);
+        when(facebook.mediaOperations()).thenReturn(mediaOperations);
         when(userOperations.getUserProfile()).thenReturn(facebookUser);
     }
 
@@ -43,6 +47,9 @@ public class FacebookDataProviderTest {
         LocalDate dateOfBirth = createFacebookUserDateOfBirth(false);
         when(facebookUser.getBirthday()).thenReturn(dateOfBirthToString(dateOfBirth, false));
         when(facebookUser.getGender()).thenReturn("male");
+        doReturn(new PagedList<>(Arrays.asList(createAlbum("1", "Profile pictures"), createAlbum("2", "Cool pics")), null, null)).when(mediaOperations).getAlbums();
+        doReturn(new PagedList<>(Arrays.asList(createPhoto("1"), createPhoto("2")), null, null)).when(mediaOperations).getPhotos("1");
+        doReturn(new PagedList<>(Arrays.asList(createPhoto("3"), createPhoto("4")), null, null)).when(mediaOperations).getPhotos("2");
 
         User user = new User();
         user = facebookDataProvider.enhanceUser(user);
@@ -51,6 +58,10 @@ public class FacebookDataProviderTest {
         assertEquals((Integer) 5, user.getAge());
         assertEquals(Date.from(dateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant()), user.getDateOfBirth());
         assertEquals(User.Gender.MALE, user.getGender());
+        assertEquals(2, user.getPhotos().size());
+        Iterator<Photo> photos = user.getPhotos().iterator();
+        assertUserPhoto("1", user, photos.next());
+        assertUserPhoto("2", user, photos.next());
     }
 
     @Test
@@ -92,6 +103,13 @@ public class FacebookDataProviderTest {
         assertEquals((Integer) 5, user.getAge());
     }
 
+    private void assertUserPhoto(String expectedId, User expectedUser, Photo actualPhoto) throws Exception {
+        assertEquals(expectedId, actualPhoto.getIdOnAccount());
+        assertEquals("http://photo" + expectedId, actualPhoto.getSourceLink());
+        assertEquals(UserAccount.Type.FACEBOOK, actualPhoto.getAccountType());
+        assertEquals(expectedUser, actualPhoto.getUser());
+    }
+
     private LocalDate createFacebookUserDateOfBirth(boolean yearOnly) {
         LocalDate date = LocalDate.now().minus(5, ChronoUnit.YEARS);
         if (yearOnly) {
@@ -105,5 +123,19 @@ public class FacebookDataProviderTest {
     private String dateOfBirthToString(LocalDate dateOfBirth, boolean yearOnly) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(yearOnly ? "yyyy" : "MM/dd/yyyy");
         return dateOfBirth.format(formatter);
+    }
+
+    private Album createAlbum(String id, String name) {
+        Album album = mock(Album.class);
+        when(album.getId()).thenReturn(id);
+        when(album.getName()).thenReturn(name);
+        return album;
+    }
+
+    private org.springframework.social.facebook.api.Photo createPhoto(String id) {
+        org.springframework.social.facebook.api.Photo photo = mock(org.springframework.social.facebook.api.Photo.class);
+        when(photo.getId()).thenReturn(id);
+        when(photo.getSource()).thenReturn("http://photo" + id);
+        return photo;
     }
 }

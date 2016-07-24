@@ -1,7 +1,7 @@
 package com.artur.dualpair.server.service.match;
 
-import com.artur.dualpair.server.domain.model.Match;
 import com.artur.dualpair.server.domain.model.match.DefaultMatchFinder;
+import com.artur.dualpair.server.domain.model.match.Match;
 import com.artur.dualpair.server.domain.model.match.RepositoryMatchFinder;
 import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.interfaces.web.controller.rest.ForbiddenException;
@@ -53,9 +53,21 @@ public class MatchService {
         return match;
     }
 
+    /*
+     *   @see getUserMatch(Long matchId, Long userId)
+     */
+    @Deprecated
     public Match getUserMatch(Long matchId, String username) {
         Match match = findNotNullMatch(matchId);
         if (!match.getUser().getUsername().equals(username)) {
+            throw new ForbiddenException("Invalid user");
+        }
+        return match;
+    }
+
+    public Match getUserMatch(Long matchId, Long userId) {
+        Match match = findNotNullMatch(matchId);
+        if (!match.getUser().getId().equals(userId)) {
             throw new ForbiddenException("Invalid user");
         }
         return match;

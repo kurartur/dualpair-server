@@ -2,9 +2,8 @@ package com.artur.dualpair.server.interfaces.dto.assembler;
 
 import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.interfaces.dto.UserDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
 
 @Component
 public class UserDTOAssembler extends DTOAssembler<User, UserDTO> {
@@ -13,7 +12,13 @@ public class UserDTOAssembler extends DTOAssembler<User, UserDTO> {
 
     private SearchParametersDTOAssembler searchParametersDTOAssembler;
 
-    @Inject
+    private LocationDTOAssembler locationDTOAssembler;
+
+    private PhotoDTOAssembler photoDTOAssembler;
+
+    public UserDTOAssembler() {}
+
+    @Deprecated
     public UserDTOAssembler(SociotypeDTOAssembler sociotypeDTOAssembler, SearchParametersDTOAssembler searchParametersDTOAssembler) {
         this.sociotypeDTOAssembler = sociotypeDTOAssembler;
         this.searchParametersDTOAssembler = searchParametersDTOAssembler;
@@ -26,8 +31,15 @@ public class UserDTOAssembler extends DTOAssembler<User, UserDTO> {
         userDTO.setDateOfBirth(user.getDateOfBirth());
         userDTO.setAge(user.getAge());
         userDTO.setSociotypes(sociotypeDTOAssembler.toDTOSet(user.getSociotypes()));
+        userDTO.setDescription(user.getDescription());
         if (user.getSearchParameters() != null) {
             userDTO.setSearchParameters(searchParametersDTOAssembler.toDTO(user.getSearchParameters()));
+            if (user.getSearchParameters().getLocation() != null) {
+                userDTO.setLocation(locationDTOAssembler.toDTO(user.getSearchParameters().getLocation()));
+            }
+        }
+        if (user.getPhotos() != null) {
+            userDTO.setPhotos(photoDTOAssembler.toDTOList(user.getPhotos()));
         }
         return userDTO;
     }
@@ -35,5 +47,25 @@ public class UserDTOAssembler extends DTOAssembler<User, UserDTO> {
     @Override
     public User toEntity(UserDTO userDTO) {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Autowired
+    public void setSociotypeDTOAssembler(SociotypeDTOAssembler sociotypeDTOAssembler) {
+        this.sociotypeDTOAssembler = sociotypeDTOAssembler;
+    }
+
+    @Autowired
+    public void setSearchParametersDTOAssembler(SearchParametersDTOAssembler searchParametersDTOAssembler) {
+        this.searchParametersDTOAssembler = searchParametersDTOAssembler;
+    }
+
+    @Autowired
+    public void setLocationDTOAssembler(LocationDTOAssembler locationDTOAssembler) {
+        this.locationDTOAssembler = locationDTOAssembler;
+    }
+
+    @Autowired
+    public void setPhotoDTOAssembler(PhotoDTOAssembler photoDTOAssembler) {
+        this.photoDTOAssembler = photoDTOAssembler;
     }
 }

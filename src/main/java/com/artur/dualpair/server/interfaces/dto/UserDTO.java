@@ -2,9 +2,7 @@ package com.artur.dualpair.server.interfaces.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class UserDTO {
 
@@ -15,6 +13,8 @@ public class UserDTO {
     private String description;
     private Set<SociotypeDTO> sociotypes = new HashSet<>();
     private SearchParametersDTO searchParameters;
+    private LocationDTO location;
+    private List<PhotoDTO> photos = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -62,5 +62,21 @@ public class UserDTO {
 
     public void setSearchParameters(SearchParametersDTO searchParameters) {
         this.searchParameters = searchParameters;
+    }
+
+    public LocationDTO getLocation() {
+        return location;
+    }
+
+    public void setLocation(LocationDTO location) {
+        this.location = location;
+    }
+
+    public List<PhotoDTO> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<PhotoDTO> photos) {
+        this.photos = photos;
     }
 }

@@ -1,16 +1,20 @@
 package com.artur.dualpair.server.service.user;
 
+import com.artur.dualpair.server.domain.model.photo.Photo;
 import com.artur.dualpair.server.domain.model.user.User;
+import com.artur.dualpair.server.domain.model.user.UserAccount;
 import org.jboss.logging.Logger;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.facebook.api.Album;
 import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.Photo;
+import org.springframework.social.facebook.api.PagedList;
 import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class FacebookDataProvider implements SocialDataProvider {
 
@@ -44,7 +48,9 @@ public class FacebookDataProvider implements SocialDataProvider {
                 user.setDateOfBirth(dateOfBirth);
             }
         }
-        //user.setProfilePictureLinks(getProfilePictureLinks(facebook));
+
+        addPhotos(user, facebook);
+
         return user;
     }
 
@@ -72,13 +78,16 @@ public class FacebookDataProvider implements SocialDataProvider {
         }
     }
 
-    private Set<String> getProfilePictureLinks(Facebook facebook) {
-        Set<String> link = new LinkedHashSet<>();
-        String albumId = getProfilePictureAlbum(facebook.mediaOperations().getAlbums()).getId();
-        for (Photo photo : facebook.mediaOperations().getPhotos(albumId)) {
-            link.add(photo.getSource());
+    private void addPhotos(User user, Facebook facebook) {
+        PagedList<Album> albums = facebook.mediaOperations().getAlbums();
+        if (albums != null) {
+            Album profilePictureAlbum = getProfilePictureAlbum(albums);
+            if (profilePictureAlbum != null) {
+                for (org.springframework.social.facebook.api.Photo photo : facebook.mediaOperations().getPhotos(profilePictureAlbum.getId())) {
+                    user.getPhotos().add(buildPhoto(photo, user));
+                }
+            }
         }
-        return link;
     }
 
     private Album getProfilePictureAlbum(List<Album> albums) {
@@ -87,6 +96,15 @@ public class FacebookDataProvider implements SocialDataProvider {
                 return album;
             }
         }
-        throw new RuntimeException("No profile pics found"); // TODO
+        return null;
+    }
+
+    private Photo buildPhoto(org.springframework.social.facebook.api.Photo facebookPhoto, User user) {
+        Photo photo = new Photo();
+        photo.setUser(user);
+        photo.setAccountType(UserAccount.Type.FACEBOOK);
+        photo.setIdOnAccount(facebookPhoto.getId());
+        photo.setSourceLink(facebookPhoto.getSource());
+        return photo;
     }
 }

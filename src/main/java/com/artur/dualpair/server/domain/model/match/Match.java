@@ -1,4 +1,4 @@
-package com.artur.dualpair.server.domain.model;
+package com.artur.dualpair.server.domain.model.match;
 
 import com.artur.dualpair.server.domain.model.user.User;
 

@@ -9,9 +9,6 @@ public class UserAccount implements Serializable {
 
     public enum Type {FACEBOOK}
 
-    public static final int TYPE_FACEBOOK = 0;
-    public static final int TYPE_VKONTAKTE = 1;
-
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;

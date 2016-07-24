@@ -1,6 +1,6 @@
 package com.artur.dualpair.server.interfaces.dto.assembler;
 
-import com.artur.dualpair.server.domain.model.Match;
+import com.artur.dualpair.server.domain.model.match.Match;
 import com.artur.dualpair.server.interfaces.dto.MatchDTO;
 import org.springframework.stereotype.Component;
 

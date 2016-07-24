@@ -2,7 +2,9 @@ package com.artur.dualpair.server.interfaces.dto.assembler;
 
 import com.artur.dualpair.server.domain.model.geo.Location;
 import com.artur.dualpair.server.interfaces.dto.LocationDTO;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LocationDTOAssembler extends DTOAssembler<Location, LocationDTO> {
 
     @Override

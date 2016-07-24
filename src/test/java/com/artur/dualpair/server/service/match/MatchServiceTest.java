@@ -1,7 +1,7 @@
 package com.artur.dualpair.server.service.match;
 
-import com.artur.dualpair.server.domain.model.Match;
 import com.artur.dualpair.server.domain.model.match.DefaultMatchFinder;
+import com.artur.dualpair.server.domain.model.match.Match;
 import com.artur.dualpair.server.domain.model.match.RepositoryMatchFinder;
 import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.user.User;
@@ -119,7 +119,7 @@ public class MatchServiceTest {
     }
 
     @Test
-    public void testGetUserMatch_invalidUser() throws Exception {
+    public void testGetUserMatchUsername_invalidUser() throws Exception {
         User user = new User();
         user.setUsername("username");
         when(userService.loadUserByUsername("username")).thenReturn(user);
@@ -133,7 +133,7 @@ public class MatchServiceTest {
     }
 
     @Test
-    public void testGetUserMatch() throws Exception {
+    public void testGetUserMatchUsername() throws Exception {
         User user = new User();
         user.setUsername("username");
         Match match = createMatch(1L, "username", Match.Response.YES);
@@ -144,7 +144,7 @@ public class MatchServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testGetUserMatch_matchNotFound() throws Exception {
+    public void testGetUserMatchUsername_matchNotFound() throws Exception {
         when(matchRepository.findOne(1L)).thenReturn(null);
         matchService.getUserMatch(1L, "userId");
     }
@@ -172,11 +172,50 @@ public class MatchServiceTest {
         assertEquals(3, result.size());
     }
 
-    private Match createMatch(Long id, String userId, Match.Response response) {
+    @Test
+    public void testGetUserMatch_invalidUser() throws Exception {
+        User user = new User();
+        user.setId(2L);
+        when(matchRepository.findOne(1L)).thenReturn(createMatch(1L, 3L, Match.Response.YES));
+        try {
+            matchService.getUserMatch(1L, 2L);
+            fail();
+        } catch (ForbiddenException fe) {
+            assertEquals("Invalid user", fe.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetUserMatch() throws Exception {
+        User user = new User();
+        user.setId(2L);
+        Match match = createMatch(1L, 2L, Match.Response.YES);
+        when(matchRepository.findOne(1L)).thenReturn(match);
+        Match result = matchService.getUserMatch(1L, 2L);
+        assertEquals(result, match);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetUserMatch_matchNotFound() throws Exception {
+        when(matchRepository.findOne(1L)).thenReturn(null);
+        matchService.getUserMatch(1L, 2L);
+    }
+
+    private Match createMatch(Long id, String username, Match.Response response) {
         Match match = new Match();
         match.setId(id);
         User user = new User();
-        user.setUsername(userId);
+        user.setUsername(username);
+        match.setUser(user);
+        match.setResponse(response);
+        return match;
+    }
+
+    private Match createMatch(Long id, Long userId, Match.Response response) {
+        Match match = new Match();
+        match.setId(id);
+        User user = new User();
+        user.setId(userId);
         match.setUser(user);
         match.setResponse(response);
         return match;

@@ -1,6 +1,8 @@
 package com.artur.dualpair.server.interfaces.dto.assembler;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public abstract class DTOAssembler<E, D> {
@@ -22,6 +24,14 @@ public abstract class DTOAssembler<E, D> {
             objectSet.add(toDTO(entity));
         }
         return objectSet;
+    }
+
+    public List<D> toDTOList(List<E> entityList) {
+        List<D> dtoList = new ArrayList<>();
+        for(E entity : entityList) {
+            dtoList.add(toDTO(entity));
+        }
+        return dtoList;
     }
 
 }
