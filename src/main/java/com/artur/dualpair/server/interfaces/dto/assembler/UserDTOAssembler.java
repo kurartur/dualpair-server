@@ -16,14 +16,6 @@ public class UserDTOAssembler extends DTOAssembler<User, UserDTO> {
 
     private PhotoDTOAssembler photoDTOAssembler;
 
-    public UserDTOAssembler() {}
-
-    @Deprecated
-    public UserDTOAssembler(SociotypeDTOAssembler sociotypeDTOAssembler, SearchParametersDTOAssembler searchParametersDTOAssembler) {
-        this.sociotypeDTOAssembler = sociotypeDTOAssembler;
-        this.searchParametersDTOAssembler = searchParametersDTOAssembler;
-    }
-
     @Override
     public UserDTO toDTO(User user) {
         UserDTO userDTO = new UserDTO();

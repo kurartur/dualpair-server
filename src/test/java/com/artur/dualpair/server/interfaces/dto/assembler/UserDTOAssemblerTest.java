@@ -5,9 +5,7 @@ import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.photo.Photo;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
-import com.artur.dualpair.server.interfaces.dto.LocationDTO;
-import com.artur.dualpair.server.interfaces.dto.PhotoDTO;
-import com.artur.dualpair.server.interfaces.dto.UserDTO;
+import com.artur.dualpair.server.interfaces.dto.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,19 +19,18 @@ import static org.mockito.Mockito.*;
 
 public class UserDTOAssemblerTest {
 
-    private UserDTOAssembler userDTOAssembler;
+    private UserDTOAssembler userDTOAssembler = new UserDTOAssembler();;
     private LocationDTOAssembler locationDTOAssembler = mock(LocationDTOAssembler.class);
     private PhotoDTOAssembler photoDTOAssembler = mock(PhotoDTOAssembler.class);
+    private SearchParametersDTOAssembler searchParametersDTOAssembler = mock(SearchParametersDTOAssembler.class);
+    private SociotypeDTOAssembler sociotypeDTOAssembler = mock(SociotypeDTOAssembler.class);
 
     @Before
     public void setUp() throws Exception {
-        userDTOAssembler = new UserDTOAssembler();
         userDTOAssembler.setLocationDTOAssembler(locationDTOAssembler);
         userDTOAssembler.setPhotoDTOAssembler(photoDTOAssembler);
-
-        // TODO make these as mocks
-        userDTOAssembler.setSearchParametersDTOAssembler(new SearchParametersDTOAssembler());
-        userDTOAssembler.setSociotypeDTOAssembler(new SociotypeDTOAssembler());
+        userDTOAssembler.setSearchParametersDTOAssembler(searchParametersDTOAssembler);
+        userDTOAssembler.setSociotypeDTOAssembler(sociotypeDTOAssembler);
     }
 
     @Test
@@ -42,14 +39,18 @@ public class UserDTOAssemblerTest {
         user.setName("name");
         Date birthday = new Date();
         user.setDateOfBirth(birthday);
-        user.setSociotypes(createSociotypes(Sociotype.Code1.EII));
+        Set<Sociotype> sociotypes = new HashSet<>(Arrays.asList(new Sociotype.Builder().build()));
+        user.setSociotypes(sociotypes);
+        SociotypeDTO sociotypeDTO = new SociotypeDTO();
+        doReturn(new HashSet<>(Arrays.asList(sociotypeDTO))).when(sociotypeDTOAssembler).toDTOSet(sociotypes);
         user.setDescription("description");
         SearchParameters searchParameters = new SearchParameters();
-        searchParameters.setMinAge(20);
+        SearchParametersDTO searchParametersDTO = new SearchParametersDTO();
         Location location = new Location(10.0, 10.0, "LT", "Vilnius");
         LocationDTO locationDTO = new LocationDTO();
         searchParameters.setLocation(location);
         user.setSearchParameters(searchParameters);
+        doReturn(searchParametersDTO).when(searchParametersDTOAssembler).toDTO(searchParameters);
         when(locationDTOAssembler.toDTO(location)).thenReturn(locationDTO);
         Photo photo = new Photo();
         user.setPhotos(Arrays.asList(photo));
@@ -58,17 +59,11 @@ public class UserDTOAssemblerTest {
         UserDTO userDTO = userDTOAssembler.toDTO(user);
         assertEquals("name", userDTO.getName());
         assertEquals((Integer)0, userDTO.getAge());
-        assertEquals("EII", userDTO.getSociotypes().iterator().next().getCode1());
+        assertEquals(sociotypeDTO, userDTO.getSociotypes().iterator().next());
         assertEquals(birthday, userDTO.getDateOfBirth());
-        assertEquals((Integer)20, userDTO.getSearchParameters().getMinAge());
+        assertEquals(searchParametersDTO, userDTO.getSearchParameters());
         assertEquals(locationDTO, userDTO.getLocation());
         assertEquals("description", userDTO.getDescription());
         assertEquals(photoDTO, userDTO.getPhotos().iterator().next());
-    }
-
-    private Set<Sociotype> createSociotypes(Sociotype.Code1 code1) {
-        Set<Sociotype> sociotypes = new HashSet<>();
-        sociotypes.add(new Sociotype.Builder().code1(code1).build());
-        return sociotypes;
     }
 }

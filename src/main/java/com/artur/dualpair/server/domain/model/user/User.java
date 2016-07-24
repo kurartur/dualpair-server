@@ -158,11 +158,11 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public Integer getAge() {
-        return ageInfo == null ? null : ageInfo.getAge(); // TODO why ageInfo is null?
+        return ageInfo == null ? null : ageInfo.getAge();
     }
 
     public Date getDateOfBirth() {
-        return ageInfo == null ? null : ageInfo.getDateOfBirth(); // TODO why ageInfo is null?
+        return ageInfo == null ? null : ageInfo.getDateOfBirth();
     }
 
     public void setDateOfBirth(Date dateOfBirth) {
