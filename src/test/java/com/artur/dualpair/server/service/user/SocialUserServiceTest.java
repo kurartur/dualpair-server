@@ -94,8 +94,8 @@ public class SocialUserServiceTest {
         assertNotNull(resultUser.getUpdated());
         SearchParameters searchParameters = resultUser.getSearchParameters();
         assertNotNull(searchParameters);
-        assertEquals(2, searchParameters.getMinAge());
-        assertEquals(8, searchParameters.getMaxAge());
+        assertEquals((Integer)2, searchParameters.getMinAge());
+        assertEquals((Integer)8, searchParameters.getMaxAge());
         assertTrue(searchParameters.getSearchFemale());
         assertFalse(searchParameters.getSearchMale());
     }
