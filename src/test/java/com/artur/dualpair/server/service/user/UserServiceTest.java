@@ -1,5 +1,6 @@
 package com.artur.dualpair.server.service.user;
 
+import com.artur.dualpair.server.domain.model.geo.Location;
 import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
@@ -158,6 +159,31 @@ public class UserServiceTest {
     @Test
     public void testSetUserSearchParameters() throws Exception {
         User user = new User();
+        SearchParameters searchParameters = new SearchParameters();
+        searchParameters.setSearchFemale(true);
+        searchParameters.setSearchMale(true);
+        searchParameters.setMinAge(20);
+        searchParameters.setMaxAge(30);
+        searchParameters.setLocation(new Location(1.0, 2.0, "LT", "Vilnius"));
+        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
+        userService.setUserSearchParameters("username", searchParameters);
+        assertNotEquals(searchParameters, user.getSearchParameters());
+        SearchParameters resultsSearchParameters = user.getSearchParameters();
+        assertTrue(resultsSearchParameters.getSearchFemale());
+        assertTrue(resultsSearchParameters.getSearchMale());
+        assertEquals((Integer)20, resultsSearchParameters.getMinAge());
+        assertEquals((Integer)30, resultsSearchParameters.getMaxAge());
+        assertEquals((Double)1.0, resultsSearchParameters.getLocation().getLatitude());
+        assertEquals((Double)2.0, resultsSearchParameters.getLocation().getLongitude());
+        assertEquals("LT", resultsSearchParameters.getLocation().getCountryCode());
+        assertEquals("Vilnius", resultsSearchParameters.getLocation().getCity());
+        verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    public void testSetUserSearchParameters_noParameters() throws Exception {
+        User user = new User();
+        user.setSearchParameters(null);
         SearchParameters searchParameters = new SearchParameters();
         when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
         userService.setUserSearchParameters("username", searchParameters);

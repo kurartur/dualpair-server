@@ -25,16 +25,16 @@ public class SearchParameters implements Serializable {
     private User user;
 
     @Column(name = "min_age")
-    private int minAge;
+    private Integer minAge;
 
     @Column(name = "max_age")
-    private int maxAge;
+    private Integer maxAge;
 
-    @Column(name = "search_male")
+    @Column(name = "search_male", length = 1)
     @Type(type = "yes_no")
     private boolean searchMale;
 
-    @Column(name = "search_female")
+    @Column(name = "search_female", length = 1)
     @Type(type = "yes_no")
     private boolean searchFemale;
 
@@ -49,19 +49,19 @@ public class SearchParameters implements Serializable {
         this.user = user;
     }
 
-    public int getMinAge() {
+    public Integer getMinAge() {
         return minAge;
     }
 
-    public void setMinAge(int minAge) {
+    public void setMinAge(Integer minAge) {
         this.minAge = minAge;
     }
 
-    public int getMaxAge() {
+    public Integer getMaxAge() {
         return maxAge;
     }
 
-    public void setMaxAge(int maxAge) {
+    public void setMaxAge(Integer maxAge) {
         this.maxAge = maxAge;
     }
 
@@ -89,6 +89,12 @@ public class SearchParameters implements Serializable {
         this.location = location;
     }
 
-
+    public void setFrom(SearchParameters s) {
+        setSearchMale(s.getSearchMale());
+        setSearchFemale(s.getSearchFemale());
+        setMinAge(s.getMinAge());
+        setMaxAge(s.getMaxAge());
+        setLocation(s.getLocation());
+    }
 
 }

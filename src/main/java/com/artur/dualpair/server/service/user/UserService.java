@@ -96,10 +96,19 @@ public class UserService implements UserDetailsService {
         updateUser(user);
     }
 
-    public void setUserSearchParameters(String username, SearchParameters searchParameters) {
+    public void setUserSearchParameters(String username, SearchParameters sp) {
         User user = loadUserByUsername(username);
-        user.setSearchParameters(searchParameters);
-        searchParameters.setUser(user);
+        SearchParameters current = user.getSearchParameters();
+        if (current == null) {
+            user.setSearchParameters(sp);
+            sp.setUser(user);
+        } else {
+            current.setSearchMale(sp.getSearchMale());
+            current.setSearchFemale(sp.getSearchFemale());
+            current.setMinAge(sp.getMinAge());
+            current.setMaxAge(sp.getMaxAge());
+            current.setLocation(sp.getLocation());
+        }
         updateUser(user);
     }
 

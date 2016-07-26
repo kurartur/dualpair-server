@@ -149,18 +149,28 @@ public class ITUserControllerTest {
 
     @Test
     @DatabaseSetup("userTest_setSearchParameters.xml")
-    public void testSetSearchParameters() throws Exception {
-        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
+    public void testSetSearchParameters_noParameters() throws Exception {
+        doTestSetSearchParameters(1L);
+    }
+
+    @Test
+    @DatabaseSetup("userTest_setSearchParameters.xml")
+    public void testSetSearchParameters_parametersExist() throws Exception {
+        doTestSetSearchParameters(2L);
+    }
+
+    private void doTestSetSearchParameters(Long userId) throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(userId));
         String data = "{\"searchMale\":true,\"searchFemale\":true,\"minAge\":\"20\",\"maxAge\":\"30\"}";
         mockMvc.perform(post("/api/user/search-parameters")
-                    .with(bearerToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(data.getBytes()))
+                .with(bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data.getBytes()))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/user"))
                 .andExpect(content().string(""));
         flushPersistenceContext();
-        Map<String, Object> searchParameters = jdbcTemplate.queryForMap("select * from search_parameters where user_id=1");
+        Map<String, Object> searchParameters = jdbcTemplate.queryForMap("select * from search_parameters where user_id=" + userId);
         assertFalse(searchParameters.isEmpty());
         assertEquals("Y", searchParameters.get("search_male"));
         assertEquals("Y", searchParameters.get("search_female"));

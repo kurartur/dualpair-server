@@ -22,10 +22,10 @@ public class MatchRequestValidator {
         if (user.getGender() == null) {
             throw new MatchRequestException("User must provide gender");
         }
-        if (searchParameters.getMinAge() == 0) {
+        if (searchParameters.getMinAge() == null) {
             throw new MatchRequestException("Invalid search parameters: min age is missing");
         }
-        if (searchParameters.getMaxAge() == 0) {
+        if (searchParameters.getMaxAge() == null) {
             throw new MatchRequestException("Invalid search parameters: max age is missing");
         }
         if (!searchParameters.getSearchMale() && !searchParameters.getSearchFemale()) {
