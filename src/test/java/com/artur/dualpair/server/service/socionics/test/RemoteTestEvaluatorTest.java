@@ -3,11 +3,10 @@ package com.artur.dualpair.server.service.socionics.test;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.socionics.test.Choice;
 import com.artur.dualpair.server.domain.model.socionics.test.ChoicePair;
-import com.artur.dualpair.server.persistence.repository.ChoicePairRepository;
-import com.artur.dualpair.server.persistence.repository.ChoiceRepository;
-import com.artur.dualpair.server.persistence.repository.SociotypeRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.ChoicePairRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.ChoiceRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -90,8 +89,7 @@ public class RemoteTestEvaluatorTest {
         }
     }
 
-    @Test
-    @Ignore
+    //@Test
     public void testEvaluateRequest() throws Exception {
         RemoteTestEvaluator.EvaluateRequest evaluateRequest = new RemoteTestEvaluator.EvaluateRequest();
         String response = evaluateRequest.post("w1=on&w2=on&w4=on&w3=on&r1=10&r2=10&r3=10&r4=10&r5=10&r6=10&r7=10&l1=10&l2=10&l3=10&l4=10&l5=10&l6=10&l7=10&s1=10&s2=10&s3=10&s4=10&s5=10&s6=10&s7=10&e1=10&e2=10&e3=10&e4=10&e5=10&e6=10&e7=10&tip=cheb");

@@ -3,9 +3,9 @@ package com.artur.dualpair.server.service.socionics.test;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.socionics.test.Choice;
 import com.artur.dualpair.server.domain.model.socionics.test.ChoicePair;
-import com.artur.dualpair.server.persistence.repository.ChoicePairRepository;
-import com.artur.dualpair.server.persistence.repository.ChoiceRepository;
-import com.artur.dualpair.server.persistence.repository.SociotypeRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.ChoicePairRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.ChoiceRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

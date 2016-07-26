@@ -1,7 +1,7 @@
 package com.artur.dualpair.server.service.socionics.test;
 
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
-import com.artur.dualpair.server.persistence.repository.SociotypeRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,7 +3,7 @@ package com.artur.dualpair.server.service.user;
 import com.artur.dualpair.server.domain.model.match.SearchParameters;
 import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.domain.model.user.UserAccount;
-import com.artur.dualpair.server.persistence.repository.UserRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.Connection;

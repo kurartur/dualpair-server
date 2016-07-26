@@ -1,4 +1,4 @@
-package com.artur.dualpair.server.persistence.repository;
+package com.artur.dualpair.server.infrastructure.persistence.repository;
 
 import org.springframework.data.repository.Repository;
 

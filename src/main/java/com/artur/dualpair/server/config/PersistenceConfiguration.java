@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.config.JpaRepositoryConfigExtensi
 
 @Configuration
 @EnableJpaRepositories(
-        basePackages = {"com.artur.dualpair.server.persistence.repository"},
-        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = {"com.artur.dualpair.server.persistence.repository.ReadOnlyRepository"})
+        basePackages = {"com.artur.dualpair.server"},
+        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = {"com.artur.dualpair.server.infrastructure.persistence.repository.ReadOnlyRepository"})
 )
 public class PersistenceConfiguration extends JpaRepositoryConfigExtension {
 }

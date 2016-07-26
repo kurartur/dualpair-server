@@ -1,7 +1,7 @@
 package com.artur.dualpair.server.service.socionics.test;
 
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
-import com.artur.dualpair.server.persistence.repository.CombinationRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.CombinationRepository;
 import org.junit.Before;
 import org.junit.Test;
 

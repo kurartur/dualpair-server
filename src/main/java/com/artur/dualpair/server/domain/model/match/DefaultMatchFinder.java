@@ -5,8 +5,8 @@ import com.artur.dualpair.server.domain.model.geo.Location;
 import com.artur.dualpair.server.domain.model.socionics.RelationType;
 import com.artur.dualpair.server.domain.model.socionics.Sociotype;
 import com.artur.dualpair.server.domain.model.user.User;
-import com.artur.dualpair.server.persistence.repository.SociotypeRepository;
-import com.artur.dualpair.server.persistence.repository.UserRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

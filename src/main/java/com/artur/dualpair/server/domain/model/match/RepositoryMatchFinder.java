@@ -1,7 +1,7 @@
 package com.artur.dualpair.server.domain.model.match;
 
 import com.artur.dualpair.server.domain.model.user.User;
-import com.artur.dualpair.server.persistence.repository.MatchRepository;
+import com.artur.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
