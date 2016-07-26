@@ -47,7 +47,7 @@ public class GoogleLocationProvider extends LocationProvider {
     protected RestTemplate getRestTemplate() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         if (System.getProperty("http.proxyHost") != null && System.getProperty("http.proxyPort") != null) {
-            InetSocketAddress address = new InetSocketAddress(System.getProperty("http.proxyHost"), new Integer(System.getProperty("http.proxyPort")));
+            InetSocketAddress address = new InetSocketAddress(System.getProperty("http.proxyHost"), Integer.valueOf(System.getProperty("http.proxyPort")));
             Proxy proxy = new Proxy(Proxy.Type.HTTP, address);
             factory.setProxy(proxy);
         }

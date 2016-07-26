@@ -63,7 +63,7 @@ public class UserService implements UserDetailsService {
 
             byte[] md5 = messageDigest.digest(outputStream.toByteArray());
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < md5.length; ++i)
                 sb.append(Integer.toHexString((md5[i] & 0xFF) | 0x100).substring(1,3));
 
@@ -103,11 +103,7 @@ public class UserService implements UserDetailsService {
             user.setSearchParameters(sp);
             sp.setUser(user);
         } else {
-            current.setSearchMale(sp.getSearchMale());
-            current.setSearchFemale(sp.getSearchFemale());
-            current.setMinAge(sp.getMinAge());
-            current.setMaxAge(sp.getMaxAge());
-            current.setLocation(sp.getLocation());
+            current.setFrom(sp);
         }
         updateUser(user);
     }

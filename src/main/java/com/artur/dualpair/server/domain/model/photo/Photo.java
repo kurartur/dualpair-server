@@ -4,10 +4,11 @@ import com.artur.dualpair.server.domain.model.user.User;
 import com.artur.dualpair.server.domain.model.user.UserAccount;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "user_photos")
-public class Photo {
+public class Photo implements Serializable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

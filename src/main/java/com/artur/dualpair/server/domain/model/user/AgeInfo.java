@@ -2,11 +2,12 @@ package com.artur.dualpair.server.domain.model.user;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
 @Embeddable
-public class AgeInfo {
+public class AgeInfo implements Serializable {
 
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
