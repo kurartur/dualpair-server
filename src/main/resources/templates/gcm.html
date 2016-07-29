@@ -1,0 +1,26 @@
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>
+            GCM
+        </title>
+    </head>
+    <body>
+        <div th:text="${pageMessage}">
+
+        </div>
+        <form method="post" action="/gcm/message/send">
+            <fieldset>
+                <legend>Send message</legend>
+                <table>
+                    <tr>
+                        <td>Message</td>
+                        <td><input type="text" name="message"/></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><input type="submit"/></td>
+                    </tr>
+                </table>
+            </fieldset>
+        </form>
+    </body>
+</html>

@@ -2,9 +2,9 @@ logging:
   level:
     org.springframework.security: DEBUG
     org.hibernate: ERROR
-    org.springframework.jdbc: DEBUG
-    org.hibernate.type: TRACE
-    org.springframework.web: DEBUG
+    #org.springframework.jdbc: DEBUG
+    #org.hibernate.type: TRACE
+    #org.springframework.web: DEBUG
 
 spring:
   datasource:
