@@ -1,77 +1,24 @@
 package lt.dualpair.server.interfaces.web.controller.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import lt.dualpair.server.Application;
-import lt.dualpair.server.OAuthHelper;
 import lt.dualpair.server.interfaces.dto.MatchDTO;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
-import javax.persistence.EntityManagerFactory;
+import java.io.IOException;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(Application.class)
-@WebAppConfiguration
-@ActiveProfiles("it")
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionalTestExecutionListener.class,
-        DbUnitTestExecutionListener.class })
-@Rollback
-@Transactional
 @DatabaseSetup({"socionicsData.xml"})
-public class ITMatchControllerTest {
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    private MockMvc mockMvc;
-
-    @Autowired
-    private OAuthHelper helper;
-
-    @Autowired
-    private EntityManagerFactory entityManagerFactory;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Before
-    public void setUp() throws Exception {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(springSecurity())
-                .build();
-    }
+public class ITMatchControllerTest extends BaseRestControllerTest {
 
     @Test
     public void testNext_unauthorized() throws Exception {
@@ -159,7 +106,6 @@ public class ITMatchControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
-        assertNotEquals("No matches", content);
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
         assertEquals("Artur", matchDTO.getUser().getName());
         assertEquals("Stephen", matchDTO.getOpponent().getName());
@@ -208,20 +154,36 @@ public class ITMatchControllerTest {
     }
 
     @Test
-    @DatabaseSetup(value = "matchTest_next_multiple.xml")
-    public void testNext_multiple() throws Exception {
-        doTestMultiple("Artur", "Diana");
-        doTestMultiple("Artur", "Melanie");
-        doTestMultiple("Artur", "Stephanie");
+    @DatabaseSetup(value = "matchTest_next_inRepo.xml")
+    public void testNext_inRepo() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L));
+        String content = mockMvc.perform(get("/api/match/next").with(bearerToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertMatch(content, "Artur", "Diana");
+
+        content = mockMvc.perform(get("/api/match/next").with(bearerToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertMatch(content, "Artur", "Diana");
     }
 
-    private void doTestMultiple(String expectedUser, String expectedOpponent) throws Exception {
+    @Test
+    @DatabaseSetup(value = "matchTest_next_inRepo.xml")
+    public void testNext_inRepo_excludeOpponents() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L));
-        MvcResult result = mockMvc.perform(get("/api/match/next").with(bearerToken))
+        String content = mockMvc.perform(get("/api/match/next?exclopp[]=2&exclopp[]=3").with(bearerToken))
                 .andExpect(status().isOk())
-                .andReturn();
-        String content = result.getResponse().getContentAsString();
-        assertNotEquals("No matches", content);
+                .andReturn().getResponse().getContentAsString();
+        assertMatch(content, "Artur", "Stephanie");
+
+        content = mockMvc.perform(get("/api/match/next?exclopp[]=2&exclopp[]=3&exclopp[]=4").with(bearerToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertMatch(content, "Artur", "Lucie");
+    }
+
+    private void assertMatch(String content, String expectedUser, String expectedOpponent) throws IOException {
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
         assertEquals(expectedUser, matchDTO.getUser().getName());
         assertEquals(expectedOpponent, matchDTO.getOpponent().getName());
@@ -290,9 +252,5 @@ public class ITMatchControllerTest {
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
         assertEquals("Artur", matchDTO.getUser().getName());
         assertEquals("Linda", matchDTO.getOpponent().getName());
-    }
-
-    private void flushPersistenceContext() {
-        EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory).flush();
     }
 }

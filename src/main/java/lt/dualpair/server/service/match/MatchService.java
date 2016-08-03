@@ -1,8 +1,6 @@
 package lt.dualpair.server.service.match;
 
-import lt.dualpair.server.domain.model.match.DefaultMatchFinder;
-import lt.dualpair.server.domain.model.match.Match;
-import lt.dualpair.server.domain.model.match.RepositoryMatchFinder;
+import lt.dualpair.server.domain.model.match.*;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.interfaces.web.controller.rest.ForbiddenException;
@@ -11,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -23,17 +22,27 @@ public class MatchService {
     private MatchRequestValidator matchRequestValidator;
 
     @Transactional
-    public Match nextFor(String userId) throws MatchRequestException {
-        User user = userService.loadUserByUserId(userId);
+    public Match nextFor(Long userId, List<Long> excludeOpponents) throws MatchRequestException {
+        User user = userService.loadUserById(userId);
         matchRequestValidator.validateMatchRequest(user, user.getSearchParameters());
-        Match match = repositoryMatchFinder.findFor(user, user.getSearchParameters());
+        MatchRequestBuilder builder =  MatchRequestBuilder.findFor(user)
+                .apply(user.getSearchParameters());
+        if (excludeOpponents != null) {
+            builder.excludeOpponents(excludeOpponents);
+        }
+        MatchRequest matchRequest = builder.build();
+        Match match = repositoryMatchFinder.findOne(matchRequest);
         if (match == null) {
-            match = defaultMatchFinder.findFor(user, user.getSearchParameters());
+            match = defaultMatchFinder.findOne(matchRequest);
         }
         if (match != null) {
             matchRepository.save(match);
         }
         return match;
+    }
+
+    public Match nextFor(Long userId) throws MatchRequestException {
+        return nextFor(userId, null);
     }
 
     @Transactional

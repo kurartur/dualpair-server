@@ -1,9 +1,7 @@
 package lt.dualpair.server.service.match;
 
-import lt.dualpair.server.domain.model.match.DefaultMatchFinder;
-import lt.dualpair.server.domain.model.match.Match;
-import lt.dualpair.server.domain.model.match.RepositoryMatchFinder;
-import lt.dualpair.server.domain.model.match.SearchParameters;
+import lt.dualpair.server.domain.model.geo.Location;
+import lt.dualpair.server.domain.model.match.*;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.interfaces.web.controller.rest.ForbiddenException;
@@ -40,12 +38,15 @@ public class MatchServiceTest {
         Match match = new Match();
         User user = new User();
         SearchParameters searchParameters = new SearchParameters();
+        searchParameters.setMinAge(10);
+        searchParameters.setMaxAge(20);
+        searchParameters.setSearchFemale(true);
+        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "City"));
         user.setSearchParameters(searchParameters);
-        doReturn(match).when(repositoryMatchFinder).findFor(eq(user), eq(searchParameters));
-        when(userService.loadUserByUserId("1")).thenReturn(user);
-        Match resultMatch = matchService.nextFor("1");
-        verify(userService, times(1)).loadUserByUserId("1");
-        verify(repositoryMatchFinder, times(1)).findFor(user, searchParameters);
+        doReturn(match).when(repositoryMatchFinder).findOne(any(MatchRequest.class));
+        when(userService.loadUserById(1L)).thenReturn(user);
+        Match resultMatch = matchService.nextFor(1L);
+        verify(userService, times(1)).loadUserById(1L);
         verifyNoMoreInteractions(defaultMatchFinder);
         verify(matchRepository, times(1)).save(match);
         verify(matchRequestValidator, times(1)).validateMatchRequest(user, searchParameters);
@@ -57,13 +58,16 @@ public class MatchServiceTest {
         Match match = new Match();
         User user = new User();
         SearchParameters searchParameters = new SearchParameters();
+        searchParameters.setMinAge(10);
+        searchParameters.setMaxAge(20);
+        searchParameters.setSearchFemale(true);
+        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "City"));
         user.setSearchParameters(searchParameters);
-        doReturn(match).when(defaultMatchFinder).findFor(eq(user), eq(searchParameters));
-        when(userService.loadUserByUserId("1")).thenReturn(user);
-        Match resultMatch = matchService.nextFor("1");
-        verify(userService, times(1)).loadUserByUserId("1");
-        verify(repositoryMatchFinder, times(1)).findFor(user, searchParameters);
-        verify(defaultMatchFinder, times(1)).findFor(user, searchParameters);
+        doReturn(match).when(defaultMatchFinder).findOne(any(MatchRequest.class));
+        when(userService.loadUserById(1L)).thenReturn(user);
+        Match resultMatch = matchService.nextFor(1L);
+        verify(userService, times(1)).loadUserById(1L);
+        verify(repositoryMatchFinder, times(1)).findOne(any(MatchRequest.class));
         verify(matchRepository, times(1)).save(match);
         verify(matchRequestValidator, times(1)).validateMatchRequest(user, searchParameters);
         assertEquals(match, resultMatch);
@@ -75,15 +79,15 @@ public class MatchServiceTest {
         SearchParameters searchParameters = new SearchParameters();
         user.setSearchParameters(searchParameters);
         doThrow(new MatchRequestException("Error")).when(matchRequestValidator).validateMatchRequest(user, searchParameters);
-        when(userService.loadUserByUserId("1")).thenReturn(user);
+        when(userService.loadUserById(1L)).thenReturn(user);
         try {
-            matchService.nextFor("1");
+            matchService.nextFor(1L);
             fail();
         } catch (MatchRequestException mre) {
             assertEquals("Error", mre.getMessage());
-            verify(userService, times(1)).loadUserByUserId("1");
-            verify(repositoryMatchFinder, times(0)).findFor(user, searchParameters);
-            verify(defaultMatchFinder, times(0)).findFor(user, searchParameters);
+            verify(userService, times(1)).loadUserById(1L);
+            verify(repositoryMatchFinder, times(0)).findOne(any(MatchRequest.class));
+            verify(defaultMatchFinder, times(0)).findOne(any(MatchRequest.class));
             verify(matchRepository, times(0)).save(any(Match.class));
             verify(matchRequestValidator, times(1)).validateMatchRequest(user, searchParameters);
         }

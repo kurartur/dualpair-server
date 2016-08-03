@@ -7,6 +7,7 @@ import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
+import lt.dualpair.server.infrastructure.persistence.repository.UserRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,18 +16,25 @@ import java.util.Set;
 @Component
 public class DefaultMatchFinder implements MatchFinder {
 
-    private static final double MAXIMUM_DISTANCE = 300e3;
-
     private UserRepository userRepository;
     private SociotypeRepository sociotypeRepository;
     private DistanceCalculator distanceCalculator;
 
     @Override
-    public Match findFor(User user, SearchParameters searchParameters) {
+    public Match findOne(MatchRequest matchRequest) {
+        User user = matchRequest.getUser();
         Sociotype dualSociotype = sociotypeRepository.findOppositeByRelationType(user.getRandomSociotype().getCode1(), RelationType.Code.DUAL);
-        Set<User> opponents = userRepository.findOpponent(user, dualSociotype, searchParameters);
+        Set<User> opponents = userRepository.findOpponents(new UserRepositoryImpl.FindOpponentsParams(
+                user,
+                dualSociotype,
+                matchRequest.getMinAge(),
+                matchRequest.getMaxAge(),
+                matchRequest.getGenders(),
+                matchRequest.getCountryCode(),
+                matchRequest.getExcludedOpponentIds()
+        ));
         if (opponents.size() != 0) {
-            ClosestOpponentResult closestOpponent = findClosestOpponent(user.getSearchParameters().getLocation(), opponents);
+            ClosestOpponentResult closestOpponent = findClosestOpponent(matchRequest.getLatitude(), matchRequest.getLongitude(), matchRequest.getRadius(), opponents);
             if (closestOpponent == null) {
                 return null;
             }
@@ -35,15 +43,13 @@ public class DefaultMatchFinder implements MatchFinder {
         return null;
     }
 
-    private ClosestOpponentResult findClosestOpponent(Location userLocation, Set<User> opponents) {
-        double userLatitude = userLocation.getLatitude();
-        double userLongitude = userLocation.getLongitude();
+    private ClosestOpponentResult findClosestOpponent(double userLatitude, double userLongitude, double radius, Set<User> opponents) {
         double shortest = Double.MAX_VALUE;
         User closestOpponent = null;
         for (User opponent : opponents) {
             Location opponentLocation = opponent.getSearchParameters().getLocation();
             double distance = distanceCalculator.calculate(userLatitude, userLongitude, opponentLocation.getLatitude(), opponentLocation.getLongitude());
-            if (distance <= MAXIMUM_DISTANCE && shortest > distance) {
+            if (distance <= radius && shortest > distance) {
                 shortest = distance;
                 closestOpponent = opponent;
             }

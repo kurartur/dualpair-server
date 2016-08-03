@@ -35,8 +35,17 @@ public class UserService implements UserDetailsService {
         return findByUsername(username);
     }
 
-    public User loadUserByUserId(String userId) throws UsernameNotFoundException {
-        return findByUsername(userId);
+    public User loadUserById(Long userId) throws UserNotFoundException {
+        Optional<User> user = userRepository.findOne(userId);
+        if (!user.isPresent()) {
+            throw new UserNotFoundException("User with ID " + userId + " not found.");
+        }
+        return user.get();
+    }
+
+    @Deprecated
+    public User loadUserByUserId(String username) throws UsernameNotFoundException {
+        return findByUsername(username);
     }
 
     private User findByUsername(String username) {

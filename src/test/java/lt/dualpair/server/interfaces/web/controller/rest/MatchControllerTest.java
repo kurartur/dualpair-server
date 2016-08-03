@@ -1,10 +1,10 @@
 package lt.dualpair.server.interfaces.web.controller.rest;
 
 import lt.dualpair.server.domain.model.match.Match;
+import lt.dualpair.server.domain.model.match.MatchRequestException;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.dto.MatchDTO;
 import lt.dualpair.server.interfaces.dto.assembler.MatchDTOAssembler;
-import lt.dualpair.server.service.match.MatchRequestException;
 import lt.dualpair.server.service.match.MatchService;
 import org.junit.After;
 import org.junit.Before;
@@ -72,9 +72,9 @@ public class MatchControllerTest {
 
     @Test
     public void testNext_exception() throws Exception {
-        doThrow(new MatchRequestException("Error")).when(matchService).nextFor("username");
+        doThrow(new MatchRequestException("Error")).when(matchService).nextFor(1L);
         try {
-            matchController.next();
+            matchController.next(null);
             fail();
         } catch (MatchRequestException mre) {
             assertEquals("Error", mre.getMessage());
@@ -85,16 +85,16 @@ public class MatchControllerTest {
     public void testNext() throws Exception {
         MatchDTO matchDTO = new MatchDTO();
         Match match = new Match();
-        doReturn(match).when(matchService).nextFor("username");
+        doReturn(match).when(matchService).nextFor(1L);
         doReturn(matchDTO).when(matchDTOAssembler).toDTO(match);
-        ResponseEntity<MatchDTO> responseEntity = matchController.next();
+        ResponseEntity<MatchDTO> responseEntity = matchController.next(null);
         assertEquals(matchDTO, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
     public void testNext_noMatches() throws Exception {
-        ResponseEntity responseEntity = matchController.next();
+        ResponseEntity responseEntity = matchController.next(null);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
 

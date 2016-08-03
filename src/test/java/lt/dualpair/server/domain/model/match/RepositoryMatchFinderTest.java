@@ -1,16 +1,19 @@
 package lt.dualpair.server.domain.model.match;
 
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RepositoryMatchFinderTest {
 
@@ -23,44 +26,15 @@ public class RepositoryMatchFinderTest {
     }
 
     @Test
-    public void testFindFor() throws Exception {
-        User user = createUser();
-        User opponent = createUser();
-        SearchParameters searchParameters = createSearchParameters();
-        Match match = createMatch(opponent, user);
+    public void testFindOne() throws Exception {
+        User user = UserTestUtils.createUser();
+        List<Long> exclude = Arrays.asList(1L);
         Set<Match> matchSet = new HashSet<>();
-        matchSet.add(match);
-        when(matchRepository.findByOpponent(user)).thenReturn(matchSet);
-        Match resultMatch = repositoryMatchFinder.findFor(user, searchParameters);
-        verify(matchRepository, times(1)).findByOpponent(user);
-        assertEquals(user, resultMatch.getUser());
-        assertEquals(opponent, resultMatch.getOpponent());
-    }
-
-    @Test
-     public void testFindFor_noMatches() throws Exception {
-        User user = createUser();
-        SearchParameters searchParameters = createSearchParameters();
-        Set<Match> matchSet = new HashSet<>();
-        when(matchRepository.findByOpponent(user)).thenReturn(matchSet);
-        assertNull(repositoryMatchFinder.findFor(user, searchParameters));
-        verify(matchRepository, times(1)).findByOpponent(user);
-    }
-
-    private SearchParameters createSearchParameters() {
-        SearchParameters searchParameters = new SearchParameters();
-        return searchParameters;
-    }
-
-    private User createUser() {
-        User user = new User();
-        return user;
-    }
-
-    private Match createMatch(User user, User opponent) {
         Match match = new Match();
-        match.setUser(user);
-        match.setOpponent(opponent);
-        return match;
+        matchSet.add(match);
+        when(matchRepository.findNotReviewed(user, exclude)).thenReturn(matchSet);
+        Match resultMatch = repositoryMatchFinder.findOne(new MatchRequestBuilder(user).excludeOpponents(exclude).build());
+        assertEquals(match, resultMatch);
     }
+
 }

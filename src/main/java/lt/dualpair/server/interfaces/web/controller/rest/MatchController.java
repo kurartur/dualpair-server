@@ -1,10 +1,10 @@
 package lt.dualpair.server.interfaces.web.controller.rest;
 
 import lt.dualpair.server.domain.model.match.Match;
+import lt.dualpair.server.domain.model.match.MatchRequestException;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.dto.MatchDTO;
 import lt.dualpair.server.interfaces.dto.assembler.MatchDTOAssembler;
-import lt.dualpair.server.service.match.MatchRequestException;
 import lt.dualpair.server.service.match.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -24,8 +25,13 @@ public class MatchController {
     private MatchDTOAssembler matchDTOAssembler;
 
     @RequestMapping(method = RequestMethod.GET, value = "/match/next")
-    public ResponseEntity next() throws MatchRequestException {
-        Match match = matchService.nextFor(getUserPrincipal().getUserId());
+    public ResponseEntity next(@RequestParam(name = "exclopp[]", required = false) List<Long> excludeOpponents) throws MatchRequestException {
+        Match match;
+        if (excludeOpponents != null) {
+            match = matchService.nextFor(getUserPrincipal().getId(), excludeOpponents);
+        } else {
+            match = matchService.nextFor(getUserPrincipal().getId());
+        }
         if (match == null) {
             return ResponseEntity.notFound().build();
         }

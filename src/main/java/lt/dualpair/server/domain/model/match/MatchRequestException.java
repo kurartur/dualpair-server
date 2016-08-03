@@ -1,4 +1,4 @@
-package lt.dualpair.server.service.match;
+package lt.dualpair.server.domain.model.match;
 
 public class MatchRequestException extends Exception {
 

@@ -1,7 +1,6 @@
-package lt.dualpair.server.service.match;
+package lt.dualpair.server.domain.model.match;
 
 import lt.dualpair.server.domain.model.geo.Location;
-import lt.dualpair.server.domain.model.match.SearchParameters;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import org.junit.Test;

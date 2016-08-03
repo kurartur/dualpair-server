@@ -4,6 +4,7 @@ import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.match.SearchParameters;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import org.junit.Before;
@@ -44,6 +45,25 @@ public class UserServiceTest {
             fail();
         } catch (UsernameNotFoundException unfe) {
             assertTrue(unfe.getMessage().equals("User with username username not found."));
+        }
+    }
+
+    @Test
+    public void testLoadUserById() throws Exception {
+        User user = UserTestUtils.createUser(1L);
+        when(userRepository.findOne(1L)).thenReturn(Optional.of(user));
+        User resultUser = userService.loadUserById(1L);
+        assertEquals(user, resultUser);
+    }
+
+    @Test
+    public void testLoadUserById_notFound() throws Exception {
+        try {
+            when(userRepository.findOne(1L)).thenReturn(Optional.empty());
+            userService.loadUserById(1L);
+            fail();
+        } catch (UserNotFoundException unfe) {
+            assertTrue(unfe.getMessage().equals("User with ID 1 not found."));
         }
     }
 

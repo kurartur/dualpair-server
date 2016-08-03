@@ -1,7 +1,5 @@
 package lt.dualpair.server.infrastructure.persistence.repository;
 
-import lt.dualpair.server.domain.model.geo.Location;
-import lt.dualpair.server.domain.model.match.SearchParameters;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import org.junit.Before;
@@ -9,9 +7,10 @@ import org.junit.Test;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -34,74 +33,28 @@ public class UserRepositoryImplTest {
         user.setDateOfBirth(new Date());
         user.setGender(User.Gender.MALE);
         Sociotype sociotype = new Sociotype.Builder().code2(Sociotype.Code2.ISFJ).build();
-        SearchParameters searchParameters = new SearchParameters();
-        searchParameters.setMinAge(20);
-        searchParameters.setMaxAge(25);
-        searchParameters.setSearchMale(true);
-        searchParameters.setSearchFemale(true);
-        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "city"));
-        userRepository.findOpponent(user, sociotype, searchParameters);
-        verify(query, times(1)).setParameter("user", user);
-        verify(query, times(1)).setParameter("minAge", 20);
-        verify(query, times(1)).setParameter("maxAge", 25);
-        List<User.Gender> genders = new ArrayList<>();
+        Set<User.Gender> genders = new HashSet<>();
         genders.add(User.Gender.MALE);
         genders.add(User.Gender.FEMALE);
-        verify(query, times(1)).setParameter("genders", genders);
-        verify(query, times(1)).setParameter("sociotype", sociotype);
-        verify(query, times(1)).setParameter("countryCode", "LT");
-        verify(query, times(1)).setParameter("userAge", 0);
-        verify(query, times(1)).setParameter("userGenderCode", "M");
-    }
-
-    @Test
-    public void testFindOpponent_searchForMale() throws Exception {
-        User user = new User();
-        user.setDateOfBirth(new Date());
-        user.setGender(User.Gender.MALE);
-        Sociotype sociotype = new Sociotype.Builder().code2(Sociotype.Code2.ISFJ).build();
-        SearchParameters searchParameters = new SearchParameters();
-        searchParameters.setMinAge(20);
-        searchParameters.setMaxAge(25);
-        searchParameters.setSearchMale(true);
-        searchParameters.setSearchFemale(false);
-        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "city"));
-        userRepository.findOpponent(user, sociotype, searchParameters);
+        UserRepositoryImpl.FindOpponentsParams params = new UserRepositoryImpl.FindOpponentsParams(
+                user,
+                sociotype,
+                20,
+                25,
+                genders,
+                "LT",
+                Arrays.asList(1L)
+        );
+        userRepository.findOpponents(params);
         verify(query, times(1)).setParameter("user", user);
         verify(query, times(1)).setParameter("minAge", 20);
         verify(query, times(1)).setParameter("maxAge", 25);
-        List<User.Gender> genders = new ArrayList<>();
-        genders.add(User.Gender.MALE);
         verify(query, times(1)).setParameter("genders", genders);
         verify(query, times(1)).setParameter("sociotype", sociotype);
         verify(query, times(1)).setParameter("countryCode", "LT");
         verify(query, times(1)).setParameter("userAge", 0);
         verify(query, times(1)).setParameter("userGenderCode", "M");
-    }
-
-    @Test
-    public void testFindOpponent_searchForFemale() throws Exception {
-        User user = new User();
-        user.setDateOfBirth(new Date());
-        user.setGender(User.Gender.MALE);
-        Sociotype sociotype = new Sociotype.Builder().code2(Sociotype.Code2.ISFJ).build();
-        SearchParameters searchParameters = new SearchParameters();
-        searchParameters.setMinAge(20);
-        searchParameters.setMaxAge(25);
-        searchParameters.setSearchMale(false);
-        searchParameters.setSearchFemale(true);
-        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "city"));
-        userRepository.findOpponent(user, sociotype, searchParameters);
-        verify(query, times(1)).setParameter("user", user);
-        verify(query, times(1)).setParameter("minAge", 20);
-        verify(query, times(1)).setParameter("maxAge", 25);
-        List<User.Gender> genders = new ArrayList<>();
-        genders.add(User.Gender.FEMALE);
-        verify(query, times(1)).setParameter("genders", genders);
-        verify(query, times(1)).setParameter("sociotype", sociotype);
-        verify(query, times(1)).setParameter("countryCode", "LT");
-        verify(query, times(1)).setParameter("userAge", 0);
-        verify(query, times(1)).setParameter("userGenderCode", "M");
+        verify(query, times(1)).setParameter("exclude", Arrays.asList(1L));
     }
 
 }

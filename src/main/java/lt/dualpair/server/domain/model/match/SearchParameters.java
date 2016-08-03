@@ -6,6 +6,8 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "search_parameters")
@@ -79,6 +81,13 @@ public class SearchParameters implements Serializable {
 
     public void setSearchMale(boolean searchMale) {
         this.searchMale = searchMale;
+    }
+
+    public Set<User.Gender> getSearchGenders() {
+        Set<User.Gender> genders = new HashSet<>();
+        if (getSearchFemale()) genders.add(User.Gender.FEMALE);
+        if (getSearchMale()) genders.add(User.Gender.MALE);
+        return genders;
     }
 
     public Location getLocation() {
