@@ -1,32 +1,25 @@
 package lt.dualpair.server.domain.model.match;
 
-import lt.dualpair.server.domain.model.user.User;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 @Entity
 @Table(name = "matches")
 public class Match implements Serializable {
 
-    public enum Response {UNDEFINED, NO, YES}
-
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "opponent_id")
-    private User opponent;
+    @OneToMany(mappedBy = "match")
+    private Set<MatchParty> matchParties = new HashSet<>();
 
     private Integer distance;
-
-    @Enumerated
-    private Response response = Response.UNDEFINED;
 
     public Long getId() {
         return id;
@@ -36,20 +29,38 @@ public class Match implements Serializable {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public Set<MatchParty> getMatchParties() {
+        return matchParties;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setMatchParties(MatchParty firstParty, MatchParty secondParty) {
+        Assert.notNull(firstParty);
+        Assert.notNull(secondParty);
+        matchParties.clear();
+        matchParties.add(firstParty);
+        matchParties.add(secondParty);
     }
 
-    public User getOpponent() {
-        return opponent;
+    public MatchParty getMatchParty(Long userId) {
+        Assert.notNull(userId);
+        Iterator<MatchParty> matchPartyIterator = matchParties.iterator();
+        while (matchPartyIterator.hasNext()) {
+            MatchParty matchParty = matchPartyIterator.next();
+            if (matchParty.getUser().getId().equals(userId))
+                return matchParty;
+        }
+        return null;
     }
 
-    public void setOpponent(User opponent) {
-        this.opponent = opponent;
+    public MatchParty getOppositeMatchParty(Long userId) {
+        Assert.notNull(userId);
+        Iterator<MatchParty> matchPartyIterator = matchParties.iterator();
+        while (matchPartyIterator.hasNext()) {
+            MatchParty matchParty = matchPartyIterator.next();
+            if (!matchParty.getUser().getId().equals(userId))
+                return matchParty;
+        }
+        return null;
     }
 
     public Integer getDistance() {
@@ -60,11 +71,4 @@ public class Match implements Serializable {
         this.distance = distance;
     }
 
-    public Response getResponse() {
-        return response;
-    }
-
-    public void setResponse(Response response) {
-        this.response = response;
-    }
 }

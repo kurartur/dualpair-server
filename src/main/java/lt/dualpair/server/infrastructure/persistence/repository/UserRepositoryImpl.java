@@ -16,8 +16,8 @@ public class UserRepositoryImpl implements CustomUserRepository {
 
     private static final String FIND_OPPONENTS_QUERY = "" +
             "select opp from User as opp\n" +
-            "where opp not in (\n" +
-            "   select m.opponent from Match as m where m.user = :user\n" +
+            "where not exists (\n" +
+            "   select mp from MatchParty as mp where mp.user = :user and mp.user = opp\n" +
             ")\n" +
             "   and opp.ageInfo.age >= :minAge and opp.ageInfo.age <= :maxAge\n" +
             "   and opp.gender in :genders\n" +

@@ -21,17 +21,20 @@
     <users_sociotypes user_id="5" sociotype_id="13"/>
     <search_parameters user_id="5" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="10" longitude="10.3" country_code="LT"/>
 
+    <matches id="1" distance="10" />
+    <match_parties id="1" match_id="1" user_id="1" response="0"/>
+    <match_parties id="2" match_id="1" user_id="2" response="0"/>
 
-    <matches id="1" user_id="1" opponent_id="2" distance="10" response="0"/>
-    <matches id="2" user_id="2" opponent_id="1" distance="10" response="0"/>
+    <matches id="2" distance="100" />
+    <match_parties id="3" match_id="2" user_id="1" response="0"/>
+    <match_parties id="4" match_id="2" user_id="3" response="0"/>
 
-    <matches id="3" user_id="1" opponent_id="3" distance="100" response="0"/>
-    <matches id="4" user_id="3" opponent_id="1" distance="100" response="0"/>
+    <matches id="3" distance="300"/>
+    <match_parties id="5" match_id="3" user_id="1" response="0"/>
+    <match_parties id="6" match_id="3" user_id="4" response="0"/>
 
-    <matches id="5" user_id="1" opponent_id="4" distance="300" response="0"/>
-    <matches id="6" user_id="4" opponent_id="1" distance="300" response="0"/>
-
-    <matches id="7" user_id="1" opponent_id="5" distance="500" response="0"/>
-    <matches id="8" user_id="5" opponent_id="1" distance="500" response="0"/>
+    <matches id="4" distance="500"/>
+    <match_parties id="7" match_id="4" user_id="1" response="0"/>
+    <match_parties id="8" match_id="4" user_id="5" response="0"/>
 
 </dataset>

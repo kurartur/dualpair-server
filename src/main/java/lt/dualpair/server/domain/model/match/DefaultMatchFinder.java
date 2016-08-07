@@ -59,8 +59,7 @@ public class DefaultMatchFinder implements MatchFinder {
 
     private Match createMatch(User user, User opponent, Integer distance) {
         Match match = new Match();
-        match.setUser(user);
-        match.setOpponent(opponent);
+        match.setMatchParties(new MatchParty(match, user), new MatchParty(match, opponent));
         match.setDistance(distance);
         return match;
     }

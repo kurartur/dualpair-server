@@ -2,31 +2,40 @@ package lt.dualpair.server.interfaces.dto;
 
 public class MatchDTO {
 
-    private UserDTO user;
-    private UserDTO opponent;
-    private String response;
+    private Long id;
+    private MatchPartyDTO user;
+    private MatchPartyDTO opponent;
+    private Integer distance;
 
-    public UserDTO getUser() {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public MatchPartyDTO getUser() {
         return user;
     }
 
-    public void setUser(UserDTO user) {
+    public void setUser(MatchPartyDTO user) {
         this.user = user;
     }
 
-    public UserDTO getOpponent() {
+    public MatchPartyDTO getOpponent() {
         return opponent;
     }
 
-    public void setOpponent(UserDTO opponent) {
+    public void setOpponent(MatchPartyDTO opponent) {
         this.opponent = opponent;
     }
 
-    public String getResponse() {
-        return response;
+    public Integer getDistance() {
+        return distance;
     }
 
-    public void setResponse(String response) {
-        this.response = response;
+    public void setDistance(Integer distance) {
+        this.distance = distance;
     }
 }

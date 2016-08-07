@@ -1,6 +1,7 @@
 package lt.dualpair.server.interfaces.web.controller.rest;
 
 import lt.dualpair.server.domain.model.match.Match;
+import lt.dualpair.server.domain.model.match.MatchParty;
 import lt.dualpair.server.domain.model.match.MatchRequestException;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.dto.MatchDTO;
@@ -17,8 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class MatchControllerTest {
@@ -42,21 +42,20 @@ public class MatchControllerTest {
     @Test
     public void testResponse() throws Exception {
         ResponseEntity responseEntity = matchController.response(1L, "YES");
-        verify(matchService, times(1)).responseByUser(1L, Match.Response.YES, "username");
+        verify(matchService, times(1)).responseByUser(1L, MatchParty.Response.YES, 1L);
         assertEquals(HttpStatus.SEE_OTHER, responseEntity.getStatusCode());
         assertEquals("/api/match/1", responseEntity.getHeaders().getLocation().toString());
     }
 
     @Test
     public void testResponse_exception() throws Exception {
-        doThrow(new RuntimeException("Error")).when(matchService).responseByUser(1L, Match.Response.YES, "username");
+        doThrow(new RuntimeException("Error")).when(matchService).responseByUser(1L, MatchParty.Response.YES, 1L);
         try {
             matchController.response(1L, "YES");
             fail();
         } catch (RuntimeException re) {
             assertEquals("Error", re.getMessage());
         }
-        verify(matchService, times(1)).responseByUser(1L, Match.Response.YES, "username");
     }
 
     @Test
@@ -65,9 +64,9 @@ public class MatchControllerTest {
             matchController.response(1L, "INVALID");
             fail();
         } catch (IllegalArgumentException iae) {
-            assertEquals("No enum constant lt.dualpair.server.domain.model.match.Match.Response.INVALID", iae.getMessage());
+            assertTrue(iae.getMessage().contains("No enum constant"));
         }
-        verify(matchService, times(0)).responseByUser(any(Long.class), any(Match.Response.class), any(String.class));
+        verify(matchService, times(0)).responseByUser(any(Long.class), any(MatchParty.Response.class), any(Long.class));
     }
 
     @Test
@@ -100,7 +99,7 @@ public class MatchControllerTest {
 
     @Test
     public void testMatch_exception() throws Exception {
-        doThrow(new RuntimeException("Error")).when(matchService).getUserMatch(1L, "username");
+        doThrow(new RuntimeException("Error")).when(matchService).getUserMatch(1L, 1L);
         try {
             matchController.match(1L);
         } catch (RuntimeException re) {
@@ -112,11 +111,17 @@ public class MatchControllerTest {
     public void testMatch() throws Exception {
         MatchDTO matchDTO = new MatchDTO();
         Match match = new Match();
-        doReturn(match).when(matchService).getUserMatch(1L, "username");
+        doReturn(match).when(matchService).getUserMatch(1L, 1L);
         doReturn(matchDTO).when(matchDTOAssembler).toDTO(match);
         ResponseEntity<MatchDTO> response = matchController.match(1L);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(matchDTO, response.getBody());
+    }
+
+    @Test
+    public void testMatch_notFound() throws Exception {
+        ResponseEntity response = matchController.match(1L);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
@@ -127,7 +132,7 @@ public class MatchControllerTest {
         Match match = new Match();
         Set<Match> matches = new HashSet<>();
         matches.add(match);
-        doReturn(matches).when(matchService).getUserMatches("username");
+        doReturn(matches).when(matchService).getUserMutualMatches(1L);
         doReturn(matchDTOs).when(matchDTOAssembler).toDTOSet(matches);
         ResponseEntity<Set<MatchDTO>> response = matchController.matches();
         assertEquals(HttpStatus.OK, response.getStatusCode());

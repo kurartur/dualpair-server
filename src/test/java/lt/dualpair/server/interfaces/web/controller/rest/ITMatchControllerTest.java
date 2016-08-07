@@ -66,8 +66,8 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
         String content = result.getResponse().getContentAsString();
         assertNotEquals("No matches", content);
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals("Artur", matchDTO.getUser().getName());
-        assertEquals("Diana", matchDTO.getOpponent().getName());
+        assertEquals("Artur", matchDTO.getUser().getUser().getName());
+        assertEquals("Diana", matchDTO.getOpponent().getUser().getName());
     }
 
     @Test
@@ -80,8 +80,8 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
         String content = result.getResponse().getContentAsString();
         assertNotEquals("No matches", content);
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals("Artur", matchDTO.getUser().getName());
-        assertEquals("Diana", matchDTO.getOpponent().getName());
+        assertEquals("Artur", matchDTO.getUser().getUser().getName());
+        assertEquals("Diana", matchDTO.getOpponent().getUser().getName());
     }
 
     @Test
@@ -94,8 +94,8 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
         String content = result.getResponse().getContentAsString();
         assertNotEquals("No matches", content);
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals("Diana", matchDTO.getUser().getName());
-        assertEquals("Artur", matchDTO.getOpponent().getName());
+        assertEquals("Diana", matchDTO.getUser().getUser().getName());
+        assertEquals("Artur", matchDTO.getOpponent().getUser().getName());
     }
 
     @Test
@@ -107,8 +107,8 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
                 .andReturn();
         String content = result.getResponse().getContentAsString();
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals("Artur", matchDTO.getUser().getName());
-        assertEquals("Stephen", matchDTO.getOpponent().getName());
+        assertEquals("Artur", matchDTO.getUser().getUser().getName());
+        assertEquals("Stephen", matchDTO.getOpponent().getUser().getName());
     }
 
     @Test
@@ -121,8 +121,8 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
         String content = result.getResponse().getContentAsString();
         assertNotEquals("No matches", content);
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals("Artur", matchDTO.getUser().getName());
-        assertEquals("Diana", matchDTO.getOpponent().getName());
+        assertEquals("Artur", matchDTO.getUser().getUser().getName());
+        assertEquals("Diana", matchDTO.getOpponent().getUser().getName());
     }
 
     @Test
@@ -135,8 +135,8 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
         String content = result.getResponse().getContentAsString();
         assertNotEquals("No matches", content);
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals("Diana", matchDTO.getUser().getName());
-        assertEquals("Artur", matchDTO.getOpponent().getName());
+        assertEquals("Diana", matchDTO.getUser().getUser().getName());
+        assertEquals("Artur", matchDTO.getOpponent().getUser().getName());
     }
 
     @Test
@@ -149,8 +149,8 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
         String content = result.getResponse().getContentAsString();
         assertNotEquals("No matches", content);
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals("Diana", matchDTO.getUser().getName());
-        assertEquals("Linda", matchDTO.getOpponent().getName());
+        assertEquals("Diana", matchDTO.getUser().getUser().getName());
+        assertEquals("Linda", matchDTO.getOpponent().getUser().getName());
     }
 
     @Test
@@ -185,8 +185,8 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
 
     private void assertMatch(String content, String expectedUser, String expectedOpponent) throws IOException {
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals(expectedUser, matchDTO.getUser().getName());
-        assertEquals(expectedOpponent, matchDTO.getOpponent().getName());
+        assertEquals(expectedUser, matchDTO.getUser().getUser().getName());
+        assertEquals(expectedOpponent, matchDTO.getOpponent().getUser().getName());
     }
 
     @Test
@@ -211,7 +211,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
                 .andExpect(status().isSeeOther())
                 .andExpect(header().string("Location", "/api/match/1"));
         flushPersistenceContext();
-        Map<String, Object> rs = jdbcTemplate.queryForMap("select response from matches where user_id=1");
+        Map<String, Object> rs = jdbcTemplate.queryForMap("select response from match_parties where user_id=1");
         assertEquals(2, rs.get("response"));
     }
 
@@ -223,7 +223,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
                  .andExpect(status().isSeeOther())
                  .andExpect(header().string("Location", "/api/match/1"));
         flushPersistenceContext();
-        Map<String, Object> rs = jdbcTemplate.queryForMap("select response from matches where user_id=1");
+        Map<String, Object> rs = jdbcTemplate.queryForMap("select response from match_parties where user_id=1");
         assertEquals(1, rs.get("response"));
     }
 
@@ -236,9 +236,9 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_match.xml")
     public void testMatch_forbidden() throws Exception {
-        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(2L));
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(3L));
         mockMvc.perform(get("/api/match/1").with(bearerToken))
-          .andExpect(status().isForbidden());
+          .andExpect(status().isNotFound());
     }
 
     @Test
@@ -250,7 +250,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
           .andReturn();
         String content = result.getResponse().getContentAsString();
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals("Artur", matchDTO.getUser().getName());
-        assertEquals("Linda", matchDTO.getOpponent().getName());
+        assertEquals("Artur", matchDTO.getUser().getUser().getName());
+        assertEquals("Linda", matchDTO.getOpponent().getUser().getName());
     }
 }

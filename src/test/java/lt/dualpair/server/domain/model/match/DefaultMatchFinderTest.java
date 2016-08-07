@@ -5,7 +5,6 @@ import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepositoryImpl;
@@ -17,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static lt.dualpair.server.domain.model.user.UserTestUtils.createUser;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
@@ -36,8 +36,8 @@ public class DefaultMatchFinderTest {
 
     @Test
     public void testFindOne() throws Exception {
-        User user = UserTestUtils.createUser(1L, Sociotype.Code1.EII);
-        User opponent = UserTestUtils.createUser(2L, Sociotype.Code1.LSE);
+        User user = createUser(1L, Sociotype.Code1.EII);
+        User opponent = createUser(2L, Sociotype.Code1.LSE);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
         opponent.setSearchParameters(createSearchParameters(12, "LT"));
         Set<User> opponents = new HashSet<>(Collections.singletonList(opponent));
@@ -46,15 +46,15 @@ public class DefaultMatchFinderTest {
         doReturn(300000.0).when(distanceCalculator).calculate(10, 10, 12, 12);
         Match resultMatch = defaultMatchFinder.findOne(new MatchRequestBuilder(user).location(10, 10, "LT").build());
         assertNotNull(resultMatch);
-        assertEquals(user, resultMatch.getUser());
-        assertEquals(opponent, resultMatch.getOpponent());
+        assertEquals(user, resultMatch.getMatchParty(1L).getUser());
+        assertEquals(opponent, resultMatch.getOppositeMatchParty(1L).getUser());
         assertEquals((Integer)300000, resultMatch.getDistance());
     }
 
     @Test
     public void testFindOne_tooFar() throws Exception {
-        User user = UserTestUtils.createUser(1L, Sociotype.Code1.EII);
-        User opponent = UserTestUtils.createUser(2L, Sociotype.Code1.LSE);
+        User user = createUser(1L, Sociotype.Code1.EII);
+        User opponent = createUser(2L, Sociotype.Code1.LSE);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
         opponent.setSearchParameters(createSearchParameters(12, "LT"));
         Set<User> opponents = new HashSet<>(Collections.singletonList(opponent));
@@ -69,10 +69,10 @@ public class DefaultMatchFinderTest {
 
     @Test
     public void testFindOne_closest() throws Exception {
-        User user = UserTestUtils.createUser(1L, Sociotype.Code1.EII);
-        User opponent1 = UserTestUtils.createUser(2L, Sociotype.Code1.LSE);
-        User opponent2 = UserTestUtils.createUser(3L, Sociotype.Code1.LSE);
-        User opponent3 = UserTestUtils.createUser(4L, Sociotype.Code1.LSE);
+        User user = createUser(1L, Sociotype.Code1.EII);
+        User opponent1 = createUser(2L, Sociotype.Code1.LSE);
+        User opponent2 = createUser(3L, Sociotype.Code1.LSE);
+        User opponent3 = createUser(4L, Sociotype.Code1.LSE);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
         opponent1.setSearchParameters(createSearchParameters(12, "LT"));
         opponent2.setSearchParameters(createSearchParameters(13, "LT"));
@@ -88,14 +88,14 @@ public class DefaultMatchFinderTest {
         doReturn(299999.8).when(distanceCalculator).calculate(10, 10, 14, 14);
         Match resultMatch = defaultMatchFinder.findOne(new MatchRequestBuilder(user).location(10, 10, "LT").build());
         assertNotNull(resultMatch);
-        assertEquals(user, resultMatch.getUser());
-        assertEquals(opponent2, resultMatch.getOpponent());
+        assertEquals(user, resultMatch.getMatchParty(1L).getUser());
+        assertEquals(opponent2, resultMatch.getOppositeMatchParty(1L).getUser());
         assertEquals((Integer)299999, resultMatch.getDistance());
     }
 
     @Test
     public void testFindOnee_noMatches() throws Exception {
-        User user = UserTestUtils.createUser(1L, Sociotype.Code1.EII);
+        User user = createUser(1L, Sociotype.Code1.EII);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
         SearchParameters searchParameters = new SearchParameters();
         when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.EII, RelationType.Code.DUAL)).thenReturn(pairSociotype);

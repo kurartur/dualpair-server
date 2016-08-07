@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class MatchService {
@@ -46,12 +48,13 @@ public class MatchService {
     }
 
     @Transactional
-    public void responseByUser(Long matchId, Match.Response response, String userId) {
+    public void responseByUser(Long matchId, MatchParty.Response response, Long userId) {
         Match match = findNotNullMatch(matchId);
-        if (!match.getUser().getUserId().equals(userId)) {
+        MatchParty matchParty = match.getMatchParty(userId);
+        if (matchParty == null) {
             throw new ForbiddenException("Invalid user");
         }
-        match.setResponse(response);
+        matchParty.setResponse(response);
         matchRepository.save(match);
     }
 
@@ -62,29 +65,17 @@ public class MatchService {
         return match;
     }
 
-    /*
-     *   @see getUserMatch(Long matchId, Long userId)
-     */
-    @Deprecated
-    public Match getUserMatch(Long matchId, String username) {
-        Match match = findNotNullMatch(matchId);
-        if (!match.getUser().getUsername().equals(username)) {
-            throw new ForbiddenException("Invalid user");
-        }
-        return match;
-    }
-
     public Match getUserMatch(Long matchId, Long userId) {
-        Match match = findNotNullMatch(matchId);
-        if (!match.getUser().getId().equals(userId)) {
-            throw new ForbiddenException("Invalid user");
-        }
-        return match;
+        Optional<Match> match = matchRepository.findOneByUser(matchId, userId);
+        return match.isPresent() ? match.get() : null;
     }
 
-    public Set<Match> getUserMatches(String username) {
-        User user = userService.loadUserByUsername(username);
-        return matchRepository.findByUser(user);
+    public Set<Match> getUserMutualMatches(final Long userId) {
+        User user = userService.loadUserById(userId);
+        Set<Match> matches =  matchRepository.findByUser(user, MatchParty.Response.YES);
+        return matches.stream()
+                .filter(match -> match.getOppositeMatchParty(userId).getResponse() == MatchParty.Response.YES)
+                .collect(Collectors.toSet());
     }
 
     @Autowired

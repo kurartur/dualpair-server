@@ -1,6 +1,7 @@
 package lt.dualpair.server.interfaces.web.controller.rest;
 
 import lt.dualpair.server.domain.model.match.Match;
+import lt.dualpair.server.domain.model.match.MatchParty;
 import lt.dualpair.server.domain.model.match.MatchRequestException;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.dto.MatchDTO;
@@ -40,19 +41,22 @@ public class MatchController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/match/{matchId:[0-9]+}")
     public ResponseEntity match(@PathVariable Long matchId) {
-        Match match = matchService.getUserMatch(matchId, getUserPrincipal().getUsername());
+        Match match = matchService.getUserMatch(matchId, getUserPrincipal().getId());
+        if (match == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(matchDTOAssembler.toDTO(match));
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/match/{matchId:[0-9]+}/response")
-    public ResponseEntity response(@PathVariable Long matchId, @RequestParam(required = true) String response) throws URISyntaxException {
-        matchService.responseByUser(matchId, Match.Response.valueOf(response), getUserPrincipal().getUserId());
+    public ResponseEntity response(@PathVariable Long matchId, @RequestParam String response) throws URISyntaxException {
+        matchService.responseByUser(matchId, MatchParty.Response.valueOf(response), getUserPrincipal().getId());
         return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/match/" + matchId)).build();
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/matches")
     public ResponseEntity<Set<MatchDTO>> matches() {
-        Set<Match> matches = matchService.getUserMatches(getUserPrincipal().getUsername());
+        Set<Match> matches = matchService.getUserMutualMatches(getUserPrincipal().getId());
         return ResponseEntity.ok(matchDTOAssembler.toDTOSet(matches));
     }
 
