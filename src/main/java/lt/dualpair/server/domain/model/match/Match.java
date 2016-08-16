@@ -1,5 +1,6 @@
 package lt.dualpair.server.domain.model.match;
 
+import lt.dualpair.server.domain.model.socionics.RelationType;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
@@ -16,7 +17,11 @@ public class Match implements Serializable {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    @OneToMany(mappedBy = "match")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "relation_type_id")
+    private RelationType relationType;
+
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
     private Set<MatchParty> matchParties = new HashSet<>();
 
     private Integer distance;
@@ -27,6 +32,14 @@ public class Match implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public RelationType getRelationType() {
+        return relationType;
+    }
+
+    public void setRelationType(RelationType relationType) {
+        this.relationType = relationType;
     }
 
     public Set<MatchParty> getMatchParties() {

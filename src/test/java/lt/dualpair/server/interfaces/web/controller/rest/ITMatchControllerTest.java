@@ -183,6 +183,16 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
         assertMatch(content, "Artur", "Lucie");
     }
 
+    @Test
+    @DatabaseSetup(value = "matchTest_next_noDuplicates.xml")
+    public void textNext_noDuplicates() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L));
+        String content = mockMvc.perform(get("/api/match/next").with(bearerToken))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertMatch(content, "Artur", "Melanie");
+    }
+
     private void assertMatch(String content, String expectedUser, String expectedOpponent) throws IOException {
         MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
         assertEquals(expectedUser, matchDTO.getUser().getUser().getName());

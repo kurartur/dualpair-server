@@ -5,16 +5,14 @@ import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.infrastructure.persistence.repository.RelationTypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepositoryImpl;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import static lt.dualpair.server.domain.model.user.UserTestUtils.createUser;
 import static org.junit.Assert.*;
@@ -26,12 +24,16 @@ public class DefaultMatchFinderTest {
     private UserRepository userRepository = mock(UserRepository.class);
     private SociotypeRepository sociotypeRepository = mock(SociotypeRepository.class);
     private DistanceCalculator distanceCalculator = mock(DistanceCalculator.class);
+    private RelationTypeRepository relationTypeRepository = mock(RelationTypeRepository.class);
 
     @Before
     public void setUp() throws Exception {
         defaultMatchFinder.setUserRepository(userRepository);
         defaultMatchFinder.setSociotypeRepository(sociotypeRepository);
         defaultMatchFinder.setDistanceCalculator(distanceCalculator);
+        defaultMatchFinder.setRelationTypeRepository(relationTypeRepository);
+        RelationType relationType = new RelationType.Builder().id(1).code(RelationType.Code.DUAL).build();
+        when(relationTypeRepository.findByCode(RelationType.Code.DUAL)).thenReturn(Optional.of(relationType));
     }
 
     @Test
@@ -49,6 +51,7 @@ public class DefaultMatchFinderTest {
         assertEquals(user, resultMatch.getMatchParty(1L).getUser());
         assertEquals(opponent, resultMatch.getOppositeMatchParty(1L).getUser());
         assertEquals((Integer)300000, resultMatch.getDistance());
+        assertEquals(RelationType.Code.DUAL, resultMatch.getRelationType().getCode());
     }
 
     @Test
@@ -64,8 +67,6 @@ public class DefaultMatchFinderTest {
         Match resultMatch = defaultMatchFinder.findOne(new MatchRequestBuilder(user).location(10, 10, "LT").build());
         assertNull(resultMatch);
     }
-
-
 
     @Test
     public void testFindOne_closest() throws Exception {

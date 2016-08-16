@@ -1,5 +1,6 @@
 package lt.dualpair.server.domain.model.match;
 
+import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.user.User;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ public class MatchRequest {
     private static final int DEFAULT_RADIUS = 300000; // meters
 
     private User user;
+
+    private RelationType.Code relationType = RelationType.Code.DUAL;
 
     private int minAge;
     private int maxAge;
@@ -79,6 +82,10 @@ public class MatchRequest {
 
     public void setMinAge(int minAge) {
         this.minAge = minAge;
+    }
+
+    public RelationType.Code getRelationType() {
+        return relationType;
     }
 
     public Set<User.Gender> getGenders() {

@@ -5,6 +5,7 @@ import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.infrastructure.persistence.repository.RelationTypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepositoryImpl;
@@ -19,11 +20,13 @@ public class DefaultMatchFinder implements MatchFinder {
     private UserRepository userRepository;
     private SociotypeRepository sociotypeRepository;
     private DistanceCalculator distanceCalculator;
+    private RelationTypeRepository relationTypeRepository;
 
     @Override
     public Match findOne(MatchRequest matchRequest) {
         User user = matchRequest.getUser();
-        Sociotype dualSociotype = sociotypeRepository.findOppositeByRelationType(user.getRandomSociotype().getCode1(), RelationType.Code.DUAL);
+        RelationType.Code relationType = matchRequest.getRelationType();
+        Sociotype dualSociotype = sociotypeRepository.findOppositeByRelationType(user.getRandomSociotype().getCode1(), relationType);
         Set<User> opponents = userRepository.findOpponents(new UserRepositoryImpl.FindOpponentsParams(
                 user,
                 dualSociotype,
@@ -38,7 +41,7 @@ public class DefaultMatchFinder implements MatchFinder {
             if (closestOpponent == null) {
                 return null;
             }
-            return createMatch(user, closestOpponent.opponent, new Double(closestOpponent.distance).intValue());
+            return createMatch(user, closestOpponent.opponent, relationType, new Double(closestOpponent.distance).intValue());
         }
         return null;
     }
@@ -57,8 +60,9 @@ public class DefaultMatchFinder implements MatchFinder {
         return closestOpponent == null ? null : new ClosestOpponentResult(closestOpponent, shortest);
     }
 
-    private Match createMatch(User user, User opponent, Integer distance) {
+    private Match createMatch(User user, User opponent, RelationType.Code relationType, Integer distance) {
         Match match = new Match();
+        match.setRelationType(relationTypeRepository.findByCode(relationType).get());
         match.setMatchParties(new MatchParty(match, user), new MatchParty(match, opponent));
         match.setDistance(distance);
         return match;
@@ -77,6 +81,11 @@ public class DefaultMatchFinder implements MatchFinder {
     @Autowired
     public void setDistanceCalculator(DistanceCalculator distanceCalculator) {
         this.distanceCalculator = distanceCalculator;
+    }
+
+    @Autowired
+    public void setRelationTypeRepository(RelationTypeRepository relationTypeRepository) {
+        this.relationTypeRepository = relationTypeRepository;
     }
 
     private static final class ClosestOpponentResult {
