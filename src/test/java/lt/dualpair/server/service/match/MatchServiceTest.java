@@ -3,6 +3,8 @@ package lt.dualpair.server.service.match;
 import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.match.*;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.infrastructure.notification.Notification;
+import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.interfaces.web.controller.rest.ForbiddenException;
 import lt.dualpair.server.service.user.UserService;
@@ -27,6 +29,7 @@ public class MatchServiceTest {
     private UserService userService = mock(UserService.class);
     private MatchRepository matchRepository = mock(MatchRepository.class);
     private MatchRequestValidator matchRequestValidator = mock(MatchRequestValidator.class);
+    private NotificationSender notificationSender = mock(NotificationSender.class);
 
     @Before
     public void setUp() throws Exception {
@@ -35,6 +38,7 @@ public class MatchServiceTest {
         matchService.setUserService(userService);
         matchService.setMatchRepository(matchRepository);
         matchService.setMatchRequestValidator(matchRequestValidator);
+        matchService.setNotificationSender(notificationSender);
     }
 
     @Test
@@ -107,6 +111,7 @@ public class MatchServiceTest {
         verify(matchRepository, times(1)).save(match);
         assertEquals(MatchParty.Response.YES, match.getMatchParty(2L).getResponse());
         assertEquals(MatchParty.Response.UNDEFINED, match.getMatchParty(1L).getResponse());
+        verify(notificationSender, never()).sendNotification(any(Notification.class));
     }
 
     @Test
@@ -128,6 +133,19 @@ public class MatchServiceTest {
     public void testResponseByUser_matchNotFound() throws Exception {
         when(matchRepository.findOne(1L)).thenReturn(null);
         matchService.responseByUser(1L, MatchParty.Response.YES, 2L);
+    }
+
+    @Test
+    public void testResponseByUser_notification() throws Exception {
+        MatchParty matchParty1 = createMatchParty(1L, createUser(1L), MatchParty.Response.YES);
+        MatchParty matchParty2 = createMatchParty(2L, createUser(2L), MatchParty.Response.UNDEFINED);
+        Match match = MatchTestUtils.createMatch(1L, matchParty1, matchParty2);
+        when(matchRepository.findOne(1L)).thenReturn(match);
+        matchService.responseByUser(1L, MatchParty.Response.YES, 2L);
+        verify(matchRepository, times(1)).save(match);
+        assertEquals(MatchParty.Response.YES, match.getMatchParty(2L).getResponse());
+        assertEquals(MatchParty.Response.YES, match.getMatchParty(1L).getResponse());
+        verify(notificationSender, times(2)).sendNotification(any(Notification.class));
     }
 
     @Test

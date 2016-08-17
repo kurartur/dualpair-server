@@ -2,6 +2,8 @@ package lt.dualpair.server.service.match;
 
 import lt.dualpair.server.domain.model.match.*;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.infrastructure.notification.Notification;
+import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.interfaces.web.controller.rest.ForbiddenException;
 import lt.dualpair.server.service.user.UserService;
@@ -22,6 +24,7 @@ public class MatchService {
     private MatchRepository matchRepository;
     private UserService userService;
     private MatchRequestValidator matchRequestValidator;
+    private NotificationSender notificationSender;
 
     @Transactional
     public Match nextFor(Long userId, List<Long> excludeOpponents) throws MatchRequestException {
@@ -56,6 +59,11 @@ public class MatchService {
         }
         matchParty.setResponse(response);
         matchRepository.save(match);
+
+        if (match.isMutual()) {
+            notificationSender.sendNotification(new Notification(matchParty.getUser().getId(), "New match"));
+            notificationSender.sendNotification(new Notification(match.getOppositeMatchParty(userId).getUser().getId(), "New match"));
+        }
     }
 
     private Match findNotNullMatch(Long matchId) {
@@ -101,5 +109,9 @@ public class MatchService {
     @Autowired
     public void setMatchRequestValidator(MatchRequestValidator matchRequestValidator) {
         this.matchRequestValidator = matchRequestValidator;
+    }
+
+    public void setNotificationSender(NotificationSender notificationSender) {
+        this.notificationSender = notificationSender;
     }
 }

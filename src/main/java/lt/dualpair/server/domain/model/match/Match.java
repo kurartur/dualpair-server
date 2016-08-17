@@ -76,6 +76,13 @@ public class Match implements Serializable {
         return null;
     }
 
+    public boolean isMutual() {
+        Iterator<MatchParty> matchPartyIterator = matchParties.iterator();
+        MatchParty first = matchPartyIterator.next();
+        MatchParty second = matchPartyIterator.next();
+        return first.getResponse() == MatchParty.Response.YES && second.getResponse() == MatchParty.Response.YES;
+    }
+
     public Integer getDistance() {
         return distance;
     }
