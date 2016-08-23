@@ -9,16 +9,15 @@ import lt.dualpair.server.infrastructure.persistence.repository.SociotypeReposit
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class UserServiceTest {
+public class UserServiceImplTest {
 
-    private UserService userService = new UserService();
+    private UserServiceImpl userService = new UserServiceImpl();
     private UserRepository userRepository = mock(UserRepository.class);
     private SociotypeRepository sociotypeRepository = mock(SociotypeRepository.class);
 
@@ -29,29 +28,9 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testLoadUserByUsername() throws Exception {
-        User user = createUser(1L, "username", "email");
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
-        User resultUser = userService.loadUserByUsername("username");
-        verify(userRepository, times(1)).findByUsername("username");
-        assertEquals(user, resultUser);
-    }
-
-    @Test
-    public void testLoadUserByUsername_notFound() throws Exception {
-        try {
-            when(userRepository.findByUsername("username")).thenReturn(Optional.empty());
-            userService.loadUserByUsername("username");
-            fail();
-        } catch (UsernameNotFoundException unfe) {
-            assertTrue(unfe.getMessage().equals("User with username username not found."));
-        }
-    }
-
-    @Test
     public void testLoadUserById() throws Exception {
         User user = UserTestUtils.createUser(1L);
-        when(userRepository.findOne(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         User resultUser = userService.loadUserById(1L);
         assertEquals(user, resultUser);
     }
@@ -59,31 +38,11 @@ public class UserServiceTest {
     @Test
     public void testLoadUserById_notFound() throws Exception {
         try {
-            when(userRepository.findOne(1L)).thenReturn(Optional.empty());
+            when(userRepository.findById(1L)).thenReturn(Optional.empty());
             userService.loadUserById(1L);
             fail();
         } catch (UserNotFoundException unfe) {
             assertTrue(unfe.getMessage().equals("User with ID 1 not found."));
-        }
-    }
-
-    @Test
-    public void testLoadUserByUserId() throws Exception {
-        User user = createUser(1L, "username", "email");
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
-        User resultUser = userService.loadUserByUserId("username");
-        verify(userRepository, times(1)).findByUsername("username");
-        assertEquals(user, resultUser);
-    }
-
-    @Test
-    public void testLoadUserByUserId_notFound() throws Exception {
-        try {
-            when(userRepository.findByUsername("username")).thenReturn(Optional.empty());
-            userService.loadUserByUserId("username");
-            fail();
-        } catch (UsernameNotFoundException unfe) {
-            assertTrue(unfe.getMessage().equals("User with username username not found."));
         }
     }
 
@@ -103,7 +62,7 @@ public class UserServiceTest {
         }
         
         try {
-            userService.setUserSociotypes("1", null);
+            userService.setUserSociotypes(1L, null);
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("Sociotype codes are mandatory", iae.getMessage());
@@ -115,11 +74,11 @@ public class UserServiceTest {
         Set<Sociotype.Code1> codes = new HashSet<>();
         codes.add(Sociotype.Code1.EII);
         List<Sociotype.Code1> codeList = new ArrayList<>(codes);
-        User user = createUser(1L, "username", null);
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
+        User user = UserTestUtils.createUser(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(sociotypeRepository.findByCode1List(codeList)).thenReturn(new HashSet<>());
         try {
-            userService.setUserSociotypes("username", codes);
+            userService.setUserSociotypes(1L, codes);
             fail();
         } catch (IllegalStateException ise) {
             assertEquals("Zero sociotypes found", ise.getMessage());
@@ -133,10 +92,10 @@ public class UserServiceTest {
         Set<Sociotype.Code1> codes = new HashSet<>();
         codes.add(Sociotype.Code1.EII);
         ArrayList<Sociotype.Code1> codeList = new ArrayList<>(codes);
-        User user = createUser(1L, "username", null);
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
+        User user = UserTestUtils.createUser(1L);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(sociotypeRepository.findByCode1List(codeList)).thenReturn(sociotypes);
-        userService.setUserSociotypes("username", codes);
+        userService.setUserSociotypes(1L, codes);
         assertEquals(sociotypes, user.getSociotypes());
         verify(userRepository, times(1)).save(user);
     }
@@ -146,7 +105,7 @@ public class UserServiceTest {
         Set<Sociotype.Code1> codes = new HashSet<>();
 
         try {
-            userService.setUserSociotypes("username", codes);
+            userService.setUserSociotypes(1L, codes);
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
@@ -158,7 +117,7 @@ public class UserServiceTest {
         codes.add(Sociotype.Code1.IEI);
 
         try {
-            userService.setUserSociotypes("username", codes);
+            userService.setUserSociotypes(1L, codes);
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
@@ -170,8 +129,8 @@ public class UserServiceTest {
     public void testSetUserDateOfBirth() throws Exception {
         User user = new User();
         Date date = new Date();
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
-        userService.setUserDateOfBirth("username", date);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        userService.setUserDateOfBirth(1L, date);
         verify(userRepository, times(1)).save(user);
         assertEquals(date, user.getDateOfBirth());
     }
@@ -185,8 +144,8 @@ public class UserServiceTest {
         searchParameters.setMinAge(20);
         searchParameters.setMaxAge(30);
         searchParameters.setLocation(new Location(1.0, 2.0, "LT", "Vilnius"));
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
-        userService.setUserSearchParameters("username", searchParameters);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        userService.setUserSearchParameters(1L, searchParameters);
         assertNotEquals(searchParameters, user.getSearchParameters());
         SearchParameters resultsSearchParameters = user.getSearchParameters();
         assertTrue(resultsSearchParameters.getSearchFemale());
@@ -205,18 +164,10 @@ public class UserServiceTest {
         User user = new User();
         user.setSearchParameters(null);
         SearchParameters searchParameters = new SearchParameters();
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
-        userService.setUserSearchParameters("username", searchParameters);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        userService.setUserSearchParameters(1L, searchParameters);
         assertEquals(searchParameters, user.getSearchParameters());
         assertEquals(user, searchParameters.getUser());
         verify(userRepository, times(1)).save(user);
-    }
-
-    private User createUser(Long id, String username, String email) {
-        User user = new User();
-        user.setId(id);
-        user.setUsername(username);
-        user.setEmail(email);
-        return user;
     }
 }

@@ -3,7 +3,6 @@ package lt.dualpair.server.interfaces.web.controller.rest;
 import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.geo.LocationProvider;
 import lt.dualpair.server.domain.model.geo.LocationProviderException;
-import lt.dualpair.server.domain.model.match.SearchParameters;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.dto.LocationDTO;
@@ -23,8 +22,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.Principal;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -35,21 +35,14 @@ public class UserController {
     private SearchParametersDTOAssembler searchParametersDTOAssembler;
     private LocationProvider locationProvider;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/user")
+    @RequestMapping(method = RequestMethod.GET, value = "/me")
     public UserDTO getUser() {
-        return userDTOAssembler.toDTO(socialUserService.getUser(getUserPrincipal().getUsername()));
+        return userDTOAssembler.toDTO(socialUserService.loadUserById(getUserPrincipal().getId()));
     }
 
-    @RequestMapping("/api/me")
-    public Map<String, String> user(Principal principal) {
-        Map<String, String> map = new LinkedHashMap<>();
-        map.put("name", principal.getName());
-        return map;
-    }
-
-    @RequestMapping(method = RequestMethod.POST, value = "/user/sociotypes")
+    @RequestMapping(method = RequestMethod.POST, value = "/user/{userId:[0-9]+}/sociotypes")
     public ResponseEntity setSociotypes(@RequestBody SociotypeDTO[] sociotypes) throws URISyntaxException {
-        socialUserService.setUserSociotypes(getUserPrincipal().getUserId(), convertToCodes(sociotypes));
+        socialUserService.setUserSociotypes(getUserPrincipal().getId(), convertToCodes(sociotypes));
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
@@ -62,30 +55,33 @@ public class UserController {
         return codes;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/user/date-of-birth")
+    @RequestMapping(method = RequestMethod.POST, value = "/user/{userId:[0-9]+}/date-of-birth")
     public ResponseEntity setDateOfBirth(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth) throws URISyntaxException {
-        socialUserService.setUserDateOfBirth(getUserPrincipal().getUserId(), dateOfBirth);
+        socialUserService.setUserDateOfBirth(getUserPrincipal().getId(), dateOfBirth);
         return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/user")).build();
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/user/search-parameters")
+    @RequestMapping(method = RequestMethod.POST, value = "/user/{userId:[0-9]+}/search-parameters")
     public ResponseEntity setSearchParameters(@RequestBody SearchParametersDTO searchParameters) throws URISyntaxException {
-        socialUserService.setUserSearchParameters(getUserPrincipal().getUsername(), searchParametersDTOAssembler.toEntity(searchParameters));
+        socialUserService.setUserSearchParameters(getUserPrincipal().getId(), searchParametersDTOAssembler.toEntity(searchParameters));
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/user/location")
-    public ResponseEntity setLocation(@RequestBody LocationDTO locationDTO) throws LocationProviderException, URISyntaxException {
+    @RequestMapping(method = RequestMethod.POST, value = "/user/{userId:[0-9]+}/locations")
+    public ResponseEntity setLocation(@RequestBody LocationDTO locationDTO, @PathVariable("userId") Long userId) throws LocationProviderException, URISyntaxException {
+        if (!getUserPrincipal().getId().equals(userId)) {
+            throw new ForbiddenException(ForbiddenException.illegalAccess);
+        }
+
         Location location;
         if (locationDTO.getLatitude() != null && locationDTO.getLongitude() != null) {
             location = locationProvider.getLocation(locationDTO.getLatitude(), locationDTO.getLongitude());
         } else {
             throw new IllegalArgumentException("\"latitude\" and \"longitude\" must be provided");
         }
-        User user = socialUserService.getUser(getUserPrincipal().getUsername());
-        SearchParameters searchParameters = user.getSearchParameters();
-        searchParameters.setLocation(location);
-        socialUserService.setUserSearchParameters(user.getUsername(), searchParameters);
+
+        socialUserService.addLocation(userId, location);
+
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 

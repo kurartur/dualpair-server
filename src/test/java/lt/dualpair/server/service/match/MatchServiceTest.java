@@ -7,7 +7,7 @@ import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.interfaces.web.controller.rest.ForbiddenException;
-import lt.dualpair.server.service.user.UserService;
+import lt.dualpair.server.service.user.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ public class MatchServiceTest {
     private MatchService matchService = new MatchService();
     private DefaultMatchFinder defaultMatchFinder = mock(DefaultMatchFinder.class);
     private RepositoryMatchFinder repositoryMatchFinder = mock(RepositoryMatchFinder.class);
-    private UserService userService = mock(UserService.class);
+    private UserServiceImpl userService = mock(UserServiceImpl.class);
     private MatchRepository matchRepository = mock(MatchRepository.class);
     private MatchRequestValidator matchRequestValidator = mock(MatchRequestValidator.class);
     private NotificationSender notificationSender = mock(NotificationSender.class);

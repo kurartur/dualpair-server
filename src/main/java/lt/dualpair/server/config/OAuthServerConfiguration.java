@@ -1,6 +1,5 @@
 package lt.dualpair.server.config;
 
-import lt.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -54,7 +54,7 @@ public class OAuthServerConfiguration {
         protected AuthenticationManager authenticationManager;
 
         @Autowired
-        protected UserService userService;
+        protected UserDetailsService userService;
 
         @Autowired
         @Qualifier("defaultTokenServices")

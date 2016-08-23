@@ -12,7 +12,7 @@ import lt.dualpair.server.interfaces.dto.SociotypeDTO;
 import lt.dualpair.server.interfaces.dto.UserDTO;
 import lt.dualpair.server.interfaces.dto.assembler.SearchParametersDTOAssembler;
 import lt.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
-import lt.dualpair.server.service.user.SocialUserService;
+import lt.dualpair.server.service.user.SocialUserServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 public class UserControllerTest {
 
     private UserController userController = new UserController();
-    private SocialUserService socialUserService = mock(SocialUserService.class);
+    private SocialUserServiceImpl socialUserService = mock(SocialUserServiceImpl.class);
     private UserDTOAssembler userDTOAssembler = mock(UserDTOAssembler.class);
     private SearchParametersDTOAssembler searchParametersDTOAssembler = mock(SearchParametersDTOAssembler.class);
     private LocationProvider locationProvider = mock(LocationProvider.class);
@@ -45,7 +45,6 @@ public class UserControllerTest {
         userController.setLocationProvider(locationProvider);
         User user = new User();
         user.setId(1L);
-        user.setUsername("1");
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null));
     }
 
@@ -58,7 +57,7 @@ public class UserControllerTest {
     public void testGetUser() throws Exception {
         User user = new User();
         UserDTO userDTO = new UserDTO();
-        when(socialUserService.getUser("1")).thenReturn(user);
+        when(socialUserService.loadUserById(1L)).thenReturn(user);
         when(userDTOAssembler.toDTO(user)).thenReturn(userDTO);
         assertEquals(userDTO, userController.getUser());
     }
@@ -72,7 +71,7 @@ public class UserControllerTest {
         Set<Sociotype.Code1> sociotypeCodes = new HashSet<>();
         sociotypeCodes.add(Sociotype.Code1.EII);
         ResponseEntity response = userController.setSociotypes(sociotypes);
-        verify(socialUserService, times(1)).setUserSociotypes("1", sociotypeCodes);
+        verify(socialUserService, times(1)).setUserSociotypes(1L, sociotypeCodes);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("/api/user", response.getHeaders().getLocation().toString());
     }
@@ -85,7 +84,7 @@ public class UserControllerTest {
         sociotypes[0] = dto;
         Set<Sociotype.Code1> sociotypeCodes = new HashSet<>();
         sociotypeCodes.add(Sociotype.Code1.EII);
-        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSociotypes("1", sociotypeCodes);
+        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSociotypes(1L, sociotypeCodes);
         try {
             userController.setSociotypes(sociotypes);
             fail();
@@ -98,7 +97,7 @@ public class UserControllerTest {
     public void testSetDateOfBirth() throws Exception {
         Date dateOfBirth = new Date();
         ResponseEntity responseEntity = userController.setDateOfBirth(dateOfBirth);
-        verify(socialUserService, times(1)).setUserDateOfBirth("1", dateOfBirth);
+        verify(socialUserService, times(1)).setUserDateOfBirth(1L, dateOfBirth);
         assertEquals(HttpStatus.SEE_OTHER, responseEntity.getStatusCode());
         assertEquals("/api/user", responseEntity.getHeaders().getLocation().toString());
     }
@@ -106,14 +105,14 @@ public class UserControllerTest {
     @Test
     public void testSetDateOfBirth_exception() throws Exception {
         Date dateOfBirth = new Date();
-        doThrow(new RuntimeException("Error")).when(socialUserService).setUserDateOfBirth("1", dateOfBirth);
+        doThrow(new RuntimeException("Error")).when(socialUserService).setUserDateOfBirth(1L, dateOfBirth);
         try {
             userController.setDateOfBirth(dateOfBirth);
             fail();
         } catch (RuntimeException re) {
             assertEquals("Error", re.getMessage());
         }
-        verify(socialUserService, times(1)).setUserDateOfBirth("1", dateOfBirth);
+        verify(socialUserService, times(1)).setUserDateOfBirth(1L, dateOfBirth);
     }
 
     @Test
@@ -121,7 +120,7 @@ public class UserControllerTest {
         SearchParameters searchParameters = new SearchParameters();
         SearchParametersDTO searchParametersDTO = new SearchParametersDTO();
         when(searchParametersDTOAssembler.toEntity(searchParametersDTO)).thenReturn(searchParameters);
-        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSearchParameters("1", searchParameters);
+        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSearchParameters(1L, searchParameters);
         try {
             userController.setSearchParameters(searchParametersDTO);
             fail();
@@ -136,14 +135,14 @@ public class UserControllerTest {
         SearchParametersDTO searchParametersDTO = new SearchParametersDTO();
         when(searchParametersDTOAssembler.toEntity(searchParametersDTO)).thenReturn(searchParameters);
         userController.setSearchParameters(searchParametersDTO);
-        verify(socialUserService, times(1)).setUserSearchParameters("1", searchParameters);
+        verify(socialUserService, times(1)).setUserSearchParameters(1L, searchParameters);
     }
 
     @Test
     public void testSetLocation_noLatLon() throws Exception {
         LocationDTO locationDTO = new LocationDTO();
         try {
-            userController.setLocation(locationDTO);
+            userController.setLocation(locationDTO, 1L);
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("\"latitude\" and \"longitude\" must be provided", iae.getMessage());
@@ -151,7 +150,7 @@ public class UserControllerTest {
 
         locationDTO.setLatitude(1.0);
         try {
-            userController.setLocation(locationDTO);
+            userController.setLocation(locationDTO, 1L);
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("\"latitude\" and \"longitude\" must be provided", iae.getMessage());
@@ -160,7 +159,7 @@ public class UserControllerTest {
         locationDTO.setLatitude(null);
         locationDTO.setLongitude(1.0);
         try {
-            userController.setLocation(locationDTO);
+            userController.setLocation(locationDTO, 1L);
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("\"latitude\" and \"longitude\" must be provided", iae.getMessage());
@@ -174,44 +173,38 @@ public class UserControllerTest {
         locationDTO.setLongitude(2.0);
         when(locationProvider.getLocation(1.0, 2.0)).thenThrow(new LocationProviderException("Error"));
         try {
-            userController.setLocation(locationDTO);
+            userController.setLocation(locationDTO, 1L);
             fail();
         } catch (LocationProviderException lpe) {
             assertEquals("Error", lpe.getMessage());
         }
-        verify(socialUserService, never()).setUserSearchParameters(any(String.class), any(SearchParameters.class));
+        verify(socialUserService, never()).addLocation(any(Long.class), any(Location.class));
     }
 
     @Test
-    public void testSetLocation_loadUserException() throws Exception {
+    public void testSetLocation_invalidUser() throws Exception {
         LocationDTO locationDTO = new LocationDTO();
         locationDTO.setLatitude(1.0);
         locationDTO.setLongitude(2.0);
-        doThrow(new IllegalArgumentException("Error")).when(socialUserService).getUser("1");
         try {
-            userController.setLocation(locationDTO);
+            userController.setLocation(locationDTO, 2L);
             fail();
-        } catch (IllegalArgumentException iae) {
-            assertEquals("Error", iae.getMessage());
+        } catch (ForbiddenException e) {
+            assertEquals("Illegal access", e.getMessage());
         }
-        verify(locationProvider, times(1)).getLocation(1.0, 2.0);
-        verify(socialUserService, never()).setUserSearchParameters(any(String.class), any(SearchParameters.class));
+        verify(locationProvider, never()).getLocation(any(Double.class), any(Double.class));
     }
 
     @Test
-    public void testSetLocation_setSearchParametersException() throws Exception {
+    public void testSetLocation_addLocationException() throws Exception {
         LocationDTO locationDTO = new LocationDTO();
         locationDTO.setLatitude(1.0);
         locationDTO.setLongitude(2.0);
-        User user = new User();
-        user.setUsername("username");
-        SearchParameters searchParameters = new SearchParameters();
-        user.setSearchParameters(searchParameters);
-        when(socialUserService.getUser("1")).thenReturn(user);
-        when(locationProvider.getLocation(1.0, 2.0)).thenReturn(new Location(1.0, 2.0, "LT", "Vilnius"));
-        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSearchParameters("username", searchParameters);
+        Location location = new Location(1.0, 2.0, "LT", "Vilnius");
+        when(locationProvider.getLocation(1.0, 2.0)).thenReturn(location);
+        doThrow(new RuntimeException("Error")).when(socialUserService).addLocation(1L, location);
         try {
-            userController.setLocation(locationDTO);
+            userController.setLocation(locationDTO, 1L);
             fail();
         } catch (RuntimeException re) {
             assertEquals("Error", re.getMessage());
@@ -223,16 +216,9 @@ public class UserControllerTest {
         LocationDTO locationDTO = new LocationDTO();
         locationDTO.setLatitude(1.0);
         locationDTO.setLongitude(2.0);
-        User user = new User();
-        SearchParameters searchParameters = new SearchParameters();
-        user.setSearchParameters(searchParameters);
-        when(socialUserService.getUser("1")).thenReturn(user);
-        when(locationProvider.getLocation(1.0, 2.0)).thenReturn(new Location(1.0, 2.0, "LT", "Vilnius"));
-        userController.setLocation(locationDTO);
-        verify(socialUserService, times(1)).setUserSearchParameters(any(String.class), any(SearchParameters.class));
-        assertEquals(new Double(1.0), searchParameters.getLocation().getLatitude());
-        assertEquals(new Double(2.0), searchParameters.getLocation().getLongitude());
-        assertEquals("LT", searchParameters.getLocation().getCountryCode());
-        assertEquals("Vilnius", searchParameters.getLocation().getCity());
+        Location location = new Location(1.0, 2.0, "LT", "Vilnius");
+        when(locationProvider.getLocation(1.0, 2.0)).thenReturn(location);
+        userController.setLocation(locationDTO, 1L);
+        verify(socialUserService, times(1)).addLocation(1L, location);
     }
 }

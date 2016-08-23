@@ -83,9 +83,9 @@ public class ITUserControllerTest {
     }
 
     @Test
-    public void testGetUser() throws Exception {
+    public void testMe() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
-        MvcResult result = mockMvc.perform(get("/api/user").with(bearerToken).contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc.perform(get("/api/me").with(bearerToken).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
@@ -105,7 +105,7 @@ public class ITUserControllerTest {
     public void testSetSociotypes_ok() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
         String data = "[{\"code1\": \"EII\"}]";
-        mockMvc.perform(post("/api/user/sociotypes")
+        mockMvc.perform(post("/api/user/1/sociotypes")
                     .with(bearerToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(data.getBytes()))
@@ -125,7 +125,7 @@ public class ITUserControllerTest {
     public void testSetSociotypes_noCodes() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
         String data = "[]";
-        mockMvc.perform(post("/api/user/sociotypes")
+        mockMvc.perform(post("/api/user/1/sociotypes")
                       .with(bearerToken)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(data.getBytes()))
@@ -137,7 +137,7 @@ public class ITUserControllerTest {
     @DatabaseSetup("userTest_setDateOfBirth.xml")
     public void testSetDateOfBirth() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
-        mockMvc.perform(post("/api/user/date-of-birth?dateOfBirth=1990-02-03")
+        mockMvc.perform(post("/api/user/1/date-of-birth?dateOfBirth=1990-02-03")
                     .with(bearerToken))
                 .andExpect(status().isSeeOther())
                 .andExpect(header().string("Location", "/api/user"))
@@ -162,7 +162,7 @@ public class ITUserControllerTest {
     private void doTestSetSearchParameters(Long userId) throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(userId));
         String data = "{\"searchMale\":true,\"searchFemale\":true,\"minAge\":\"20\",\"maxAge\":\"30\"}";
-        mockMvc.perform(post("/api/user/search-parameters")
+        mockMvc.perform(post("/api/user/1/search-parameters")
                 .with(bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(data.getBytes()))
@@ -183,20 +183,19 @@ public class ITUserControllerTest {
     public void testSetLocation() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
         String data = "{\"latitude\":54.63, \"longitude\":25.32}";
-        mockMvc.perform(post("/api/user/location")
+        mockMvc.perform(post("/api/user/1/locations")
                     .with(bearerToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(data.getBytes()))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/user"))
                 .andExpect(content().string(""));
-        flushPersistenceContext();
-        Map<String, Object> searchParameters = jdbcTemplate.queryForMap("select * from search_parameters where user_id=1");
-        assertFalse(searchParameters.isEmpty());
-        assertEquals(54.63, searchParameters.get("latitude"));
-        assertEquals(25.32, searchParameters.get("longitude"));
-        assertEquals("LT", searchParameters.get("country_code"));
-        assertEquals("Vilnius", searchParameters.get("city"));
+        Map<String, Object> locations = jdbcTemplate.queryForMap("select * from user_locations where user_id=1");
+        assertFalse(locations.isEmpty());
+        assertEquals(54.63, locations.get("latitude"));
+        assertEquals(25.32, locations.get("longitude"));
+        assertEquals("LT", locations.get("country_code"));
+        assertEquals("Vilnius", locations.get("city"));
     }
 
     private void flushPersistenceContext() {

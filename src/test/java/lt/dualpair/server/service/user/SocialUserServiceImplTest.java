@@ -17,9 +17,9 @@ import java.util.Optional;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class SocialUserServiceTest {
+public class SocialUserServiceImplTest {
 
-    private SocialUserService socialUserService = new SocialUserService();
+    private SocialUserServiceImpl socialUserService = new SocialUserServiceImpl();
     private UserRepository userRepository = mock(UserRepository.class);
     private SocialDataProviderFactory socialDataProviderFactory = mock(SocialDataProviderFactory.class);
 
@@ -27,25 +27,6 @@ public class SocialUserServiceTest {
     public void setUp() throws Exception {
         socialUserService.setUserRepository(userRepository);
         socialUserService.setSocialDataProviderFactory(socialDataProviderFactory);
-    }
-
-    @Test
-    public void testGetUser() throws Exception {
-        User user = new User();
-        when(userRepository.findByUsername("username")).thenReturn(Optional.of(user));
-        User resultUser = socialUserService.getUser("username");
-        verify(userRepository, times(1)).findByUsername("username");
-        assertEquals(user, resultUser);
-    }
-
-    @Test
-     public void testGetUser_nullParameters() throws Exception {
-        try {
-            socialUserService.getUser(null);
-            fail();
-        } catch (IllegalArgumentException iae) {
-            assertEquals("User id required", iae.getMessage());
-        }
     }
 
     @Test

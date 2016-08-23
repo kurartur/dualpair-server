@@ -25,7 +25,7 @@ import java.io.IOException;
 @Controller
 public class SignupController {
 
-    private final ProviderSignInUtils providerSignInUtils;
+    private ProviderSignInUtils providerSignInUtils;
 
     private SocialUserService socialUserService;
 

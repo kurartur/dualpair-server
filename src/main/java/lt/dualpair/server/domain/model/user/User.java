@@ -61,6 +61,9 @@ public class User implements SocialUserDetails, Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<Photo> photos = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<UserLocation> locations = new ArrayList<>();
+
     public User() {}
 
     public Long getId() {
@@ -191,6 +194,15 @@ public class User implements SocialUserDetails, Serializable {
 
     public void setPhotos(List<Photo> photos) {
         this.photos = photos;
+    }
+
+    public List<UserLocation> getLocations() {
+        return locations;
+    }
+
+    public void addLocation(UserLocation location) {
+        this.locations.clear();
+        this.locations.add(location);
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface UserRepository extends Repository<User, Long>, CustomUserRepository {
 
-    Optional<User> findOne(Long id);
+    Optional<User> findById(Long id);
 
     <S extends User> S save(S entity);
 

@@ -25,4 +25,11 @@ public class UserTestUtils {
         return user;
     }
 
+    public static User createUser(Long id, String username) {
+        User user = new User();
+        user.setId(id);
+        user.setUsername(username);
+        return user;
+    }
+
 }

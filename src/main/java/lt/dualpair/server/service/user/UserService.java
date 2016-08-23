@@ -1,129 +1,24 @@
 package lt.dualpair.server.service.user;
 
+import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.match.SearchParameters;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
-import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-import org.thymeleaf.util.Validate;
+import lt.dualpair.server.domain.model.user.UserLocation;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Optional;
 import java.util.Set;
 
-@Service("userService")
-public class UserService implements UserDetailsService {
+public interface UserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class.getName());
+    User loadUserById(Long userId) throws UserNotFoundException;
 
-    protected UserRepository userRepository;
-    private SociotypeRepository sociotypeRepository;
+    UserLocation addLocation(Long userId, Location location);
 
-    @Override
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return findByUsername(username);
-    }
+    void setUserSociotypes(Long userId, Set<Sociotype.Code1> codes);
 
-    public User loadUserById(Long userId) throws UserNotFoundException {
-        Optional<User> user = userRepository.findOne(userId);
-        if (!user.isPresent()) {
-            throw new UserNotFoundException("User with ID " + userId + " not found.");
-        }
-        return user.get();
-    }
+    void setUserDateOfBirth(Long userId, Date date);
 
-    @Deprecated
-    public User loadUserByUserId(String username) throws UsernameNotFoundException {
-        return findByUsername(username);
-    }
+    void setUserSearchParameters(Long userId, SearchParameters sp);
 
-    private User findByUsername(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (!user.isPresent()) {
-            throw new UsernameNotFoundException("User with username " + username + " not found.");
-        }
-        return user.get();
-    }
-
-    private User updateUser(User user) {
-        user.setUpdated(new Date());
-        userRepository.save(user);
-        return user;
-    }
-
-    protected String buildUserId(String accountId, Long time) {
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            outputStream.write(accountId.getBytes("UTF-8"));
-            outputStream.write(time.toString().getBytes("UTF-8"));
-
-            byte[] md5 = messageDigest.digest(outputStream.toByteArray());
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < md5.length; ++i)
-                sb.append(Integer.toHexString((md5[i] & 0xFF) | 0x100).substring(1,3));
-
-            return sb.toString();
-        } catch (IOException | NoSuchAlgorithmException e) {
-            logger.error("Was not able to generate user id: " + e.getMessage(), e);
-            return time.toString();
-        }
-    }
-
-    public void setUserSociotypes(String userId, Set<Sociotype.Code1> codes) {
-        Validate.notNull(userId, "User id is mandatory");
-        Validate.notNull(codes, "Sociotype codes are mandatory");
-        if (codes.size() < 1 || codes.size() > 2) {
-            throw new IllegalArgumentException("Invalid sociotype code count. Must be 1 or 2");
-        }
-
-        User user = findByUsername(userId);
-        Set<Sociotype> sociotypes = sociotypeRepository.findByCode1List(new ArrayList<>(codes));
-        if (sociotypes.isEmpty()) {
-            throw new IllegalStateException("Zero sociotypes found");
-        }
-        user.setSociotypes(sociotypes);
-        updateUser(user);
-    }
-
-    public void setUserDateOfBirth(String userId, Date date) {
-        User user = loadUserByUserId(userId);
-        user.setDateOfBirth(date);
-        updateUser(user);
-    }
-
-    public void setUserSearchParameters(String username, SearchParameters sp) {
-        User user = loadUserByUsername(username);
-        SearchParameters current = user.getSearchParameters();
-        if (current == null) {
-            user.setSearchParameters(sp);
-            sp.setUser(user);
-        } else {
-            current.setFrom(sp);
-        }
-        updateUser(user);
-    }
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setSociotypeRepository(SociotypeRepository sociotypeRepository) {
-        this.sociotypeRepository = sociotypeRepository;
-    }
 }
