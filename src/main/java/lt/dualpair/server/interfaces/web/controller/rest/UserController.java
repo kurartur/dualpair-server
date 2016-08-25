@@ -40,7 +40,7 @@ public class UserController {
         return userDTOAssembler.toDTO(socialUserService.loadUserById(getUserPrincipal().getId()));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/user/{userId:[0-9]+}/sociotypes")
+    @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/sociotypes")
     public ResponseEntity setSociotypes(@RequestBody SociotypeDTO[] sociotypes) throws URISyntaxException {
         socialUserService.setUserSociotypes(getUserPrincipal().getId(), convertToCodes(sociotypes));
         return ResponseEntity.created(new URI("/api/user")).build();
@@ -55,19 +55,19 @@ public class UserController {
         return codes;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/user/{userId:[0-9]+}/date-of-birth")
+    @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/date-of-birth")
     public ResponseEntity setDateOfBirth(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth) throws URISyntaxException {
         socialUserService.setUserDateOfBirth(getUserPrincipal().getId(), dateOfBirth);
         return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/user")).build();
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/user/{userId:[0-9]+}/search-parameters")
+    @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/search-parameters")
     public ResponseEntity setSearchParameters(@RequestBody SearchParametersDTO searchParameters) throws URISyntaxException {
         socialUserService.setUserSearchParameters(getUserPrincipal().getId(), searchParametersDTOAssembler.toEntity(searchParameters));
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/user/{userId:[0-9]+}/locations")
+    @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/locations")
     public ResponseEntity setLocation(@RequestBody LocationDTO locationDTO, @PathVariable("userId") Long userId) throws LocationProviderException, URISyntaxException {
         if (!getUserPrincipal().getId().equals(userId)) {
             throw new ForbiddenException(ForbiddenException.illegalAccess);

@@ -3,9 +3,12 @@ package lt.dualpair.server.interfaces.web.controller.rest;
 import lt.dualpair.server.domain.model.match.Match;
 import lt.dualpair.server.domain.model.match.MatchParty;
 import lt.dualpair.server.domain.model.match.MatchRequestException;
+import lt.dualpair.server.domain.model.match.UserAwareMatch;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.dto.MatchDTO;
 import lt.dualpair.server.interfaces.dto.assembler.MatchDTOAssembler;
+import lt.dualpair.server.interfaces.resource.match.MatchResource;
+import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
 import lt.dualpair.server.service.match.MatchService;
 import org.junit.After;
 import org.junit.Before;
@@ -26,12 +29,14 @@ public class MatchControllerTest {
     private MatchController matchController = new MatchController();
     private MatchService matchService = mock(MatchService.class);
     private MatchDTOAssembler matchDTOAssembler = mock(MatchDTOAssembler.class);
+    private MatchResourceAssembler matchResourceAssembler = mock(MatchResourceAssembler.class);
 
     @Before
     public void setUp() throws Exception {
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(crateUser(1L, "username"), null));
         matchController.setMatchService(matchService);
         matchController.setMatchDTOAssembler(matchDTOAssembler);
+        matchController.setMatchResourceAssembler(matchResourceAssembler);
     }
 
     @After
@@ -82,12 +87,12 @@ public class MatchControllerTest {
 
     @Test
     public void testNext() throws Exception {
-        MatchDTO matchDTO = new MatchDTO();
+        MatchResource matchResource= new MatchResource();
         Match match = new Match();
         doReturn(match).when(matchService).nextFor(1L);
-        doReturn(matchDTO).when(matchDTOAssembler).toDTO(match);
-        ResponseEntity<MatchDTO> responseEntity = matchController.next(null);
-        assertEquals(matchDTO, responseEntity.getBody());
+        doReturn(matchResource).when(matchResourceAssembler).toResource(any(UserAwareMatch.class));
+        ResponseEntity<MatchResource> responseEntity = matchController.next(null);
+        assertEquals(matchResource, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 

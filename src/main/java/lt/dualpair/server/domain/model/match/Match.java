@@ -1,6 +1,7 @@
 package lt.dualpair.server.domain.model.match;
 
 import lt.dualpair.server.domain.model.socionics.RelationType;
+import org.springframework.hateoas.Identifiable;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "matches")
-public class Match implements Serializable {
+public class Match implements Serializable, Identifiable<Long> {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -26,6 +27,7 @@ public class Match implements Serializable {
 
     private Integer distance;
 
+    @Override
     public Long getId() {
         return id;
     }

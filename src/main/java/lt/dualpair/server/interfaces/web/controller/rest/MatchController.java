@@ -3,9 +3,11 @@ package lt.dualpair.server.interfaces.web.controller.rest;
 import lt.dualpair.server.domain.model.match.Match;
 import lt.dualpair.server.domain.model.match.MatchParty;
 import lt.dualpair.server.domain.model.match.MatchRequestException;
+import lt.dualpair.server.domain.model.match.UserAwareMatch;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.dto.MatchDTO;
 import lt.dualpair.server.interfaces.dto.assembler.MatchDTOAssembler;
+import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
 import lt.dualpair.server.service.match.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ public class MatchController {
 
     private MatchService matchService;
     private MatchDTOAssembler matchDTOAssembler;
+    private MatchResourceAssembler matchResourceAssembler;
 
     @RequestMapping(method = RequestMethod.GET, value = "/match/next")
     public ResponseEntity next(@RequestParam(name = "exclopp[]", required = false) List<Long> excludeOpponents) throws MatchRequestException {
@@ -36,7 +39,7 @@ public class MatchController {
         if (match == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().body(matchDTOAssembler.toDTO(match));
+        return ResponseEntity.ok().body(matchResourceAssembler.toResource(new UserAwareMatch(getUserPrincipal(), match)));
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/match/{matchId:[0-9]+}")
@@ -48,8 +51,8 @@ public class MatchController {
         return ResponseEntity.ok(matchDTOAssembler.toDTO(match));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/match/{matchId:[0-9]+}/response")
-    public ResponseEntity response(@PathVariable Long matchId, @RequestParam String response) throws URISyntaxException {
+    @RequestMapping(method = RequestMethod.PUT, value = "/match/{matchId:[0-9]+}/response")
+    public ResponseEntity response(@PathVariable Long matchId, @RequestBody String response) throws URISyntaxException {
         matchService.responseByUser(matchId, MatchParty.Response.valueOf(response), getUserPrincipal().getId());
         return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/match/" + matchId)).build();
     }
@@ -72,5 +75,10 @@ public class MatchController {
     @Autowired
     public void setMatchDTOAssembler(MatchDTOAssembler matchDTOAssembler) {
         this.matchDTOAssembler = matchDTOAssembler;
+    }
+
+    @Autowired
+    public void setMatchResourceAssembler(MatchResourceAssembler matchResourceAssembler) {
+        this.matchResourceAssembler = matchResourceAssembler;
     }
 }

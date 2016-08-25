@@ -38,8 +38,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -105,7 +104,7 @@ public class ITUserControllerTest {
     public void testSetSociotypes_ok() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
         String data = "[{\"code1\": \"EII\"}]";
-        mockMvc.perform(post("/api/user/1/sociotypes")
+        mockMvc.perform(put("/api/user/1/sociotypes")
                     .with(bearerToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(data.getBytes()))
@@ -125,7 +124,7 @@ public class ITUserControllerTest {
     public void testSetSociotypes_noCodes() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
         String data = "[]";
-        mockMvc.perform(post("/api/user/1/sociotypes")
+        mockMvc.perform(put("/api/user/1/sociotypes")
                       .with(bearerToken)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(data.getBytes()))
@@ -137,7 +136,7 @@ public class ITUserControllerTest {
     @DatabaseSetup("userTest_setDateOfBirth.xml")
     public void testSetDateOfBirth() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
-        mockMvc.perform(post("/api/user/1/date-of-birth?dateOfBirth=1990-02-03")
+        mockMvc.perform(put("/api/user/1/date-of-birth?dateOfBirth=1990-02-03")
                     .with(bearerToken))
                 .andExpect(status().isSeeOther())
                 .andExpect(header().string("Location", "/api/user"))
@@ -162,7 +161,7 @@ public class ITUserControllerTest {
     private void doTestSetSearchParameters(Long userId) throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(userId));
         String data = "{\"searchMale\":true,\"searchFemale\":true,\"minAge\":\"20\",\"maxAge\":\"30\"}";
-        mockMvc.perform(post("/api/user/1/search-parameters")
+        mockMvc.perform(put("/api/user/1/search-parameters")
                 .with(bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(data.getBytes()))
@@ -183,7 +182,7 @@ public class ITUserControllerTest {
     public void testSetLocation() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
         String data = "{\"latitude\":54.63, \"longitude\":25.32}";
-        mockMvc.perform(post("/api/user/1/locations")
+        mockMvc.perform(put("/api/user/1/locations")
                     .with(bearerToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(data.getBytes()))
