@@ -5,7 +5,7 @@ import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import lt.dualpair.server.Application;
 import lt.dualpair.server.OAuthHelper;
-import lt.dualpair.server.interfaces.dto.UserDTO;
+import lt.dualpair.server.interfaces.resource.user.UserResource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,8 +89,8 @@ public class ITUserControllerTest {
                 .andReturn();
         String content = result.getResponse().getContentAsString();
         ObjectMapper objectMapper = new ObjectMapper();
-        UserDTO userDTO = objectMapper.readValue(content, UserDTO.class);
-        assertEquals("Artur", userDTO.getName());
+        UserResource userResource = objectMapper.readValue(content, UserResource.class);
+        assertEquals("Artur", userResource.getName());
     }
 
     @Test

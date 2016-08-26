@@ -9,9 +9,10 @@ import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.dto.LocationDTO;
 import lt.dualpair.server.interfaces.dto.SearchParametersDTO;
 import lt.dualpair.server.interfaces.dto.SociotypeDTO;
-import lt.dualpair.server.interfaces.dto.UserDTO;
 import lt.dualpair.server.interfaces.dto.assembler.SearchParametersDTOAssembler;
 import lt.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
+import lt.dualpair.server.interfaces.resource.user.UserResource;
+import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.service.user.SocialUserServiceImpl;
 import org.junit.After;
 import org.junit.Before;
@@ -36,6 +37,7 @@ public class UserControllerTest {
     private UserDTOAssembler userDTOAssembler = mock(UserDTOAssembler.class);
     private SearchParametersDTOAssembler searchParametersDTOAssembler = mock(SearchParametersDTOAssembler.class);
     private LocationProvider locationProvider = mock(LocationProvider.class);
+    private UserResourceAssembler userResourceAssembler = mock(UserResourceAssembler.class);
 
     @Before
     public void setUp() throws Exception {
@@ -43,6 +45,7 @@ public class UserControllerTest {
         userController.setUserDTOAssembler(userDTOAssembler);
         userController.setSearchParametersDTOAssembler(searchParametersDTOAssembler);
         userController.setLocationProvider(locationProvider);
+        userController.setUserResourceAssembler(userResourceAssembler);
         User user = new User();
         user.setId(1L);
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null));
@@ -56,10 +59,10 @@ public class UserControllerTest {
     @Test
     public void testGetUser() throws Exception {
         User user = new User();
-        UserDTO userDTO = new UserDTO();
+        UserResource userResource = new UserResource();
         when(socialUserService.loadUserById(1L)).thenReturn(user);
-        when(userDTOAssembler.toDTO(user)).thenReturn(userDTO);
-        assertEquals(userDTO, userController.getUser());
+        when(userResourceAssembler.toResource(user)).thenReturn(userResource);
+        assertEquals(userResource, userController.getUser());
     }
 
     @Test
