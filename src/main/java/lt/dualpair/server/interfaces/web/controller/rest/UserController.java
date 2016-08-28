@@ -8,9 +8,10 @@ import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.dto.LocationDTO;
 import lt.dualpair.server.interfaces.dto.SearchParametersDTO;
 import lt.dualpair.server.interfaces.dto.SociotypeDTO;
-import lt.dualpair.server.interfaces.dto.UserDTO;
 import lt.dualpair.server.interfaces.dto.assembler.SearchParametersDTOAssembler;
 import lt.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
+import lt.dualpair.server.interfaces.resource.user.UserResource;
+import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,10 +35,11 @@ public class UserController {
     private UserDTOAssembler userDTOAssembler;
     private SearchParametersDTOAssembler searchParametersDTOAssembler;
     private LocationProvider locationProvider;
+    private UserResourceAssembler userResourceAssembler;
 
     @RequestMapping(method = RequestMethod.GET, value = "/me")
-    public UserDTO getUser() {
-        return userDTOAssembler.toDTO(socialUserService.loadUserById(getUserPrincipal().getId()));
+    public UserResource getUser() {
+        return userResourceAssembler.toResource(socialUserService.loadUserById(getUserPrincipal().getId()));
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/sociotypes")
@@ -108,5 +110,10 @@ public class UserController {
     @Qualifier("multipleServiceLocationProvider")
     public void setLocationProvider(LocationProvider locationProvider) {
         this.locationProvider = locationProvider;
+    }
+
+    @Autowired
+    public void setUserResourceAssembler(UserResourceAssembler userResourceAssembler) {
+        this.userResourceAssembler = userResourceAssembler;
     }
 }
