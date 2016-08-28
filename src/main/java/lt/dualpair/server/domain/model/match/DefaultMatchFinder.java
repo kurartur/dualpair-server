@@ -1,10 +1,10 @@
 package lt.dualpair.server.domain.model.match;
 
 import lt.dualpair.server.domain.model.geo.DistanceCalculator;
-import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserLocation;
 import lt.dualpair.server.infrastructure.persistence.repository.RelationTypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
@@ -50,7 +50,7 @@ public class DefaultMatchFinder implements MatchFinder {
         double shortest = Double.MAX_VALUE;
         User closestOpponent = null;
         for (User opponent : opponents) {
-            Location opponentLocation = opponent.getSearchParameters().getLocation();
+            UserLocation opponentLocation = opponent.getRecentLocation();
             double distance = distanceCalculator.calculate(userLatitude, userLongitude, opponentLocation.getLatitude(), opponentLocation.getLongitude());
             if (distance <= radius && shortest > distance) {
                 shortest = distance;

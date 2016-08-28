@@ -1,6 +1,5 @@
 package lt.dualpair.server.domain.model.match;
 
-import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.user.User;
 import org.springframework.util.Assert;
 
@@ -55,11 +54,8 @@ public class MatchRequestBuilder {
 
     public MatchRequestBuilder apply(SearchParameters searchParameters) {
         Assert.notNull(searchParameters);
-        Assert.notNull(searchParameters.getLocation());
         ageRange(searchParameters.getMinAge(), searchParameters.getMaxAge());
         genders(searchParameters.getSearchGenders());
-        Location location = searchParameters.getLocation();
-        location(location.getLatitude(), location.getLongitude(), location.getCountryCode());
         return this;
     }
 

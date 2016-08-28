@@ -1,8 +1,8 @@
 package lt.dualpair.server.domain.model.match;
 
-import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserLocation;
 import org.junit.Test;
 
 import java.util.Date;
@@ -77,34 +77,34 @@ public class MatchRequestValidatorTest {
             validator.validateMatchRequest(user, searchParameters);
             fail();
         } catch (MatchRequestException mre) {
-            assertEquals("Invalid search parameters: location is missing", mre.getMessage());
+            assertEquals("User location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(0.0, 0.0, "", "city"));
+        user.addLocation(new UserLocation(user, 0.0, 0.0, "", "city"));
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();
         } catch (MatchRequestException mre) {
-            assertEquals("Invalid search parameters: location is missing", mre.getMessage());
+            assertEquals("User location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(0.0, 0.0, "LT", "city"));
+        user.addLocation(new UserLocation(user, 0.0, 0.0, "LT", "city"));
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();
         } catch (MatchRequestException mre) {
-            assertEquals("Invalid search parameters: location is missing", mre.getMessage());
+            assertEquals("User location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(1.0, 0.0, "LT", "city"));
+        user.addLocation(new UserLocation(user, 1.0, 0.0, "LT", "city"));
         try {
             validator.validateMatchRequest(user, searchParameters);
             fail();
         } catch (MatchRequestException mre) {
-            assertEquals("Invalid search parameters: location is missing", mre.getMessage());
+            assertEquals("User location is missing", mre.getMessage());
         }
 
-        searchParameters.setLocation(new Location(1.0, 1.0, "LT", "city"));
+        user.addLocation(new UserLocation(user, 1.0, 1.0, "LT", "city"));
         validator.validateMatchRequest(user, searchParameters);
     }
 }

@@ -200,6 +200,10 @@ public class User implements SocialUserDetails, Serializable {
         return locations;
     }
 
+    public UserLocation getRecentLocation() {
+        return locations.isEmpty() ? null : locations.get(0);
+    }
+
     public void addLocation(UserLocation location) {
         this.locations.clear();
         this.locations.add(location);

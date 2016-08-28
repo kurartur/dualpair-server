@@ -27,7 +27,9 @@ public class UserRepositoryImpl implements CustomUserRepository {
             "   and :userAge >= opp.searchParameters.minAge and :userAge <= opp.searchParameters.maxAge\n" +
             "   and ((:userGenderCode = 'M' and opp.searchParameters.searchMale = true)\n" +
             "       or (:userGenderCode = 'F' and opp.searchParameters.searchFemale = true))\n" +
-            "   and opp.searchParameters.location.countryCode = :countryCode" +
+            "   and exists (" +
+            "       select ul from UserLocation ul where ul.user = opp and ul.location.countryCode = :countryCode" +
+            "   )" +
             "   and opp.id not in :exclude";
 
     private EntityManager entityManager;

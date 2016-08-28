@@ -1,6 +1,5 @@
 package lt.dualpair.server.domain.model.match;
 
-import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.user.User;
 import org.junit.Test;
 
@@ -101,25 +100,15 @@ public class MatchRequestBuilderTest {
         searchParameters.setMaxAge(20);
         searchParameters.setSearchMale(true);
         searchParameters.setSearchFemale(true);
-        searchParameters.setLocation(new Location(10.0, 11.0, "LT", "City"));
         MatchRequest mr = new MatchRequestBuilder(null).apply(searchParameters).build();
         assertEquals(10, mr.getMinAge());
         assertEquals(20, mr.getMaxAge());
         assertTrue(mr.getGenders().contains(User.Gender.FEMALE));
         assertTrue(mr.getGenders().contains(User.Gender.MALE));
-        assertEquals(10.0, mr.getLatitude(), 0);
-        assertEquals(11.0, mr.getLongitude(), 0);
-        assertEquals("LT", mr.getCountryCode());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testApplySearchParameters_null() throws Exception {
         new MatchRequestBuilder(null).apply(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testApplySearchParameters_nullLocation() throws Exception {
-        SearchParameters searchParameters = new SearchParameters();
-        new MatchRequestBuilder(null).apply(searchParameters);
     }
 }

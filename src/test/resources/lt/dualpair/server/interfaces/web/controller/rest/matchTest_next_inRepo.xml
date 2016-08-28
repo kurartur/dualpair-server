@@ -3,23 +3,28 @@
 
     <users id="1" username="1" gender="M" age="25" name="Artur"/>
     <users_sociotypes user_id="1" sociotype_id="15"/>
-    <search_parameters user_id="1" min_age="25" max_age="25" search_male="N" search_female="Y" latitude="10" longitude="10" country_code="LT"/>
+    <search_parameters user_id="1" min_age="25" max_age="25" search_male="N" search_female="Y"/>
+    <user_locations user_id="1" latitude="10" longitude="10" country_code="LT"/>
 
     <users id="2" username="2" gender="F" age="25" name="Diana"/>
     <users_sociotypes user_id="2" sociotype_id="13"/>
-    <search_parameters user_id="2" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="10" longitude="10.1" country_code="LT"/>
+    <search_parameters user_id="2" min_age="25" max_age="25" search_male="Y" search_female="N"/>
+    <user_locations user_id="2" latitude="10" longitude="10.1" country_code="LT"/>
 
     <users id="3" username="3" gender="F" age="25" name="Melanie"/>
     <users_sociotypes user_id="3" sociotype_id="13"/>
-    <search_parameters user_id="3" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="10" longitude="10.2" country_code="LT"/>
+    <search_parameters user_id="3" min_age="25" max_age="25" search_male="Y" search_female="N"/>
+    <user_locations user_id="3" latitude="10" longitude="10.2" country_code="LT"/>
 
     <users id="4" username="4" gender="F" age="25" name="Stephanie"/>
     <users_sociotypes user_id="4" sociotype_id="13"/>
-    <search_parameters user_id="4" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="10" longitude="10.3" country_code="LT"/>
+    <search_parameters user_id="4" min_age="25" max_age="25" search_male="Y" search_female="N"/>
+    <user_locations user_id="4" latitude="10" longitude="10.3" country_code="LT"/>
 
     <users id="5" username="5" gender="F" age="25" name="Lucie"/>
     <users_sociotypes user_id="5" sociotype_id="13"/>
-    <search_parameters user_id="5" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="10" longitude="10.3" country_code="LT"/>
+    <search_parameters user_id="5" min_age="25" max_age="25" search_male="Y" search_female="N"/>
+    <user_locations user_id="5" latitude="10" longitude="10.3" country_code="LT"/>
 
     <matches id="1" distance="10" />
     <match_parties id="1" match_id="1" user_id="1" response="0"/>

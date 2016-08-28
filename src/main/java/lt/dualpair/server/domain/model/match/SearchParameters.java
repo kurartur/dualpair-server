@@ -1,6 +1,5 @@
 package lt.dualpair.server.domain.model.match;
 
-import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.user.User;
 import org.hibernate.annotations.Type;
 
@@ -39,9 +38,6 @@ public class SearchParameters implements Serializable {
     @Column(name = "search_female", length = 1)
     @Type(type = "yes_no")
     private boolean searchFemale;
-
-    @Embedded
-    private Location location;
 
     public User getUser() {
         return user;
@@ -90,20 +86,11 @@ public class SearchParameters implements Serializable {
         return genders;
     }
 
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
     public void setFrom(SearchParameters s) {
         setSearchMale(s.getSearchMale());
         setSearchFemale(s.getSearchFemale());
         setMinAge(s.getMinAge());
         setMaxAge(s.getMaxAge());
-        setLocation(s.getLocation());
     }
 
 }

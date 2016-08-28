@@ -3,42 +3,52 @@
 
     <users id="1" username="1" gender="M" age="25" name="Artur"/>
     <users_sociotypes user_id="1" sociotype_id="15"/>
-    <search_parameters user_id="1" min_age="25" max_age="25" search_male="N" search_female="Y" latitude="10" longitude="10" country_code="LT"/>
+    <search_parameters user_id="1" min_age="25" max_age="25" search_male="N" search_female="Y"/>
+    <user_locations user_id="1" latitude="10" longitude="10" country_code="LT"/>
 
     <users id="2" username="2" gender="M" age="25" name="Kyle"/>
     <users_sociotypes user_id="2" sociotype_id="13"/>
-    <search_parameters user_id="2" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="10" longitude="10" country_code="LT"/>
+    <search_parameters user_id="2" min_age="25" max_age="25" search_male="Y" search_female="N"/>
+    <user_locations user_id="2" latitude="10" longitude="10" country_code="LT"/>
 
     <users id="3" username="3" gender="M" age="25" name="Stephen"/>
     <users_sociotypes user_id="3" sociotype_id="13"/>
-    <search_parameters user_id="3" min_age="25" max_age="25" search_male="Y" search_female="Y" latitude="10" longitude="10" country_code="LT"/>
+    <search_parameters user_id="3" min_age="25" max_age="25" search_male="Y" search_female="Y"/>
+    <user_locations user_id="3" latitude="10" longitude="10" country_code="LT"/>
 
     <users id="4" username="4" gender="F" age="25" name="Beatrice"/>
     <users_sociotypes user_id="4" sociotype_id="12"/>
-    <search_parameters user_id="4" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="10" longitude="10" country_code="LT"/>
+    <search_parameters user_id="4" min_age="25" max_age="25" search_male="Y" search_female="N"/>
+    <user_locations user_id="4" latitude="10" longitude="10" country_code="LT"/>
 
     <users id="5" username="5" gender="F" age="25" name="Lucia"/>
     <users_sociotypes user_id="5" sociotype_id="13"/>
-    <search_parameters user_id="5" min_age="20" max_age="24" search_male="Y" search_female="N" latitude="10" longitude="10" country_code="LT"/>
+    <search_parameters user_id="5" min_age="20" max_age="24" search_male="Y" search_female="N"/>
+    <user_locations user_id="5" latitude="10" longitude="10" country_code="LT"/>
 
     <users id="6" username="6" gender="F" age="25" name="Kate"/>
     <users_sociotypes user_id="6" sociotype_id="13"/>
-    <search_parameters user_id="6" min_age="26" max_age="30" search_male="Y" search_female="N" latitude="10" longitude="10" country_code="LT"/>
+    <search_parameters user_id="6" min_age="26" max_age="30" search_male="Y" search_female="N"/>
+    <user_locations user_id="6" latitude="10" longitude="10" country_code="LT"/>
 
     <users id="7" username="7" gender="F" age="25" name="Melanie"/>
     <users_sociotypes user_id="7" sociotype_id="13"/>
-    <search_parameters user_id="7" min_age="25" max_age="25" search_male="N" search_female="Y" latitude="10" longitude="10" country_code="LT"/>
+    <search_parameters user_id="7" min_age="25" max_age="25" search_male="N" search_female="Y"/>
+    <user_locations user_id="7" latitude="10" longitude="10" country_code="LT"/>
 
     <users id="8" username="8" gender="F" age="25" name="Lilian"/>
     <users_sociotypes user_id="8" sociotype_id="13"/>
-    <search_parameters user_id="8" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="10" longitude="10" country_code="EE"/>
+    <search_parameters user_id="8" min_age="25" max_age="25" search_male="Y" search_female="N"/>
+    <user_locations user_id="8" latitude="10" longitude="10" country_code="EE"/>
 
     <users id="9" username="9" gender="F" age="25" name="Angela"/>
     <users_sociotypes user_id="9" sociotype_id="13"/>
-    <search_parameters user_id="9" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="12" longitude="12" country_code="LT"/>
+    <search_parameters user_id="9" min_age="25" max_age="25" search_male="Y" search_female="N"/>
+    <user_locations user_id="9" latitude="12" longitude="12" country_code="LT"/>
 
     <users id="10" username="10" gender="F" age="25" name="Diana"/>
     <users_sociotypes user_id="10" sociotype_id="13"/>
-    <search_parameters user_id="10" min_age="25" max_age="25" search_male="Y" search_female="N" latitude="10" longitude="10" country_code="LT"/>
+    <search_parameters user_id="10" min_age="25" max_age="25" search_male="Y" search_female="N"/>
+    <user_locations user_id="10" latitude="10" longitude="10" country_code="LT"/>
 
 </dataset>

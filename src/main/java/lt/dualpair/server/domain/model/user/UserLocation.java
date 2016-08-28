@@ -25,4 +25,24 @@ public class UserLocation {
         this.user = user;
         this.location = new Location(latitude, longitude, countryCode, city);
     }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public Double getLatitude() {
+        return location.getLatitude();
+    }
+
+    public Double getLongitude() {
+        return location.getLongitude();
+    }
+
+    public String getCountryCode() {
+        return location.getCountryCode();
+    }
+
+    public String getCity() {
+        return location.getCity();
+    }
 }

@@ -1,10 +1,10 @@
 package lt.dualpair.server.domain.model.match;
 
 import lt.dualpair.server.domain.model.geo.DistanceCalculator;
-import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserLocationTestUtils;
 import lt.dualpair.server.infrastructure.persistence.repository.RelationTypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
@@ -41,7 +41,7 @@ public class DefaultMatchFinderTest {
         User user = createUser(1L, Sociotype.Code1.EII);
         User opponent = createUser(2L, Sociotype.Code1.LSE);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
-        opponent.setSearchParameters(createSearchParameters(12, "LT"));
+        opponent.addLocation(UserLocationTestUtils.createUserLocation(12, "LT"));
         Set<User> opponents = new HashSet<>(Collections.singletonList(opponent));
         when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.EII, RelationType.Code.DUAL)).thenReturn(pairSociotype);
         when(userRepository.findOpponents(any(UserRepositoryImpl.FindOpponentsParams.class))).thenReturn(opponents);
@@ -50,7 +50,7 @@ public class DefaultMatchFinderTest {
         assertNotNull(resultMatch);
         assertEquals(user, resultMatch.getMatchParty(1L).getUser());
         assertEquals(opponent, resultMatch.getOppositeMatchParty(1L).getUser());
-        assertEquals((Integer)300000, resultMatch.getDistance());
+        assertEquals((Integer) 300000, resultMatch.getDistance());
         assertEquals(RelationType.Code.DUAL, resultMatch.getRelationType().getCode());
     }
 
@@ -59,7 +59,7 @@ public class DefaultMatchFinderTest {
         User user = createUser(1L, Sociotype.Code1.EII);
         User opponent = createUser(2L, Sociotype.Code1.LSE);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
-        opponent.setSearchParameters(createSearchParameters(12, "LT"));
+        opponent.addLocation(UserLocationTestUtils.createUserLocation(12, "LT"));
         Set<User> opponents = new HashSet<>(Collections.singletonList(opponent));
         when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.EII, RelationType.Code.DUAL)).thenReturn(pairSociotype);
         when(userRepository.findOpponents(any(UserRepositoryImpl.FindOpponentsParams.class))).thenReturn(opponents);
@@ -75,9 +75,9 @@ public class DefaultMatchFinderTest {
         User opponent2 = createUser(3L, Sociotype.Code1.LSE);
         User opponent3 = createUser(4L, Sociotype.Code1.LSE);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
-        opponent1.setSearchParameters(createSearchParameters(12, "LT"));
-        opponent2.setSearchParameters(createSearchParameters(13, "LT"));
-        opponent3.setSearchParameters(createSearchParameters(14, "LT"));
+        opponent1.addLocation(UserLocationTestUtils.createUserLocation(12, "LT"));
+        opponent2.addLocation(UserLocationTestUtils.createUserLocation(13, "LT"));
+        opponent3.addLocation(UserLocationTestUtils.createUserLocation(14, "LT"));
         Set<User> opponents = new LinkedHashSet<>();
         opponents.add(opponent1);
         opponents.add(opponent2);
@@ -102,12 +102,6 @@ public class DefaultMatchFinderTest {
         when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.EII, RelationType.Code.DUAL)).thenReturn(pairSociotype);
         when(userRepository.findOpponents(any(UserRepositoryImpl.FindOpponentsParams.class))).thenReturn(new HashSet<>());
         assertNull(defaultMatchFinder.findOne(new MatchRequestBuilder(user).build()));
-    }
-
-    private SearchParameters createSearchParameters(double latLon, String country) {
-        SearchParameters searchParameters = new SearchParameters();
-        searchParameters.setLocation(new Location(latLon, latLon, country, "city"));
-        return searchParameters;
     }
 
     private Sociotype createSociotype(Sociotype.Code1 code1) {

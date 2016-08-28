@@ -1,6 +1,5 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.match.SearchParameters;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
@@ -143,7 +142,6 @@ public class UserServiceImplTest {
         searchParameters.setSearchMale(true);
         searchParameters.setMinAge(20);
         searchParameters.setMaxAge(30);
-        searchParameters.setLocation(new Location(1.0, 2.0, "LT", "Vilnius"));
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         userService.setUserSearchParameters(1L, searchParameters);
         assertNotEquals(searchParameters, user.getSearchParameters());
@@ -152,10 +150,6 @@ public class UserServiceImplTest {
         assertTrue(resultsSearchParameters.getSearchMale());
         assertEquals((Integer)20, resultsSearchParameters.getMinAge());
         assertEquals((Integer)30, resultsSearchParameters.getMaxAge());
-        assertEquals((Double)1.0, resultsSearchParameters.getLocation().getLatitude());
-        assertEquals((Double)2.0, resultsSearchParameters.getLocation().getLongitude());
-        assertEquals("LT", resultsSearchParameters.getLocation().getCountryCode());
-        assertEquals("Vilnius", resultsSearchParameters.getLocation().getCity());
         verify(userRepository, times(1)).save(user);
     }
 

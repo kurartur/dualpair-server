@@ -31,7 +31,8 @@ public class MatchService {
         User user = userService.loadUserById(userId);
         matchRequestValidator.validateMatchRequest(user, user.getSearchParameters());
         MatchRequestBuilder builder =  MatchRequestBuilder.findFor(user)
-                .apply(user.getSearchParameters());
+                .apply(user.getSearchParameters())
+                .location(user.getRecentLocation().getLatitude(), user.getRecentLocation().getLongitude(), user.getRecentLocation().getCountryCode());
         if (excludeOpponents != null) {
             builder.excludeOpponents(excludeOpponents);
         }

@@ -1,8 +1,8 @@
 package lt.dualpair.server.service.match;
 
-import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.match.*;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserLocationTestUtils;
 import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
@@ -49,8 +49,8 @@ public class MatchServiceTest {
         searchParameters.setMinAge(10);
         searchParameters.setMaxAge(20);
         searchParameters.setSearchFemale(true);
-        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "City"));
         user.setSearchParameters(searchParameters);
+        user.addLocation(UserLocationTestUtils.createUserLocation(10, "LT"));
         doReturn(match).when(repositoryMatchFinder).findOne(any(MatchRequest.class));
         when(userService.loadUserById(1L)).thenReturn(user);
         Match resultMatch = matchService.nextFor(1L);
@@ -69,8 +69,8 @@ public class MatchServiceTest {
         searchParameters.setMinAge(10);
         searchParameters.setMaxAge(20);
         searchParameters.setSearchFemale(true);
-        searchParameters.setLocation(new Location(10.0, 10.0, "LT", "City"));
         user.setSearchParameters(searchParameters);
+        user.addLocation(UserLocationTestUtils.createUserLocation(10, "LT"));
         doReturn(match).when(defaultMatchFinder).findOne(any(MatchRequest.class));
         when(userService.loadUserById(1L)).thenReturn(user);
         Match resultMatch = matchService.nextFor(1L);
