@@ -1,7 +1,9 @@
 package lt.dualpair.server.interfaces.resource.user;
 
+import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserLocation;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResource;
 import lt.dualpair.server.interfaces.web.controller.rest.UserController;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -9,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Component
 public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserResource> {
@@ -34,6 +39,25 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
             sociotypes.add(sociotypeResource);
         }
         resource.setSociotypes(sociotypes);
+
+        Set<LocationResource> locations = new HashSet<>();
+        for (UserLocation userLocation : entity.getLocations()) {
+            LocationResource locationResource = new LocationResource();
+            locationResource.setCountryCode(userLocation.getCountryCode());
+            locationResource.setCity(userLocation.getCity());
+            locations.add(locationResource);
+        }
+        resource.setLocations(locations);
+
+        Set<PhotoResource> photos = new HashSet<>();
+        for (Photo photo : entity.getPhotos()) {
+            PhotoResource photoResource = new PhotoResource();
+            photoResource.setSourceUrl(photo.getSourceLink());
+            photos.add(photoResource);
+        }
+        resource.setPhotos(photos);
+
+        resource.add(linkTo(methodOn(UserController.class).getSearchParameters(entity.getId())).withRel("search-parameters"));
 
         return resource;
     }

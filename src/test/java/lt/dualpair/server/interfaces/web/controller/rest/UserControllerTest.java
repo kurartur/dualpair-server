@@ -10,7 +10,6 @@ import lt.dualpair.server.interfaces.dto.LocationDTO;
 import lt.dualpair.server.interfaces.dto.SearchParametersDTO;
 import lt.dualpair.server.interfaces.dto.SociotypeDTO;
 import lt.dualpair.server.interfaces.dto.assembler.SearchParametersDTOAssembler;
-import lt.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.service.user.SocialUserServiceImpl;
@@ -34,7 +33,6 @@ public class UserControllerTest {
 
     private UserController userController = new UserController();
     private SocialUserServiceImpl socialUserService = mock(SocialUserServiceImpl.class);
-    private UserDTOAssembler userDTOAssembler = mock(UserDTOAssembler.class);
     private SearchParametersDTOAssembler searchParametersDTOAssembler = mock(SearchParametersDTOAssembler.class);
     private LocationProvider locationProvider = mock(LocationProvider.class);
     private UserResourceAssembler userResourceAssembler = mock(UserResourceAssembler.class);
@@ -42,7 +40,6 @@ public class UserControllerTest {
     @Before
     public void setUp() throws Exception {
         userController.setSocialUserService(socialUserService);
-        userController.setUserDTOAssembler(userDTOAssembler);
         userController.setSearchParametersDTOAssembler(searchParametersDTOAssembler);
         userController.setLocationProvider(locationProvider);
         userController.setUserResourceAssembler(userResourceAssembler);

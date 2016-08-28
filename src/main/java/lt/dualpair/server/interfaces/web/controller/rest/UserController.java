@@ -9,7 +9,6 @@ import lt.dualpair.server.interfaces.dto.LocationDTO;
 import lt.dualpair.server.interfaces.dto.SearchParametersDTO;
 import lt.dualpair.server.interfaces.dto.SociotypeDTO;
 import lt.dualpair.server.interfaces.dto.assembler.SearchParametersDTOAssembler;
-import lt.dualpair.server.interfaces.dto.assembler.UserDTOAssembler;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.service.user.SocialUserService;
@@ -32,7 +31,6 @@ import java.util.Set;
 public class UserController {
 
     private SocialUserService socialUserService;
-    private UserDTOAssembler userDTOAssembler;
     private SearchParametersDTOAssembler searchParametersDTOAssembler;
     private LocationProvider locationProvider;
     private UserResourceAssembler userResourceAssembler;
@@ -87,6 +85,11 @@ public class UserController {
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/user/{userId:[0-9]+}/search-parameters")
+    public ResponseEntity getSearchParameters(@PathVariable Long userId) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
     private User getUserPrincipal() {
         return (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
@@ -94,11 +97,6 @@ public class UserController {
     @Autowired
     public void setSocialUserService(SocialUserService socialUserService) {
         this.socialUserService = socialUserService;
-    }
-
-    @Autowired
-    public void setUserDTOAssembler(UserDTOAssembler userDTOAssembler) {
-        this.userDTOAssembler = userDTOAssembler;
     }
 
     @Autowired

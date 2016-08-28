@@ -2,7 +2,6 @@ package lt.dualpair.server.interfaces.web.controller.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import lt.dualpair.server.interfaces.dto.MatchDTO;
 import lt.dualpair.server.interfaces.resource.match.MatchResource;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
@@ -258,8 +257,8 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
           .andExpect(status().isOk())
           .andReturn();
         String content = result.getResponse().getContentAsString();
-        MatchDTO matchDTO = new ObjectMapper().readValue(content, MatchDTO.class);
-        assertEquals("Artur", matchDTO.getUser().getUser().getName());
-        assertEquals("Linda", matchDTO.getOpponent().getUser().getName());
+        MatchResource matchResource = new ObjectMapper().readValue(content, MatchResource.class);
+        assertTrue(matchResource.getUser().getLink("user").getHref().endsWith("/me"));
+        assertEquals("Linda", matchResource.getOpponent().getUser().getName());
     }
 }

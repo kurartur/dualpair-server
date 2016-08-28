@@ -22,6 +22,7 @@ public class MatchResourceAssembler extends ResourceAssemblerSupport<UserAwareMa
         resource.setMatchId(entity.getId());
         resource.setUser(basicMatchPartyResourceAssembler.toResource(entity.getUserMatchParty()));
         resource.setOpponent(fullMatchPartyResourceAssembler.toResource(entity.getOpponentMatchParty()));
+        resource.setDistance(entity.getDistance());
         return resource;
     }
 

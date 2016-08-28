@@ -5,8 +5,7 @@ import lt.dualpair.server.domain.model.match.MatchParty;
 import lt.dualpair.server.domain.model.match.MatchRequestException;
 import lt.dualpair.server.domain.model.match.UserAwareMatch;
 import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.interfaces.dto.MatchDTO;
-import lt.dualpair.server.interfaces.dto.assembler.MatchDTOAssembler;
+import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.match.MatchResource;
 import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
 import lt.dualpair.server.service.match.MatchService;
@@ -18,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -28,14 +29,14 @@ public class MatchControllerTest {
 
     private MatchController matchController = new MatchController();
     private MatchService matchService = mock(MatchService.class);
-    private MatchDTOAssembler matchDTOAssembler = mock(MatchDTOAssembler.class);
     private MatchResourceAssembler matchResourceAssembler = mock(MatchResourceAssembler.class);
+    private User userPrincipal;
 
     @Before
     public void setUp() throws Exception {
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(crateUser(1L, "username"), null));
+        userPrincipal = UserTestUtils.createUser(1L, "username");
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userPrincipal, null));
         matchController.setMatchService(matchService);
-        matchController.setMatchDTOAssembler(matchDTOAssembler);
         matchController.setMatchResourceAssembler(matchResourceAssembler);
     }
 
@@ -90,7 +91,7 @@ public class MatchControllerTest {
         MatchResource matchResource= new MatchResource();
         Match match = new Match();
         doReturn(match).when(matchService).nextFor(1L);
-        doReturn(matchResource).when(matchResourceAssembler).toResource(any(UserAwareMatch.class));
+        doReturn(matchResource).when(matchResourceAssembler).toResource(new UserAwareMatch(userPrincipal, match));
         ResponseEntity<MatchResource> responseEntity = matchController.next(null);
         assertEquals(matchResource, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -114,13 +115,13 @@ public class MatchControllerTest {
 
     @Test
     public void testMatch() throws Exception {
-        MatchDTO matchDTO = new MatchDTO();
+        MatchResource matchResource = new MatchResource();
         Match match = new Match();
         doReturn(match).when(matchService).getUserMatch(1L, 1L);
-        doReturn(matchDTO).when(matchDTOAssembler).toDTO(match);
-        ResponseEntity<MatchDTO> response = matchController.match(1L);
+        doReturn(matchResource).when(matchResourceAssembler).toResource(new UserAwareMatch(userPrincipal, match));
+        ResponseEntity<MatchResource> response = matchController.match(1L);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(matchDTO, response.getBody());
+        assertEquals(matchResource, response.getBody());
     }
 
     @Test
@@ -131,24 +132,18 @@ public class MatchControllerTest {
 
     @Test
     public void testMatches() throws Exception {
-        MatchDTO matchDTO = new MatchDTO();
-        Set<MatchDTO> matchDTOs = new HashSet<>();
-        matchDTOs.add(matchDTO);
+        MatchResource matchResource = new MatchResource();
+        List<MatchResource> matchResources = new ArrayList<>();
+        matchResources.add(matchResource);
         Match match = new Match();
         Set<Match> matches = new HashSet<>();
         matches.add(match);
         doReturn(matches).when(matchService).getUserMutualMatches(1L);
-        doReturn(matchDTOs).when(matchDTOAssembler).toDTOSet(matches);
-        ResponseEntity<Set<MatchDTO>> response = matchController.matches();
+        doReturn(matchResources).when(matchResourceAssembler).toResources(UserAwareMatch.fromSet(userPrincipal, matches));
+        ResponseEntity<List<MatchResource>> response = matchController.matches();
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(matchDTOs, response.getBody());
+        assertEquals(matchResources, response.getBody());
         assertEquals(1, response.getBody().size());
     }
 
-    private User crateUser(Long id, String username) {
-        User user = new User();
-        user.setId(id);
-        user.setUsername(username);
-        return user;
-    }
 }

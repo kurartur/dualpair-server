@@ -16,6 +16,8 @@ public class UserResource extends ResourceSupport {
     private Integer age;
     private String description;
     private Set<SociotypeResource> sociotypes;
+    private Set<LocationResource> locations;
+    private Set<PhotoResource> photos;
 
     public Long getUserId() {
         return userId;
@@ -63,5 +65,21 @@ public class UserResource extends ResourceSupport {
 
     public void setSociotypes(Set<SociotypeResource> sociotypes) {
         this.sociotypes = sociotypes;
+    }
+
+    public Set<LocationResource> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(Set<LocationResource> locations) {
+        this.locations = locations;
+    }
+
+    public Set<PhotoResource> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(Set<PhotoResource> photos) {
+        this.photos = photos;
     }
 }
