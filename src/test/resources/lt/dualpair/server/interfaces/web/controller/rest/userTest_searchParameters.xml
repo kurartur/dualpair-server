@@ -4,6 +4,6 @@
     <users id="1" username="1" gender="M" name="Artur"/>
 
     <users id="2" username="2" gender="M" name="Artur"/>
-    <search_parameters user_id="2" search_male="F" search_female="F"/>
+    <search_parameters user_id="2" search_male="F" search_female="F" min_age="20" max_age="30"/>
 
 </dataset>

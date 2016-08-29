@@ -93,7 +93,7 @@ public class UserControllerTest {
     @Test
     public void testSetDateOfBirth() throws Exception {
         Date dateOfBirth = new Date();
-        ResponseEntity responseEntity = userController.setDateOfBirth(dateOfBirth);
+        ResponseEntity responseEntity = userController.setDateOfBirth(1L, dateOfBirth);
         verify(socialUserService, times(1)).setUserDateOfBirth(1L, dateOfBirth);
         assertEquals(HttpStatus.SEE_OTHER, responseEntity.getStatusCode());
         assertEquals("/api/user", responseEntity.getHeaders().getLocation().toString());
@@ -104,12 +104,20 @@ public class UserControllerTest {
         Date dateOfBirth = new Date();
         doThrow(new RuntimeException("Error")).when(socialUserService).setUserDateOfBirth(1L, dateOfBirth);
         try {
-            userController.setDateOfBirth(dateOfBirth);
+            userController.setDateOfBirth(1L, dateOfBirth);
             fail();
         } catch (RuntimeException re) {
             assertEquals("Error", re.getMessage());
         }
         verify(socialUserService, times(1)).setUserDateOfBirth(1L, dateOfBirth);
+    }
+
+    @Test
+    public void testSetDateOfBirth_invalidUser() throws Exception {
+        Date dateOfBirth = new Date();
+        ResponseEntity response = userController.setDateOfBirth(2L, dateOfBirth);
+        verify(socialUserService, never()).setUserDateOfBirth(any(Long.class), any(Date.class));
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test

@@ -55,8 +55,11 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/date-of-birth")
-    public ResponseEntity setDateOfBirth(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth) throws URISyntaxException {
-        socialUserService.setUserDateOfBirth(getUserPrincipal().getId(), dateOfBirth);
+    public ResponseEntity setDateOfBirth(@PathVariable Long userId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth) throws URISyntaxException {
+        if (!getUserPrincipal().getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        socialUserService.setUserDateOfBirth(userId, dateOfBirth);
         return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/user")).build();
     }
 

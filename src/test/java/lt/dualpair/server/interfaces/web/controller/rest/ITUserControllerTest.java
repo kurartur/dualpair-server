@@ -5,6 +5,7 @@ import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import lt.dualpair.server.Application;
 import lt.dualpair.server.OAuthHelper;
+import lt.dualpair.server.interfaces.resource.user.SearchParametersResource;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,8 +36,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -121,6 +121,20 @@ public class ITUserControllerTest {
 
     @Test
     @DatabaseSetup("userTest_setSociotypes.xml")
+    public void testSetSociotypes_invalidUser() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(2L));
+        String data = "[\"EII\"]";
+        mockMvc.perform(put("/api/user/1/sociotypes")
+                .with(bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data.getBytes()))
+                .andExpect(status().isForbidden());
+        Integer c = jdbcTemplate.queryForObject("select count(*) from users_sociotypes where user_id=1", Integer.class);
+        assertTrue(c.equals(0));
+    }
+
+    @Test
+    @DatabaseSetup("userTest_setSociotypes.xml")
     public void testSetSociotypes_noCodes() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
         String data = "[]";
@@ -147,13 +161,24 @@ public class ITUserControllerTest {
     }
 
     @Test
-    @DatabaseSetup("userTest_setSearchParameters.xml")
+    @DatabaseSetup("userTest_setDateOfBirth.xml")
+    public void testSetDateOfBirth_invalidUser() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(2L));
+        mockMvc.perform(put("/api/user/1/date-of-birth?dateOfBirth=1990-02-03")
+                .with(bearerToken))
+                .andExpect(status().isForbidden());
+        Date date = jdbcTemplate.queryForObject("select date_of_birth from users where id=1", Date.class);
+        assertNull(date);
+    }
+
+    @Test
+    @DatabaseSetup("userTest_searchParameters.xml")
     public void testSetSearchParameters_noParameters() throws Exception {
         doTestSetSearchParameters(1L);
     }
 
     @Test
-    @DatabaseSetup("userTest_setSearchParameters.xml")
+    @DatabaseSetup("userTest_searchParameters.xml")
     public void testSetSearchParameters_parametersExist() throws Exception {
         doTestSetSearchParameters(2L);
     }
@@ -178,6 +203,44 @@ public class ITUserControllerTest {
     }
 
     @Test
+    @DatabaseSetup("userTest_searchParameters.xml")
+    public void testSetSearchParameters_invalidUser() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(2L));
+        String data = "{\"searchMale\":true,\"searchFemale\":true,\"minAge\":\"20\",\"maxAge\":\"30\"}";
+        mockMvc.perform(put("/api/user/1/search-parameters")
+                .with(bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data.getBytes()))
+                .andExpect(status().isForbidden());
+        Integer c = jdbcTemplate.queryForObject("select count(*) from search_parameters where user_id=1", Integer.class);
+        assertTrue(c.equals(0));
+    }
+
+    @Test
+    @DatabaseSetup("userTest_searchParameters.xml")
+    public void testGetSearchParameters_invalidUser() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(2L));
+        mockMvc.perform(get("/api/user/1/search-parameters")
+                .with(bearerToken))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DatabaseSetup("userTest_searchParameters.xml")
+    public void testGetSearchParameters() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(2L));
+        MvcResult result = mockMvc.perform(get("/api/user/2/search-parameters")
+                .with(bearerToken))
+                .andExpect(status().isOk())
+                .andReturn();
+        SearchParametersResource resource = new ObjectMapper().readValue(result.getResponse().getContentAsString(), SearchParametersResource.class);
+        assertEquals((Integer)20, resource.getMinAge());
+        assertEquals((Integer)30, resource.getMaxAge());
+        assertFalse(resource.getSearchFemale());
+        assertFalse(resource.getSearchMale());
+    }
+
+    @Test
     @DatabaseSetup("userTest_setLocation.xml")
     public void testSetLocation() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
@@ -195,6 +258,20 @@ public class ITUserControllerTest {
         assertEquals(25.32, locations.get("longitude"));
         assertEquals("LT", locations.get("country_code"));
         assertEquals("Vilnius", locations.get("city"));
+    }
+
+    @Test
+    @DatabaseSetup("userTest_setLocation.xml")
+    public void testSetLocation_invalidUser() throws Exception {
+        RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(2L));
+        String data = "{\"latitude\":54.63, \"longitude\":25.32}";
+        mockMvc.perform(put("/api/user/1/locations")
+                .with(bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data.getBytes()))
+                .andExpect(status().isForbidden());
+        Integer c = jdbcTemplate.queryForObject("select count(*) from user_locations where user_id=1", Integer.class);
+        assertTrue(c.equals(0));
     }
 
     private void flushPersistenceContext() {
