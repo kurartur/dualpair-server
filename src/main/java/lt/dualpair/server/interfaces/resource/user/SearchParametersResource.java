@@ -1,6 +1,8 @@
-package lt.dualpair.server.interfaces.dto;
+package lt.dualpair.server.interfaces.resource.user;
 
-public class SearchParametersDTO {
+import org.springframework.hateoas.ResourceSupport;
+
+public class SearchParametersResource extends ResourceSupport {
 
     private Boolean searchMale;
     private Boolean searchFemale;
@@ -38,4 +40,5 @@ public class SearchParametersDTO {
     public void setMaxAge(Integer maxAge) {
         this.maxAge = maxAge;
     }
+
 }

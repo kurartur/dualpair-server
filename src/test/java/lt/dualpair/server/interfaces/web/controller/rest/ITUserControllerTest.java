@@ -103,7 +103,7 @@ public class ITUserControllerTest {
     @DatabaseSetup("userTest_setSociotypes.xml")
     public void testSetSociotypes_ok() throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(1L, "1"));
-        String data = "[{\"code1\": \"EII\"}]";
+        String data = "[\"EII\"]";
         mockMvc.perform(put("/api/user/1/sociotypes")
                     .with(bearerToken)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -161,7 +161,7 @@ public class ITUserControllerTest {
     private void doTestSetSearchParameters(Long userId) throws Exception {
         RequestPostProcessor bearerToken = helper.bearerToken("dualpairandroid", helper.buildUserPrincipal(userId));
         String data = "{\"searchMale\":true,\"searchFemale\":true,\"minAge\":\"20\",\"maxAge\":\"30\"}";
-        mockMvc.perform(put("/api/user/1/search-parameters")
+        mockMvc.perform(put("/api/user/" + userId + "/search-parameters")
                 .with(bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(data.getBytes()))

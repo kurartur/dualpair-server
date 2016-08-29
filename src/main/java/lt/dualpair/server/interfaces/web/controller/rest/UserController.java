@@ -3,14 +3,10 @@ package lt.dualpair.server.interfaces.web.controller.rest;
 import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.geo.LocationProvider;
 import lt.dualpair.server.domain.model.geo.LocationProviderException;
+import lt.dualpair.server.domain.model.match.SearchParameters;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.interfaces.dto.LocationDTO;
-import lt.dualpair.server.interfaces.dto.SearchParametersDTO;
-import lt.dualpair.server.interfaces.dto.SociotypeDTO;
-import lt.dualpair.server.interfaces.dto.assembler.SearchParametersDTOAssembler;
-import lt.dualpair.server.interfaces.resource.user.UserResource;
-import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
+import lt.dualpair.server.interfaces.resource.user.*;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,9 +27,9 @@ import java.util.Set;
 public class UserController {
 
     private SocialUserService socialUserService;
-    private SearchParametersDTOAssembler searchParametersDTOAssembler;
     private LocationProvider locationProvider;
     private UserResourceAssembler userResourceAssembler;
+    private SearchParametersResourceAssembler searchParametersResourceAssembler;
 
     @RequestMapping(method = RequestMethod.GET, value = "/me")
     public UserResource getUser() {
@@ -41,18 +37,21 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/sociotypes")
-    public ResponseEntity setSociotypes(@RequestBody SociotypeDTO[] sociotypes) throws URISyntaxException {
-        socialUserService.setUserSociotypes(getUserPrincipal().getId(), convertToCodes(sociotypes));
+    public ResponseEntity setSociotypes(@PathVariable Long userId, @RequestBody String[] codes) throws URISyntaxException {
+        if (!getUserPrincipal().getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        socialUserService.setUserSociotypes(getUserPrincipal().getId(), convertToEnumCodes(codes));
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
-    private Set<Sociotype.Code1> convertToCodes(SociotypeDTO[] sociotypes) {
-        Set<Sociotype.Code1> codes = new HashSet<>();
-        for (SociotypeDTO sociotype : sociotypes) {
-            Sociotype.Code1 code = Sociotype.Code1.valueOf(sociotype.getCode1());
-            codes.add(code);
+    private Set<Sociotype.Code1> convertToEnumCodes(String[] codes) {
+        Set<Sociotype.Code1> enumCodes = new HashSet<>();
+        for (String code : codes) {
+            Sociotype.Code1 enumCode = Sociotype.Code1.valueOf(code);
+            enumCodes.add(enumCode);
         }
-        return codes;
+        return enumCodes;
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/date-of-birth")
@@ -62,20 +61,28 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/search-parameters")
-    public ResponseEntity setSearchParameters(@RequestBody SearchParametersDTO searchParameters) throws URISyntaxException {
-        socialUserService.setUserSearchParameters(getUserPrincipal().getId(), searchParametersDTOAssembler.toEntity(searchParameters));
+    public ResponseEntity setSearchParameters(@PathVariable Long userId, @RequestBody SearchParametersResource resource) throws URISyntaxException {
+        if (!getUserPrincipal().getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        SearchParameters searchParameters = new SearchParameters();
+        searchParameters.setMinAge(resource.getMinAge());
+        searchParameters.setMaxAge(resource.getMaxAge());
+        searchParameters.setSearchFemale(resource.getSearchFemale());
+        searchParameters.setSearchMale(resource.getSearchMale());
+        socialUserService.setUserSearchParameters(userId, searchParameters);
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/locations")
-    public ResponseEntity setLocation(@RequestBody LocationDTO locationDTO, @PathVariable("userId") Long userId) throws LocationProviderException, URISyntaxException {
+    public ResponseEntity setLocation(@RequestBody LocationResource locationResource, @PathVariable("userId") Long userId) throws LocationProviderException, URISyntaxException {
         if (!getUserPrincipal().getId().equals(userId)) {
-            throw new ForbiddenException(ForbiddenException.illegalAccess);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         Location location;
-        if (locationDTO.getLatitude() != null && locationDTO.getLongitude() != null) {
-            location = locationProvider.getLocation(locationDTO.getLatitude(), locationDTO.getLongitude());
+        if (locationResource.getLatitude() != null && locationResource.getLongitude() != null) {
+            location = locationProvider.getLocation(locationResource.getLatitude(), locationResource.getLongitude());
         } else {
             throw new IllegalArgumentException("\"latitude\" and \"longitude\" must be provided");
         }
@@ -87,7 +94,11 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/user/{userId:[0-9]+}/search-parameters")
     public ResponseEntity getSearchParameters(@PathVariable Long userId) {
-        throw new UnsupportedOperationException("Not implemented");
+        if (!getUserPrincipal().getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        User user = socialUserService.loadUserById(userId);
+        return ResponseEntity.ok(searchParametersResourceAssembler.toResource(user.getSearchParameters()));
     }
 
     private User getUserPrincipal() {
@@ -100,11 +111,6 @@ public class UserController {
     }
 
     @Autowired
-    public void setSearchParametersDTOAssembler(SearchParametersDTOAssembler searchParametersDTOAssembler) {
-        this.searchParametersDTOAssembler = searchParametersDTOAssembler;
-    }
-
-    @Autowired
     @Qualifier("multipleServiceLocationProvider")
     public void setLocationProvider(LocationProvider locationProvider) {
         this.locationProvider = locationProvider;
@@ -113,5 +119,10 @@ public class UserController {
     @Autowired
     public void setUserResourceAssembler(UserResourceAssembler userResourceAssembler) {
         this.userResourceAssembler = userResourceAssembler;
+    }
+
+    @Autowired
+    public void setSearchParametersResourceAssembler(SearchParametersResourceAssembler searchParametersResourceAssembler) {
+        this.searchParametersResourceAssembler = searchParametersResourceAssembler;
     }
 }
