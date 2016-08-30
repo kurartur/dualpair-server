@@ -35,12 +35,13 @@ public class FacebookDataProvider implements SocialDataProvider {
     public User enhanceUser(User user) throws SocialDataException {
         Facebook facebook = facebookConnection.getApi();
         org.springframework.social.facebook.api.User facebookUser = facebook.userOperations().getUserProfile();
-        user.setName(facebookUser.getFirstName());
+        if (!StringUtils.isEmpty(facebookUser.getFirstName())) {
+            user.setName(facebookUser.getFirstName());
+        }
         user.setEmail(facebookConnection.fetchUserProfile().getEmail());
         //user.setLocation(facebookUser.getLocation().getName());
         user.setGender(resolveGender(facebookUser.getGender()));
 
-        user.setDateOfBirth(null);
         String birthday = facebookUser.getBirthday();
         if (!StringUtils.isEmpty(birthday)) {
             Date dateOfBirth = birthdayToDate(birthday);

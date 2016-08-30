@@ -71,8 +71,8 @@ public class SocialUserServiceImplTest {
         assertEquals("111", userAccount.getAccountId());
         assertEquals(UserAccount.Type.FACEBOOK, userAccount.getAccountType());
         assertNotNull(resultUser.getUserId());
-        assertNotNull(resultUser.getCreated());
-        assertNotNull(resultUser.getUpdated());
+        assertNotNull(resultUser.getDateCreated());
+        assertNotNull(resultUser.getDateUpdated());
         SearchParameters searchParameters = resultUser.getSearchParameters();
         assertNotNull(searchParameters);
         assertEquals((Integer)2, searchParameters.getMinAge());

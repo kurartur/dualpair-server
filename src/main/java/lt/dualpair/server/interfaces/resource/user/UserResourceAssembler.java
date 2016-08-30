@@ -5,7 +5,8 @@ import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserLocation;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResource;
-import lt.dualpair.server.interfaces.web.controller.rest.UserController;
+import lt.dualpair.server.interfaces.web.controller.rest.user.SearchParametersController;
+import lt.dualpair.server.interfaces.web.controller.rest.user.UserController;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
@@ -57,7 +58,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
         }
         resource.setPhotos(photos);
 
-        resource.add(linkTo(methodOn(UserController.class).getSearchParameters(entity.getId())).withRel("search-parameters"));
+        resource.add(linkTo(methodOn(SearchParametersController.class).getSearchParameters(entity.getId())).withRel("search-parameters"));
 
         return resource;
     }

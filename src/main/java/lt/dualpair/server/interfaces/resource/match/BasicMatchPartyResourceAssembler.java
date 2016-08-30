@@ -2,7 +2,7 @@ package lt.dualpair.server.interfaces.resource.match;
 
 import lt.dualpair.server.domain.model.match.MatchParty;
 import lt.dualpair.server.interfaces.web.controller.rest.MatchController;
-import lt.dualpair.server.interfaces.web.controller.rest.UserController;
+import lt.dualpair.server.interfaces.web.controller.rest.user.UserController;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 

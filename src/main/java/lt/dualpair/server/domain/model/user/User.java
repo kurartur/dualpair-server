@@ -5,6 +5,7 @@ import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.social.security.SocialUserDetails;
+import org.springframework.util.Assert;
 import org.thymeleaf.util.Validate;
 
 import javax.persistence.*;
@@ -16,6 +17,9 @@ import java.util.*;
 public class User implements SocialUserDetails, Serializable {
 
     public enum Status { INITIAL, ACTIVE, BLOCKED }
+
+    private static final int NAME_LENGTH = 100;
+    private static final int DESCRIPTION_LENGTH = 255;
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -30,11 +34,11 @@ public class User implements SocialUserDetails, Serializable {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
-    private Date created;
+    private Date dateCreated;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "update_time")
-    private Date updated;
+    private Date dateUpdated;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private Set<UserAccount> userAccounts;
@@ -100,20 +104,20 @@ public class User implements SocialUserDetails, Serializable {
         return status;
     }
 
-    public Date getCreated() {
-        return created;
+    public Date getDateCreated() {
+        return dateCreated;
     }
 
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
-    public Date getUpdated() {
-        return updated;
+    public Date getDateUpdated() {
+        return dateUpdated;
     }
 
-    public void setUpdated(Date updated) {
-        this.updated = updated;
+    public void setDateUpdated(Date date_updated) {
+        this.dateUpdated = date_updated;
     }
 
     public Set<UserAccount> getUserAccounts() {
@@ -157,6 +161,10 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public void setName(String name) {
+        Assert.hasText(name);
+        if (name.length() > NAME_LENGTH) {
+            throw new IllegalArgumentException("Name length can't be greater than " + NAME_LENGTH);
+        }
         this.name = name;
     }
 
@@ -169,6 +177,7 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public void setDateOfBirth(Date dateOfBirth) {
+        Assert.notNull(dateOfBirth);
         this.ageInfo = new AgeInfo(dateOfBirth);
     }
 
@@ -185,6 +194,9 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public void setDescription(String description) {
+        if (description.length() > DESCRIPTION_LENGTH) {
+            throw new IllegalArgumentException("Description length can't be greater than " + DESCRIPTION_LENGTH);
+        }
         this.description = description;
     }
 

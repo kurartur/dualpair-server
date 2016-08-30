@@ -164,4 +164,12 @@ public class UserServiceImplTest {
         assertEquals(user, searchParameters.getUser());
         verify(userRepository, times(1)).save(user);
     }
+
+    @Test
+    public void testUpdateUser() throws Exception {
+        User user = new User();
+        userService.updateUser(user);
+        verify(userRepository, times(1)).save(user);
+        assertNotNull(user.getDateUpdated());
+    }
 }

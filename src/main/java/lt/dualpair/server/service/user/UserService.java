@@ -13,6 +13,8 @@ public interface UserService {
 
     User loadUserById(Long userId) throws UserNotFoundException;
 
+    void updateUser(User user);
+
     UserLocation addLocation(Long userId, Location location);
 
     void setUserSociotypes(Long userId, Set<Sociotype.Code1> codes);

@@ -1,57 +1,55 @@
-package lt.dualpair.server.interfaces.web.controller.rest;
+package lt.dualpair.server.interfaces.web.controller.rest.user;
 
 import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.geo.LocationProvider;
 import lt.dualpair.server.domain.model.geo.LocationProviderException;
-import lt.dualpair.server.domain.model.match.SearchParameters;
-import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.interfaces.resource.user.*;
+import lt.dualpair.server.interfaces.resource.user.LocationResource;
+import lt.dualpair.server.interfaces.resource.user.UserResource;
+import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
+import lt.dualpair.server.interfaces.web.controller.rest.BaseController;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-public class UserController {
+public class UserController extends BaseController {
 
     private SocialUserService socialUserService;
     private LocationProvider locationProvider;
     private UserResourceAssembler userResourceAssembler;
-    private SearchParametersResourceAssembler searchParametersResourceAssembler;
 
     @RequestMapping(method = RequestMethod.GET, value = "/me")
     public UserResource getUser() {
         return userResourceAssembler.toResource(socialUserService.loadUserById(getUserPrincipal().getId()));
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/sociotypes")
-    public ResponseEntity setSociotypes(@PathVariable Long userId, @RequestBody String[] codes) throws URISyntaxException {
+    @RequestMapping(method = RequestMethod.PATCH, value="/user/{userId:[0-9]}")
+    public ResponseEntity updateUser(@PathVariable Long userId, @RequestBody Map<String, Object> data) throws URISyntaxException, ParseException {
         if (!getUserPrincipal().getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        socialUserService.setUserSociotypes(getUserPrincipal().getId(), convertToEnumCodes(codes));
-        return ResponseEntity.created(new URI("/api/user")).build();
-    }
-
-    private Set<Sociotype.Code1> convertToEnumCodes(String[] codes) {
-        Set<Sociotype.Code1> enumCodes = new HashSet<>();
-        for (String code : codes) {
-            Sociotype.Code1 enumCode = Sociotype.Code1.valueOf(code);
-            enumCodes.add(enumCode);
-        }
-        return enumCodes;
+        User user = socialUserService.loadUserById(userId);
+        if (data.containsKey("description"))
+            user.setDescription((String)data.get("description"));
+        if (data.containsKey("name"))
+            user.setName((String)data.get("name"));
+        if (data.containsKey("dateOfBirth"))
+            user.setDateOfBirth(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse((String)data.get("dateOfBirth")));
+        socialUserService.updateUser(user);
+        return ResponseEntity.noContent().location(new URI("/api/user/" + userId)).build();
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/date-of-birth")
@@ -61,20 +59,6 @@ public class UserController {
         }
         socialUserService.setUserDateOfBirth(userId, dateOfBirth);
         return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/user")).build();
-    }
-
-    @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/search-parameters")
-    public ResponseEntity setSearchParameters(@PathVariable Long userId, @RequestBody SearchParametersResource resource) throws URISyntaxException {
-        if (!getUserPrincipal().getId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        SearchParameters searchParameters = new SearchParameters();
-        searchParameters.setMinAge(resource.getMinAge());
-        searchParameters.setMaxAge(resource.getMaxAge());
-        searchParameters.setSearchFemale(resource.getSearchFemale());
-        searchParameters.setSearchMale(resource.getSearchMale());
-        socialUserService.setUserSearchParameters(userId, searchParameters);
-        return ResponseEntity.created(new URI("/api/user")).build();
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/locations")
@@ -95,19 +79,6 @@ public class UserController {
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/user/{userId:[0-9]+}/search-parameters")
-    public ResponseEntity getSearchParameters(@PathVariable Long userId) {
-        if (!getUserPrincipal().getId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        User user = socialUserService.loadUserById(userId);
-        return ResponseEntity.ok(searchParametersResourceAssembler.toResource(user.getSearchParameters()));
-    }
-
-    private User getUserPrincipal() {
-        return (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
     @Autowired
     public void setSocialUserService(SocialUserService socialUserService) {
         this.socialUserService = socialUserService;
@@ -124,8 +95,4 @@ public class UserController {
         this.userResourceAssembler = userResourceAssembler;
     }
 
-    @Autowired
-    public void setSearchParametersResourceAssembler(SearchParametersResourceAssembler searchParametersResourceAssembler) {
-        this.searchParametersResourceAssembler = searchParametersResourceAssembler;
-    }
 }

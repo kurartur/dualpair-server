@@ -42,12 +42,10 @@ public class UserServiceImpl implements UserService {
         return user.get();
     }
 
-
-
-    private User updateUser(User user) {
-        user.setUpdated(new Date());
+    @Override
+    public void updateUser(User user) {
+        user.setDateUpdated(new Date());
         userRepository.save(user);
-        return user;
     }
 
     protected String buildUserId(String accountId, Long time) {

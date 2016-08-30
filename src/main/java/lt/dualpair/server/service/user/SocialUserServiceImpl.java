@@ -71,8 +71,8 @@ public class SocialUserServiceImpl extends UserServiceImpl implements SocialUser
         User user = new User();
         Long currentTime = System.currentTimeMillis();
         Date currentDate = new Date(currentTime);
-        user.setCreated(currentDate);
-        user.setUpdated(currentDate);
+        user.setDateCreated(currentDate);
+        user.setDateUpdated(currentDate);
         user.setUsername(buildUserId(accountId, currentTime));
 
         UserAccount userAccount = new UserAccount(user);
