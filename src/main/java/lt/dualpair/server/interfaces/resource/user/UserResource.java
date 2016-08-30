@@ -1,6 +1,7 @@
 package lt.dualpair.server.interfaces.resource.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResource;
 import org.springframework.hateoas.ResourceSupport;
 
@@ -9,6 +10,7 @@ import java.util.Set;
 
 public class UserResource extends ResourceSupport {
 
+    @JsonProperty("id")
     private Long userId;
     private String name;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
