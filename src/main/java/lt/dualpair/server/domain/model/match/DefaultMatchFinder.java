@@ -12,6 +12,7 @@ import lt.dualpair.server.infrastructure.persistence.repository.UserRepositoryIm
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Set;
 
 @Component
@@ -65,6 +66,7 @@ public class DefaultMatchFinder implements MatchFinder {
         match.setRelationType(relationTypeRepository.findByCode(relationType).get());
         match.setMatchParties(new MatchParty(match, user), new MatchParty(match, opponent));
         match.setDistance(distance);
+        match.setDateCreated(new Date());
         return match;
     }
 
