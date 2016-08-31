@@ -112,6 +112,7 @@ public class MatchService {
         this.matchRequestValidator = matchRequestValidator;
     }
 
+    @Autowired
     public void setNotificationSender(NotificationSender notificationSender) {
         this.notificationSender = notificationSender;
     }
