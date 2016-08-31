@@ -6,6 +6,7 @@ import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -26,6 +27,10 @@ public class Match implements Serializable, Identifiable<Long> {
     private Set<MatchParty> matchParties = new HashSet<>();
 
     private Integer distance;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "create_time")
+    private Date dateCreated = new Date();
 
     @Override
     public Long getId() {
@@ -82,7 +87,7 @@ public class Match implements Serializable, Identifiable<Long> {
         Iterator<MatchParty> matchPartyIterator = matchParties.iterator();
         MatchParty first = matchPartyIterator.next();
         MatchParty second = matchPartyIterator.next();
-        return first.getResponse() == MatchParty.Response.YES && second.getResponse() == MatchParty.Response.YES;
+        return first.getResponse() == Response.YES && second.getResponse() == Response.YES;
     }
 
     public Integer getDistance() {
@@ -93,4 +98,11 @@ public class Match implements Serializable, Identifiable<Long> {
         this.distance = distance;
     }
 
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 }

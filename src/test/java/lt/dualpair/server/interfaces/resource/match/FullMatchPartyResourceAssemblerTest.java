@@ -2,6 +2,7 @@ package lt.dualpair.server.interfaces.resource.match;
 
 import lt.dualpair.server.domain.model.match.Match;
 import lt.dualpair.server.domain.model.match.MatchParty;
+import lt.dualpair.server.domain.model.match.Response;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
@@ -33,7 +34,7 @@ public class FullMatchPartyResourceAssemblerTest {
         MatchParty matchParty = new MatchParty();
         matchParty.setUser(user);
         matchParty.setMatch(match);
-        matchParty.setResponse(MatchParty.Response.YES);
+        matchParty.setResponse(Response.YES);
         UserResource userResource = new UserResource();
         when(userResourceAssembler.toResource(user)).thenReturn(userResource);
         FullMatchPartyResource matchPartyResource = fullMatchPartyResourceAssembler.toResource(matchParty);

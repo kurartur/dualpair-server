@@ -1,8 +1,8 @@
 package lt.dualpair.server.interfaces.web.controller.rest;
 
 import lt.dualpair.server.domain.model.match.Match;
-import lt.dualpair.server.domain.model.match.MatchParty;
 import lt.dualpair.server.domain.model.match.MatchRequestException;
+import lt.dualpair.server.domain.model.match.Response;
 import lt.dualpair.server.domain.model.match.UserAwareMatch;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserTestUtils;
@@ -48,14 +48,14 @@ public class MatchControllerTest {
     @Test
     public void testResponse() throws Exception {
         ResponseEntity responseEntity = matchController.response(1L, "YES");
-        verify(matchService, times(1)).responseByUser(1L, MatchParty.Response.YES, 1L);
+        verify(matchService, times(1)).responseByUser(1L, Response.YES, 1L);
         assertEquals(HttpStatus.SEE_OTHER, responseEntity.getStatusCode());
         assertEquals("/api/match/1", responseEntity.getHeaders().getLocation().toString());
     }
 
     @Test
     public void testResponse_exception() throws Exception {
-        doThrow(new RuntimeException("Error")).when(matchService).responseByUser(1L, MatchParty.Response.YES, 1L);
+        doThrow(new RuntimeException("Error")).when(matchService).responseByUser(1L, Response.YES, 1L);
         try {
             matchController.response(1L, "YES");
             fail();
@@ -72,7 +72,7 @@ public class MatchControllerTest {
         } catch (IllegalArgumentException iae) {
             assertTrue(iae.getMessage().contains("No enum constant"));
         }
-        verify(matchService, times(0)).responseByUser(any(Long.class), any(MatchParty.Response.class), any(Long.class));
+        verify(matchService, times(0)).responseByUser(any(Long.class), any(Response.class), any(Long.class));
     }
 
     @Test

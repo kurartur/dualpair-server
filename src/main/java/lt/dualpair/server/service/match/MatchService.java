@@ -52,7 +52,7 @@ public class MatchService {
     }
 
     @Transactional
-    public void responseByUser(Long matchId, MatchParty.Response response, Long userId) {
+    public void responseByUser(Long matchId, Response response, Long userId) {
         Match match = findNotNullMatch(matchId);
         MatchParty matchParty = match.getMatchParty(userId);
         if (matchParty == null) {
@@ -81,9 +81,9 @@ public class MatchService {
 
     public Set<Match> getUserMutualMatches(final Long userId) {
         User user = userService.loadUserById(userId);
-        Set<Match> matches =  matchRepository.findByUser(user, MatchParty.Response.YES);
+        Set<Match> matches =  matchRepository.findByUser(user, Response.YES);
         return matches.stream()
-                .filter(match -> match.getOppositeMatchParty(userId).getResponse() == MatchParty.Response.YES)
+                .filter(match -> match.getOppositeMatchParty(userId).getResponse() == Response.YES)
                 .collect(Collectors.toSet());
     }
 

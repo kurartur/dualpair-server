@@ -2,6 +2,7 @@ package lt.dualpair.server.interfaces.resource.match;
 
 import lt.dualpair.server.domain.model.match.Match;
 import lt.dualpair.server.domain.model.match.MatchParty;
+import lt.dualpair.server.domain.model.match.Response;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import org.junit.Ignore;
@@ -24,7 +25,7 @@ public class BasicMatchPartyResourceAssemblerTest {
         MatchParty matchParty = new MatchParty();
         matchParty.setUser(user);
         matchParty.setMatch(match);
-        matchParty.setResponse(MatchParty.Response.YES);
+        matchParty.setResponse(Response.YES);
         UserResource userResource = new UserResource();
         BasicMatchPartyResource matchPartyResource = basicMatchPartyResourceAssembler.toResource(matchParty);
         assertTrue(matchPartyResource.getLink("user").getHref().endsWith("api/me"));

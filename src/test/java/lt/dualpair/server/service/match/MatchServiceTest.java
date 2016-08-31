@@ -103,25 +103,25 @@ public class MatchServiceTest {
 
     @Test
     public void testResponseByUser() throws Exception {
-        MatchParty matchParty1 = createMatchParty(1L, createUser(1L), MatchParty.Response.UNDEFINED);
-        MatchParty matchParty2 = createMatchParty(2L, createUser(2L), MatchParty.Response.UNDEFINED);
+        MatchParty matchParty1 = createMatchParty(1L, createUser(1L), Response.UNDEFINED);
+        MatchParty matchParty2 = createMatchParty(2L, createUser(2L), Response.UNDEFINED);
         Match match = MatchTestUtils.createMatch(1L, matchParty1, matchParty2);
         when(matchRepository.findOne(1L)).thenReturn(match);
-        matchService.responseByUser(1L, MatchParty.Response.YES, 2L);
+        matchService.responseByUser(1L, Response.YES, 2L);
         verify(matchRepository, times(1)).save(match);
-        assertEquals(MatchParty.Response.YES, match.getMatchParty(2L).getResponse());
-        assertEquals(MatchParty.Response.UNDEFINED, match.getMatchParty(1L).getResponse());
+        assertEquals(Response.YES, match.getMatchParty(2L).getResponse());
+        assertEquals(Response.UNDEFINED, match.getMatchParty(1L).getResponse());
         verify(notificationSender, never()).sendNotification(any(Notification.class));
     }
 
     @Test
     public void testResponseByUser_invalidUser() throws Exception {
-        MatchParty matchParty1 = createMatchParty(1L, createUser(1L), MatchParty.Response.UNDEFINED);
-        MatchParty matchParty2 = createMatchParty(2L, createUser(2L), MatchParty.Response.UNDEFINED);
+        MatchParty matchParty1 = createMatchParty(1L, createUser(1L), Response.UNDEFINED);
+        MatchParty matchParty2 = createMatchParty(2L, createUser(2L), Response.UNDEFINED);
         Match match = MatchTestUtils.createMatch(1L, matchParty1, matchParty2);
         when(matchRepository.findOne(1L)).thenReturn(match);
         try {
-            matchService.responseByUser(1L, MatchParty.Response.YES, 3L);
+            matchService.responseByUser(1L, Response.YES, 3L);
             fail();
         } catch (ForbiddenException fe) {
             assertEquals("Invalid user", fe.getMessage());
@@ -132,19 +132,19 @@ public class MatchServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void testResponseByUser_matchNotFound() throws Exception {
         when(matchRepository.findOne(1L)).thenReturn(null);
-        matchService.responseByUser(1L, MatchParty.Response.YES, 2L);
+        matchService.responseByUser(1L, Response.YES, 2L);
     }
 
     @Test
     public void testResponseByUser_notification() throws Exception {
-        MatchParty matchParty1 = createMatchParty(1L, createUser(1L), MatchParty.Response.YES);
-        MatchParty matchParty2 = createMatchParty(2L, createUser(2L), MatchParty.Response.UNDEFINED);
+        MatchParty matchParty1 = createMatchParty(1L, createUser(1L), Response.YES);
+        MatchParty matchParty2 = createMatchParty(2L, createUser(2L), Response.UNDEFINED);
         Match match = MatchTestUtils.createMatch(1L, matchParty1, matchParty2);
         when(matchRepository.findOne(1L)).thenReturn(match);
-        matchService.responseByUser(1L, MatchParty.Response.YES, 2L);
+        matchService.responseByUser(1L, Response.YES, 2L);
         verify(matchRepository, times(1)).save(match);
-        assertEquals(MatchParty.Response.YES, match.getMatchParty(2L).getResponse());
-        assertEquals(MatchParty.Response.YES, match.getMatchParty(1L).getResponse());
+        assertEquals(Response.YES, match.getMatchParty(2L).getResponse());
+        assertEquals(Response.YES, match.getMatchParty(1L).getResponse());
         verify(notificationSender, times(2)).sendNotification(any(Notification.class));
     }
 
@@ -152,7 +152,7 @@ public class MatchServiceTest {
     public void testGetUserMutualMatches_noMatches() throws Exception {
         User user = new User();
         when(userService.loadUserById(1L)).thenReturn(user);
-        when(matchRepository.findByUser(user, MatchParty.Response.YES)).thenReturn(new HashSet<>());
+        when(matchRepository.findByUser(user, Response.YES)).thenReturn(new HashSet<>());
         Set<Match> matches = matchService.getUserMutualMatches(1L);
         assertNotNull(matches);
         assertEquals(0, matches.size());
@@ -164,29 +164,29 @@ public class MatchServiceTest {
         Set<Match> matches = new HashSet<>();
         long i = 1;
         for (; i<=3; i++) {
-            MatchParty matchParty1 = createMatchParty(i, user, MatchParty.Response.YES);
-            MatchParty matchParty2 = createMatchParty(i, createUser(i), MatchParty.Response.YES);
+            MatchParty matchParty1 = createMatchParty(i, user, Response.YES);
+            MatchParty matchParty2 = createMatchParty(i, createUser(i), Response.YES);
             matches.add(MatchTestUtils.createMatch(i, matchParty1, matchParty2));
         }
         for (; i<=6; i++) {
-            MatchParty matchParty1 = createMatchParty(i, user, MatchParty.Response.YES);
-            MatchParty matchParty2 = createMatchParty(i, createUser(i), MatchParty.Response.NO);
+            MatchParty matchParty1 = createMatchParty(i, user, Response.YES);
+            MatchParty matchParty2 = createMatchParty(i, createUser(i), Response.NO);
             matches.add(MatchTestUtils.createMatch(i, matchParty1, matchParty2));
         }
         for (; i<=9; i++) {
-            MatchParty matchParty1 = createMatchParty(i, user, MatchParty.Response.YES);
-            MatchParty matchParty2 = createMatchParty(i, createUser(i), MatchParty.Response.UNDEFINED);
+            MatchParty matchParty1 = createMatchParty(i, user, Response.YES);
+            MatchParty matchParty2 = createMatchParty(i, createUser(i), Response.UNDEFINED);
             matches.add(MatchTestUtils.createMatch(i, matchParty1, matchParty2));
         }
         when(userService.loadUserById(100L)).thenReturn(user);
-        when(matchRepository.findByUser(user, MatchParty.Response.YES)).thenReturn(matches);
+        when(matchRepository.findByUser(user, Response.YES)).thenReturn(matches);
         Set<Match> result = matchService.getUserMutualMatches(100L);
         assertEquals(3, result.size());
         Iterator<Match> matchIterator = result.iterator();
         while (matchIterator.hasNext()) {
             Match match = matchIterator.next();
-            assertEquals(MatchParty.Response.YES, match.getMatchParty(100L).getResponse());
-            assertEquals(MatchParty.Response.YES, match.getOppositeMatchParty(100L).getResponse());
+            assertEquals(Response.YES, match.getMatchParty(100L).getResponse());
+            assertEquals(Response.YES, match.getOppositeMatchParty(100L).getResponse());
         }
     }
 

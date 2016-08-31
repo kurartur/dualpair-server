@@ -1,3 +1,8 @@
+logging:
+  level:
+    #org.springframework.jdbc: DEBUG
+    #org.hibernate.type: TRACE
+
 spring:
   datasource:
     driverClassName: org.hsqldb.jdbc.JDBCDriver

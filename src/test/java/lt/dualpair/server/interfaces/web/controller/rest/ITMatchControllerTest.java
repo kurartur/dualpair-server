@@ -220,7 +220,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
                 .andExpect(header().string("Location", "/api/match/1"));
         flushPersistenceContext();
         Map<String, Object> rs = jdbcTemplate.queryForMap("select response from match_parties where user_id=1");
-        assertEquals(2, rs.get("response"));
+        assertEquals("Y", rs.get("response"));
     }
 
     @Test
@@ -232,7 +232,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
                  .andExpect(header().string("Location", "/api/match/1"));
         flushPersistenceContext();
         Map<String, Object> rs = jdbcTemplate.queryForMap("select response from match_parties where user_id=1");
-        assertEquals(1, rs.get("response"));
+        assertEquals("N", rs.get("response"));
     }
 
     @Test

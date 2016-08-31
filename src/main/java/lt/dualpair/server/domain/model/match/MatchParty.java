@@ -8,8 +8,6 @@ import javax.persistence.*;
 @Table(name = "match_parties")
 public class MatchParty {
 
-    public enum Response {UNDEFINED, NO, YES}
-
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
@@ -22,7 +20,6 @@ public class MatchParty {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Enumerated
     private Response response = Response.UNDEFINED;
 
     public MatchParty() {}
