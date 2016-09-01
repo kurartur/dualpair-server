@@ -40,6 +40,7 @@ public class ITMatchPartyControllerTest extends BaseRestControllerTest {
         mockMvc.perform(put("/api/party/1/response").with(bearerToken(1L)).content("YES"))
                 .andExpect(status().isSeeOther())
                 .andExpect(header().string("Location", "/api/match/1"));
+        flushPersistenceContext();
         Map<String, Object> rs = jdbcTemplate.queryForMap("select response from match_parties where user_id=1");
         assertEquals("Y", rs.get("response"));
     }
@@ -50,6 +51,7 @@ public class ITMatchPartyControllerTest extends BaseRestControllerTest {
         mockMvc.perform(put("/api/party/1/response").with(bearerToken(1L)).content("NO"))
                 .andExpect(status().isSeeOther())
                 .andExpect(header().string("Location", "/api/match/1"));
+        flushPersistenceContext();
         Map<String, Object> rs = jdbcTemplate.queryForMap("select response from match_parties where user_id=1");
         assertEquals("N", rs.get("response"));
     }
