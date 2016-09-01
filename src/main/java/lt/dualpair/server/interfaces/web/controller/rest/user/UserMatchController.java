@@ -36,6 +36,11 @@ public class UserMatchController extends BaseController {
         return ResponseEntity.ok(pagedResourcesAssembler.toResource(matches.map(source -> new UserAwareMatch(getUserPrincipal(), source)), matchResourceAssembler));
     }
 
+    @RequestMapping(method = RequestMethod.GET, path = "/match/{matchId:[0-9]+}")
+    public ResponseEntity getMatch(@PathVariable Long userId, @PathVariable Long matchId) {
+        throw new UnsupportedOperationException("Not implemented"); // TODO implement this
+    }
+
     @Autowired
     public void setMatchRepository(MatchRepository matchRepository) {
         this.matchRepository = matchRepository;

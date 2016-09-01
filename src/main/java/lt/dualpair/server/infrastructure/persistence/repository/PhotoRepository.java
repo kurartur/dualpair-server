@@ -1,4 +1,4 @@
-package lt.dualpair.server.persistence.repository;
+package lt.dualpair.server.infrastructure.persistence.repository;
 
 import lt.dualpair.server.domain.model.photo.Photo;
 import org.springframework.data.jpa.repository.Query;

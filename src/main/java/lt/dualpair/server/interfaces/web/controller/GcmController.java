@@ -4,6 +4,7 @@ import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-@Controller // TODO disable in prod
+@Controller
+@Profile("!prod")
 public class GcmController {
 
     @Autowired

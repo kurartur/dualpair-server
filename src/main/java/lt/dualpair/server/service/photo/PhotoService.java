@@ -1,7 +1,7 @@
 package lt.dualpair.server.service.photo;
 
 import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.persistence.repository.PhotoRepository;
+import lt.dualpair.server.infrastructure.persistence.repository.PhotoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

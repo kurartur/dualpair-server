@@ -8,9 +8,9 @@ public class MatchResource extends ResourceSupport {
     @JsonProperty("id")
     private Long matchId;
 
-    private BasicMatchPartyResource user;
+    private UserMatchPartyResource user;
 
-    private FullMatchPartyResource opponent;
+    private OpponentMatchPartyResource opponent;
 
     private Integer distance;
 
@@ -22,19 +22,19 @@ public class MatchResource extends ResourceSupport {
         this.matchId = matchId;
     }
 
-    public BasicMatchPartyResource getUser() {
+    public UserMatchPartyResource getUser() {
         return user;
     }
 
-    public void setUser(BasicMatchPartyResource user) {
+    public void setUser(UserMatchPartyResource user) {
         this.user = user;
     }
 
-    public FullMatchPartyResource getOpponent() {
+    public OpponentMatchPartyResource getOpponent() {
         return opponent;
     }
 
-    public void setOpponent(FullMatchPartyResource opponent) {
+    public void setOpponent(OpponentMatchPartyResource opponent) {
         this.opponent = opponent;
     }
 

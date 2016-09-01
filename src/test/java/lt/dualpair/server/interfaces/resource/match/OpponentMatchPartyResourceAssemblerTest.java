@@ -15,14 +15,14 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class FullMatchPartyResourceAssemblerTest {
+public class OpponentMatchPartyResourceAssemblerTest {
 
-    private FullMatchPartyResourceAssembler fullMatchPartyResourceAssembler = new FullMatchPartyResourceAssembler();
+    private OpponentMatchPartyResourceAssembler opponentMatchPartyResourceAssembler = new OpponentMatchPartyResourceAssembler();
     private UserResourceAssembler userResourceAssembler = mock(UserResourceAssembler.class);
 
     @Before
     public void setUp() throws Exception {
-        fullMatchPartyResourceAssembler.setUserResourceAssembler(userResourceAssembler);
+        opponentMatchPartyResourceAssembler.setUserResourceAssembler(userResourceAssembler);
     }
 
     @Test
@@ -37,9 +37,8 @@ public class FullMatchPartyResourceAssemblerTest {
         matchParty.setResponse(Response.YES);
         UserResource userResource = new UserResource();
         when(userResourceAssembler.toResource(user)).thenReturn(userResource);
-        FullMatchPartyResource matchPartyResource = fullMatchPartyResourceAssembler.toResource(matchParty);
+        OpponentMatchPartyResource matchPartyResource = opponentMatchPartyResourceAssembler.toResource(matchParty);
         assertEquals(userResource, matchPartyResource.getUser());
         assertTrue(matchPartyResource.getLink("match").getHref().endsWith("/match/1"));
-        assertEquals("YES", matchPartyResource.getResponse());
     }
 }

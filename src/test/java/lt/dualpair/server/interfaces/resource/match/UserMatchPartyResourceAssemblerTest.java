@@ -11,9 +11,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class BasicMatchPartyResourceAssemblerTest {
+public class UserMatchPartyResourceAssemblerTest {
 
-    private BasicMatchPartyResourceAssembler basicMatchPartyResourceAssembler = new BasicMatchPartyResourceAssembler();
+    private UserMatchPartyResourceAssembler userMatchPartyResourceAssembler = new UserMatchPartyResourceAssembler();
 
     @Test
     @Ignore // TODO move to integration test?
@@ -27,7 +27,7 @@ public class BasicMatchPartyResourceAssemblerTest {
         matchParty.setMatch(match);
         matchParty.setResponse(Response.YES);
         UserResource userResource = new UserResource();
-        BasicMatchPartyResource matchPartyResource = basicMatchPartyResourceAssembler.toResource(matchParty);
+        UserMatchPartyResource matchPartyResource = userMatchPartyResourceAssembler.toResource(matchParty);
         assertTrue(matchPartyResource.getLink("user").getHref().endsWith("api/me"));
         assertTrue(matchPartyResource.getLink("match").getHref().endsWith("api/match/1"));
         assertEquals("YES", matchPartyResource.getResponse());

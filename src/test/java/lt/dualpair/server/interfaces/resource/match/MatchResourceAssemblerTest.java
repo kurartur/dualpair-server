@@ -15,13 +15,13 @@ import static org.mockito.Mockito.when;
 public class MatchResourceAssemblerTest {
 
     private MatchResourceAssembler matchResourceAssembler = new MatchResourceAssembler();
-    private BasicMatchPartyResourceAssembler basicMatchPartyResourceAssembler = mock(BasicMatchPartyResourceAssembler.class);
-    private FullMatchPartyResourceAssembler fullMatchPartyResourceAssembler = mock(FullMatchPartyResourceAssembler.class);
+    private UserMatchPartyResourceAssembler userMatchPartyResourceAssembler = mock(UserMatchPartyResourceAssembler.class);
+    private OpponentMatchPartyResourceAssembler opponentMatchPartyResourceAssembler = mock(OpponentMatchPartyResourceAssembler.class);
 
     @Before
     public void setUp() throws Exception {
-        matchResourceAssembler.setBasicMatchPartyResourceAssembler(basicMatchPartyResourceAssembler);
-        matchResourceAssembler.setFullMatchPartyResourceAssembler(fullMatchPartyResourceAssembler);
+        matchResourceAssembler.setUserMatchPartyResourceAssembler(userMatchPartyResourceAssembler);
+        matchResourceAssembler.setOpponentMatchPartyResourceAssembler(opponentMatchPartyResourceAssembler);
     }
 
     @Test
@@ -38,14 +38,14 @@ public class MatchResourceAssemblerTest {
         Match match = new Match();
         match.setId(1L);
         match.setDistance(10);
-        FullMatchPartyResource fullMatchPartyResource = new FullMatchPartyResource();
-        BasicMatchPartyResource basicMatchPartyResource = new BasicMatchPartyResource();
-        when(fullMatchPartyResourceAssembler.toResource(matchParty2)).thenReturn(fullMatchPartyResource);
-        when(basicMatchPartyResourceAssembler.toResource(matchParty1)).thenReturn(basicMatchPartyResource);
+        OpponentMatchPartyResource opponentMatchPartyResource = new OpponentMatchPartyResource();
+        UserMatchPartyResource userMatchPartyResource = new UserMatchPartyResource();
+        when(opponentMatchPartyResourceAssembler.toResource(matchParty2)).thenReturn(opponentMatchPartyResource);
+        when(userMatchPartyResourceAssembler.toResource(matchParty1)).thenReturn(userMatchPartyResource);
         MatchResource matchResource = matchResourceAssembler.toResource(new UserAwareMatch(user, match));
         assertEquals((Long)1L, matchResource.getMatchId());
-        assertEquals(fullMatchPartyResource, matchResource.getOpponent());
-        assertEquals(basicMatchPartyResource, matchResource.getUser());
+        assertEquals(opponentMatchPartyResource, matchResource.getOpponent());
+        assertEquals(userMatchPartyResource, matchResource.getUser());
         assertEquals((Integer)10, matchResource.getDistance());
     }
 }
