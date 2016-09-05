@@ -7,6 +7,10 @@
     <users id="4" gender="F" age="25" name="Linda"/>
     <users id="5" gender="F" age="25" name="Diana"/>
     <users id="6" gender="F" age="25" name="Kate"/>
+    <users id="7" gender="F" age="25" name="Angela"/>
+
+    <user_accounts user_id="2" account_type="FB" account_id="100"/>
+    <user_accounts user_id="7" account_type="FB" account_id="200"/>
 
     <matches id="1" create_time="2016-08-25 01:15:10"/>
     <match_parties id="1" match_id="1" user_id="1" response="Y"/>
@@ -27,5 +31,9 @@
     <matches id="5" create_time="2016-08-25 01:14:50"/>
     <match_parties id="9" match_id="5" user_id="1" response="Y"/>
     <match_parties id="10" match_id="5" user_id="6" response="Y"/>
+
+    <matches id="6" create_time="2016-08-25 01:14:50"/>
+    <match_parties id="11" match_id="6" user_id="1" response="Y"/>
+    <match_parties id="12" match_id="6" user_id="7" response="N"/>
 
 </dataset>

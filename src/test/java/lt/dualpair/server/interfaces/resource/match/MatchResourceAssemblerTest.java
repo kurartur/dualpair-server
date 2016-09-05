@@ -1,18 +1,17 @@
 package lt.dualpair.server.interfaces.resource.match;
 
-import lt.dualpair.server.domain.model.match.Match;
-import lt.dualpair.server.domain.model.match.MatchParty;
-import lt.dualpair.server.domain.model.match.UserAwareMatch;
+import lt.dualpair.server.domain.model.match.*;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserTestUtils;
+import lt.dualpair.server.interfaces.resource.BaseResourceAssemblerTest;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MatchResourceAssemblerTest {
+public class MatchResourceAssemblerTest extends BaseResourceAssemblerTest {
 
     private MatchResourceAssembler matchResourceAssembler = new MatchResourceAssembler();
     private UserMatchPartyResourceAssembler userMatchPartyResourceAssembler = mock(UserMatchPartyResourceAssembler.class);
@@ -20,30 +19,26 @@ public class MatchResourceAssemblerTest {
 
     @Before
     public void setUp() throws Exception {
+        super.setUp();
         matchResourceAssembler.setUserMatchPartyResourceAssembler(userMatchPartyResourceAssembler);
         matchResourceAssembler.setOpponentMatchPartyResourceAssembler(opponentMatchPartyResourceAssembler);
     }
 
     @Test
-    @Ignore // TODO move to integration test?
     public void testToResource() throws Exception {
-        User user = new User();
-        user.setId(1L);
-        User opponent = new User();
-        opponent.setId(2L);
-        MatchParty matchParty1 = new MatchParty();
-        matchParty1.setUser(user);
-        MatchParty matchParty2 = new MatchParty();
-        matchParty2.setUser(opponent);
-        Match match = new Match();
-        match.setId(1L);
+        User user = UserTestUtils.createUser(1L);
+        MatchParty matchParty1 = MatchPartyTestUtils.createMatchParty(10L, user, Response.NO);
+        MatchParty matchParty2 = MatchPartyTestUtils.createMatchParty(11L, UserTestUtils.createUser(2L), Response.NO);
+        Match match = MatchTestUtils.createMatch(100L, matchParty1, matchParty2);
         match.setDistance(10);
+
         OpponentMatchPartyResource opponentMatchPartyResource = new OpponentMatchPartyResource();
-        UserMatchPartyResource userMatchPartyResource = new UserMatchPartyResource();
         when(opponentMatchPartyResourceAssembler.toResource(matchParty2)).thenReturn(opponentMatchPartyResource);
+        UserMatchPartyResource userMatchPartyResource = new UserMatchPartyResource();
         when(userMatchPartyResourceAssembler.toResource(matchParty1)).thenReturn(userMatchPartyResource);
+
         MatchResource matchResource = matchResourceAssembler.toResource(new UserAwareMatch(user, match));
-        assertEquals((Long)1L, matchResource.getMatchId());
+        assertEquals((Long)100L, matchResource.getMatchId());
         assertEquals(opponentMatchPartyResource, matchResource.getOpponent());
         assertEquals(userMatchPartyResource, matchResource.getUser());
         assertEquals((Integer)10, matchResource.getDistance());

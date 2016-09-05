@@ -20,7 +20,6 @@ public class UserMatchPartyResourceAssembler extends ResourceAssemblerSupport<Ma
     public UserMatchPartyResource toResource(MatchParty entity) {
         UserMatchPartyResource resource = new UserMatchPartyResource();
         resource.setPartyId(entity.getId());
-        resource.add(linkTo(methodOn(MatchController.class).match(entity.getMatch().getId())).withRel("match"));
         resource.add(linkTo(methodOn(UserController.class).getUser()).withRel("user"));
         resource.setResponse(entity.getResponse().name());
         return resource;

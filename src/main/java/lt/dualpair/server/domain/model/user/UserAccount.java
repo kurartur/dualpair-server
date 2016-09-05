@@ -2,12 +2,12 @@ package lt.dualpair.server.domain.model.user;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table(name = "user_accounts")
 public class UserAccount implements Serializable {
-
-    public enum Type {FACEBOOK}
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -21,7 +21,6 @@ public class UserAccount implements Serializable {
     private String accountId;
 
     @Column(name = "account_type")
-    @Enumerated
     private Type accountType;
 
     private UserAccount() {}
@@ -45,4 +44,25 @@ public class UserAccount implements Serializable {
     public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
+
+    public enum Type {
+        FACEBOOK("FB");
+        private String code;
+        Type(String code) {
+            this.code = code;
+        }
+        private static Map<String, Type> typesByCode = new HashMap<>();
+        static {
+            for (Type gender: Type.values()) {
+                typesByCode.put(gender.code, gender);
+            }
+        }
+        public String getCode() {
+            return code;
+        }
+        public static Type fromCode(String code) {
+            return typesByCode.get(code);
+        }
+    }
+
 }

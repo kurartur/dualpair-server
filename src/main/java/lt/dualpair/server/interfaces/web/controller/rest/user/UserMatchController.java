@@ -6,7 +6,6 @@ import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.authentication.ActiveUser;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
-import lt.dualpair.server.interfaces.web.controller.rest.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +21,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user/{userId:[0-9]+}")
-public class UserMatchController extends BaseController {
+public class UserMatchController {
 
     private MatchRepository matchRepository;
     private MatchResourceAssembler matchResourceAssembler;
@@ -31,12 +30,13 @@ public class UserMatchController extends BaseController {
     public ResponseEntity getMutualMatches(@PathVariable Long userId,
                                            Pageable pageable,
                                            PagedResourcesAssembler pagedResourcesAssembler,
-                                           @RequestParam Long timestamp) {
-        if (!getUserPrincipal().getId().equals(userId)) {
+                                           @RequestParam Long timestamp,
+                                           @ActiveUser User principal) {
+        if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Page<Match> matches = matchRepository.findMutualByUser(getUserPrincipal(), Date.from(Instant.ofEpochSecond(timestamp)), pageable);
-        return ResponseEntity.ok(pagedResourcesAssembler.toResource(matches.map(source -> new UserAwareMatch(getUserPrincipal(), source)), matchResourceAssembler));
+        Page<Match> matches = matchRepository.findMutualByUser(userId, Date.from(Instant.ofEpochSecond(timestamp)), pageable);
+        return ResponseEntity.ok(pagedResourcesAssembler.toResource(matches.map(source -> new UserAwareMatch(userId, source)), matchResourceAssembler));
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/mutual-matches/{matchId:[0-9]+}")

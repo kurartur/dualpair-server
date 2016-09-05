@@ -8,13 +8,20 @@ import java.util.Set;
 
 public class UserAwareMatch {
 
-    private User user;
+    private Long userId;
     private Match match;
 
     public UserAwareMatch(User user, Match match) {
         Assert.notNull(user);
         Assert.notNull(match);
-        this.user = user;
+        this.userId = user.getId();
+        this.match = match;
+    }
+
+    public UserAwareMatch(Long userId, Match match) {
+        Assert.notNull(userId);
+        Assert.notNull(match);
+        this.userId = userId;
         this.match = match;
     }
 
@@ -23,11 +30,11 @@ public class UserAwareMatch {
     }
 
     public MatchParty getUserMatchParty() {
-        return match.getMatchParty(user.getId());
+        return match.getMatchParty(userId);
     }
 
     public MatchParty getOpponentMatchParty() {
-        return match.getOppositeMatchParty(user.getId());
+        return match.getOppositeMatchParty(userId);
     }
 
     public Integer getDistance() {
@@ -51,14 +58,14 @@ public class UserAwareMatch {
 
         UserAwareMatch that = (UserAwareMatch) o;
 
-        if (!user.equals(that.user)) return false;
+        if (!userId.equals(that.userId)) return false;
         return match.equals(that.match);
 
     }
 
     @Override
     public int hashCode() {
-        int result = user.hashCode();
+        int result = userId.hashCode();
         result = 31 * result + match.hashCode();
         return result;
     }

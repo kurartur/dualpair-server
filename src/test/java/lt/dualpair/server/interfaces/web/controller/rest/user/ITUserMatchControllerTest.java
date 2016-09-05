@@ -3,6 +3,7 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import lt.dualpair.server.interfaces.resource.match.MatchResource;
+import lt.dualpair.server.interfaces.resource.user.UserAccountResource;
 import lt.dualpair.server.interfaces.web.controller.rest.BaseRestControllerTest;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Set;
 import java.util.TimeZone;
 
 import static org.junit.Assert.*;
@@ -74,5 +76,22 @@ public class ITUserMatchControllerTest extends BaseRestControllerTest {
         assertEquals(4, resources.getMetadata().getTotalElements());
         assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/mutual-matches?timestamp=1472087705"));
         assertNull(resources.getLink("next"));
+    }
+
+    @Test
+    public void testGetMutualMatch_accountsAreSet() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/user/1/mutual-matches/1").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        MatchResource resource = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MatchResource.class);
+        Set<UserAccountResource> accounts = resource.getOpponent().getUser().getAccounts();
+        UserAccountResource userAccountResource = accounts.iterator().next();
+        assertEquals("FACEBOOK", userAccountResource.getAccountType());
+        assertEquals("100", userAccountResource.getAccountId());
+    }
+
+    @Test
+    public void testGetMutualMatch_notMutual() throws Exception {
+        mockMvc.perform(get("/api/user/1/mutual-matches/6").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound()).andReturn();
     }
 }

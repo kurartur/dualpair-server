@@ -1,10 +1,14 @@
-package lt.dualpair.server.interfaces.resource.user;
+package lt.dualpair.server.interfaces.resource.match;
 
 import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.domain.model.user.UserLocation;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;
-import lt.dualpair.server.interfaces.web.controller.rest.user.SearchParametersController;
+import lt.dualpair.server.interfaces.resource.user.LocationResource;
+import lt.dualpair.server.interfaces.resource.user.PhotoResource;
+import lt.dualpair.server.interfaces.resource.user.UserAccountResource;
+import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.web.controller.rest.user.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -13,24 +17,22 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
 @Component
-public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserResource> {
+public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<OpponentUserResourceAssembler.AssemblingContext, UserResource> {
 
     private SociotypeResourceAssembler sociotypeResourceAssembler;
 
-    public UserResourceAssembler() {
+    public OpponentUserResourceAssembler() {
         super(UserController.class, UserResource.class);
     }
 
     @Override
-    public UserResource toResource(User entity) {
+    public UserResource toResource(AssemblingContext context) {
+        User entity = context.getUser();
+
         UserResource resource = new UserResource();
-        resource.setUserId(entity.getId());
+
         resource.setName(entity.getName());
-        resource.setDateOfBirth(entity.getDateOfBirth());
         resource.setAge(entity.getAge());
         resource.setDescription(entity.getDescription());
         resource.setSociotypes(new HashSet<>(sociotypeResourceAssembler.toResources(entity.getSociotypes())));
@@ -52,7 +54,16 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
         }
         resource.setPhotos(photos);
 
-        resource.add(linkTo(methodOn(SearchParametersController.class).getSearchParameters(entity.getId())).withRel("search-parameters"));
+        if (context.isMutualMatch()) {
+            Set<UserAccountResource> accountResources = new HashSet<>();
+            for (UserAccount userAccount : entity.getUserAccounts()) {
+                UserAccountResource userAccountResource = new UserAccountResource();
+                userAccountResource.setAccountType(userAccount.getAccountType().name());
+                userAccountResource.setAccountId(userAccount.getAccountId());
+                accountResources.add(userAccountResource);
+            }
+            resource.setAccounts(accountResources);
+        }
 
         return resource;
     }
@@ -60,5 +71,24 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
     @Autowired
     public void setSociotypeResourceAssembler(SociotypeResourceAssembler sociotypeResourceAssembler) {
         this.sociotypeResourceAssembler = sociotypeResourceAssembler;
+    }
+
+    public static class AssemblingContext {
+
+        private User user;
+        private boolean isMutualMatch;
+
+        public AssemblingContext(User user, boolean isMutualMatch) {
+            this.user = user;
+            this.isMutualMatch = isMutualMatch;
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+        public boolean isMutualMatch() {
+            return isMutualMatch;
+        }
     }
 }
