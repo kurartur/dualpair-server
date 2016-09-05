@@ -3,6 +3,7 @@ package lt.dualpair.server.interfaces.web.controller;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
+import lt.dualpair.server.infrastructure.notification.NotificationType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +29,7 @@ public class GcmController {
     public ModelAndView sendMessage(@RequestParam String message) {
         ModelAndView modelAndView = new ModelAndView("gcm");
         User user = (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Notification notification = new Notification(user.getId(), message);
+        Notification notification = new Notification<>(user.getId(), NotificationType.NEW_MATCH, message);
         notificationSender.sendNotification(notification);
         modelAndView.addObject("pageMessage", "Sent " + notification);
         return modelAndView;

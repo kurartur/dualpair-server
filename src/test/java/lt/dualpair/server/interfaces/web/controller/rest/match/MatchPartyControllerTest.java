@@ -67,7 +67,7 @@ public class MatchPartyControllerTest {
         matchParty.setMatch(match);
         when(matchPartyRepository.findById(1L)).thenReturn(Optional.of(matchParty));
         ResponseEntity responseEntity = matchPartyController.response(1L, "YES");
-        assertEquals(HttpStatus.SEE_OTHER, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(Response.YES, matchParty.getResponse());
         verify(matchPartyRepository, times(1)).save(matchParty);
         verify(matchService, times(1)).sendMutualMatchNotifications(match);

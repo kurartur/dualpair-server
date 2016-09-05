@@ -6,6 +6,7 @@ import lt.dualpair.server.domain.model.user.Device;
 import lt.dualpair.server.domain.model.user.DeviceRepository;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.notification.Notification;
+import lt.dualpair.server.infrastructure.notification.NotificationType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -31,11 +32,13 @@ public class NotificationSenderImplTest {
 
     @Test
     public void testSendNotification() throws Exception {
-        Notification notification = new Notification(1L, "message");
+        Notification notification = new Notification<>(1L, NotificationType.NEW_MATCH, "Hello");
         when(deviceRepository.findUserDevices(1L)).thenReturn(new HashSet<>(Arrays.asList(new Device("device1", new User()))));
         ArgumentCaptor<Message> messageArgumentCaptor = ArgumentCaptor.forClass(Message.class);
         notificationSender.sendNotification(notification);
         verify(messageSender).send(messageArgumentCaptor.capture(), eq(Arrays.asList("device1")), eq(3));
-        assertEquals("message", messageArgumentCaptor.getValue().getData().get("message"));
+        assertEquals("NEW_MATCH", messageArgumentCaptor.getValue().getData().get("type"));
+        assertEquals("\"Hello\"", messageArgumentCaptor.getValue().getData().get("payload"));
+        assertEquals("1", messageArgumentCaptor.getValue().getData().get("to"));
     }
 }

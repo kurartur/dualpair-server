@@ -4,13 +4,16 @@ import lt.dualpair.server.domain.model.match.*;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
+import lt.dualpair.server.infrastructure.notification.NotificationType;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MatchServiceImpl implements MatchService {
@@ -48,10 +51,23 @@ public class MatchServiceImpl implements MatchService {
     @Transactional
     public void sendMutualMatchNotifications(Match match) {
         if (match.isMutual()) {
+            Long matchId = match.getId();
             for (MatchParty matchParty : match.getMatchParties()) {
-                notificationSender.sendNotification(new Notification(matchParty.getUser().getId(), "New match"));
+                Long userId = matchParty.getUser().getId();
+                User opponent = match.getOppositeMatchParty(userId).getUser();
+                Notification<Map> notification = new Notification<>(userId,
+                        NotificationType.NEW_MATCH,
+                        createPayload(matchId, opponent.getName()));
+                notificationSender.sendNotification(notification);
             }
         }
+    }
+
+    private Map createPayload(Long id, String name) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("matchId", id);
+        map.put("opponentName", name);
+        return map;
     }
 
     @Autowired

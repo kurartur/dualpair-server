@@ -27,6 +27,12 @@ public interface MatchRepository extends CrudRepository<Match, Long> {
             "and mp1.match.dateCreated <= ?2")
     Page<Match> findMutualByUser(User user, Date createdBefore, Pageable pageable);
 
+    @Query(" select mp1.match from MatchParty mp1, MatchParty mp2 " +
+            "where mp1.user.id = ?1 and mp2.user.id <> ?1 and mp1.match = mp2.match " +
+            "and mp1.response = lt.dualpair.server.domain.model.match.Response.YES and mp2.response = lt.dualpair.server.domain.model.match.Response.YES " +
+            "and mp1.match.id = ?2")
+    Optional<Match> findOneMutualByUser(Long userId, Long matchId);
+
     @Query("" +
             "select m from Match m, MatchParty mp1, MatchParty mp2 " +
             "where m = mp1.match and mp1.user = ?1 " +

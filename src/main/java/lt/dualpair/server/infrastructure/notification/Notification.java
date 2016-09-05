@@ -1,28 +1,26 @@
 package lt.dualpair.server.infrastructure.notification;
 
-public class Notification {
+public class Notification<T> {
 
     private Long userId;
-    private String message;
+    private NotificationType notificationType;
+    private T payload;
 
-    public Notification(Long userId, String message) {
+    public Notification(Long userId, NotificationType notificationType, T payload) {
         this.userId = userId;
-        this.message = message;
+        this.notificationType = notificationType;
+        this.payload = payload;
     }
 
     public Long getUserId() {
         return userId;
     }
 
-    public String getMessage() {
-        return message;
+    public NotificationType getNotificationType() {
+        return notificationType;
     }
 
-    @Override
-    public String toString() {
-        return "Notification{" +
-                "message='" + message + '\'' +
-                ", userId=" + userId +
-                '}';
+    public T getPayload() {
+        return payload;
     }
 }

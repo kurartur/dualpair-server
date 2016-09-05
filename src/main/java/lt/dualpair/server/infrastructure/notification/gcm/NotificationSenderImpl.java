@@ -1,5 +1,8 @@
 package lt.dualpair.server.infrastructure.notification.gcm;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Sender;
 import lt.dualpair.server.domain.model.user.Device;
@@ -42,9 +45,13 @@ public class NotificationSenderImpl implements NotificationSender {
         return deviceRepository.findUserDevices(userId).stream().map(Device::getId).collect(Collectors.toList());
     }
 
-    private Message createMessage(Notification notification) {
+    private Message createMessage(Notification notification) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         return new Message.Builder()
-                .addData("message", notification.getMessage())
+                .addData("to", notification.getUserId().toString())
+                .addData("type", notification.getNotificationType().name())
+                .addData("payload", mapper.writeValueAsString(notification.getPayload()))
                 .build();
     }
 

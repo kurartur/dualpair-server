@@ -11,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 
 @RestController
@@ -23,7 +21,7 @@ public class MatchPartyController extends BaseController {
     private MatchPartyRepository matchPartyRepository;
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{partyId:[0-9]+}/response")
-    public ResponseEntity response(@PathVariable Long partyId, @RequestBody String responseString) throws URISyntaxException {
+    public ResponseEntity response(@PathVariable Long partyId, @RequestBody String responseString) {
         Response response = Response.valueOf(responseString); // TODO make Response as method's type
         Optional<MatchParty> optMatchParty = matchPartyRepository.findById(partyId);
         if (!optMatchParty.isPresent()) {
@@ -37,7 +35,7 @@ public class MatchPartyController extends BaseController {
         matchPartyRepository.save(matchParty);
         Match match = matchParty.getMatch();
         matchService.sendMutualMatchNotifications(match);
-        return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/match/" + match.getId())).build();
+        return ResponseEntity.ok().build();
     }
 
     @Autowired
