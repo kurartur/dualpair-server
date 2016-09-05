@@ -6,6 +6,7 @@ import lt.dualpair.server.interfaces.resource.socionics.SociotypeResource;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class UserResource extends ResourceSupport {
@@ -19,7 +20,7 @@ public class UserResource extends ResourceSupport {
     private String description;
     private Set<SociotypeResource> sociotypes;
     private Set<LocationResource> locations;
-    private Set<PhotoResource> photos;
+    private List<PhotoResource> photos;
     private Set<UserAccountResource> accounts;
 
     public Long getUserId() {
@@ -78,11 +79,11 @@ public class UserResource extends ResourceSupport {
         this.locations = locations;
     }
 
-    public Set<PhotoResource> getPhotos() {
+    public List<PhotoResource> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(Set<PhotoResource> photos) {
+    public void setPhotos(List<PhotoResource> photos) {
         this.photos = photos;
     }
 

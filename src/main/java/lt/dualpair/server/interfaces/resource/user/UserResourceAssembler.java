@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -44,7 +46,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
         }
         resource.setLocations(locations);
 
-        Set<PhotoResource> photos = new HashSet<>();
+        List<PhotoResource> photos = new ArrayList<>();
         for (Photo photo : entity.getPhotos()) {
             PhotoResource photoResource = new PhotoResource();
             photoResource.setSourceUrl(photo.getSourceLink());

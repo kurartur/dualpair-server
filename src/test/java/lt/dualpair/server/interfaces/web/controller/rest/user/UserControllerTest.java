@@ -4,11 +4,13 @@ import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.geo.LocationProvider;
 import lt.dualpair.server.domain.model.geo.LocationProviderException;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResourceAssembler;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.service.user.SocialUserServiceImpl;
+import lt.dualpair.server.service.user.UserNotFoundException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +57,16 @@ public class UserControllerTest {
         UserResource userResource = new UserResource();
         when(socialUserService.loadUserById(1L)).thenReturn(user);
         when(userResourceAssembler.toResource(user)).thenReturn(userResource);
-        assertEquals(userResource, userController.getUser());
+        ResponseEntity responseEntity = userController.me(UserTestUtils.createUser(1L));
+        assertEquals(userResource, responseEntity.getBody());
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
+
+    @Test
+    public void testGetUser_notFound() throws Exception {
+        doThrow(new UserNotFoundException("User not found")).when(socialUserService).loadUserById(1L);
+        ResponseEntity responseEntity = userController.me(UserTestUtils.createUser(1L));
+        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
     }
 
     @Test

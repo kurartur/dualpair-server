@@ -4,16 +4,18 @@ import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.geo.LocationProvider;
 import lt.dualpair.server.domain.model.geo.LocationProviderException;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.infrastructure.authentication.ActiveUser;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
-import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.interfaces.web.controller.rest.BaseController;
 import lt.dualpair.server.service.user.SocialUserService;
+import lt.dualpair.server.service.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -32,8 +34,14 @@ public class UserController extends BaseController {
     private UserResourceAssembler userResourceAssembler;
 
     @RequestMapping(method = RequestMethod.GET, value = "/me")
-    public UserResource getUser() {
-        return userResourceAssembler.toResource(socialUserService.loadUserById(getUserPrincipal().getId()));
+    public ResponseEntity me(@ActiveUser User principal) {
+        try {
+            User user = socialUserService.loadUserById(principal.getId());
+            return ResponseEntity.ok(userResourceAssembler.toResource(user));
+        } catch (UserNotFoundException unfe) { // in case user was deleted
+            SecurityContextHolder.clearContext();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @RequestMapping(method = RequestMethod.PATCH, value="/user/{userId:[0-9]}")

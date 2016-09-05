@@ -14,8 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<OpponentUserResourceAssembler.AssemblingContext, UserResource> {
@@ -46,8 +45,10 @@ public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<Oppo
         }
         resource.setLocations(locations);
 
-        Set<PhotoResource> photos = new HashSet<>();
-        for (Photo photo : entity.getPhotos()) {
+        List<PhotoResource> photos = new ArrayList<>();
+        List<Photo> sortedPhotos = new ArrayList<>(entity.getPhotos());
+        Collections.sort(sortedPhotos, (o1, o2) -> o2.getPosition() - o1.getPosition());
+        for (Photo photo : sortedPhotos) {
             PhotoResource photoResource = new PhotoResource();
             photoResource.setSourceUrl(photo.getSourceLink());
             photos.add(photoResource);

@@ -28,6 +28,8 @@ public class Photo implements Serializable {
     @Column(name = "source_link")
     private String sourceLink;
 
+    private int position = 0;
+
     public Long getId() {
         return id;
     }
@@ -66,5 +68,13 @@ public class Photo implements Serializable {
 
     public void setSourceLink(String sourceLink) {
         this.sourceLink = sourceLink;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }
