@@ -7,7 +7,6 @@ import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.authentication.ActiveUser;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
-import lt.dualpair.server.interfaces.web.controller.rest.BaseController;
 import lt.dualpair.server.service.user.SocialUserService;
 import lt.dualpair.server.service.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-public class UserController extends BaseController {
+public class UserController {
 
     private SocialUserService socialUserService;
     private LocationProvider locationProvider;
@@ -45,8 +44,8 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.PATCH, value="/user/{userId:[0-9]}")
-    public ResponseEntity updateUser(@PathVariable Long userId, @RequestBody Map<String, Object> data) throws URISyntaxException, ParseException {
-        if (!getUserPrincipal().getId().equals(userId)) {
+    public ResponseEntity updateUser(@PathVariable Long userId, @RequestBody Map<String, Object> data, @ActiveUser User principal) throws URISyntaxException, ParseException {
+        if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         User user = socialUserService.loadUserById(userId);
@@ -61,8 +60,8 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/date-of-birth")
-    public ResponseEntity setDateOfBirth(@PathVariable Long userId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth) throws URISyntaxException {
-        if (!getUserPrincipal().getId().equals(userId)) {
+    public ResponseEntity setDateOfBirth(@PathVariable Long userId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth, @ActiveUser User principal) throws URISyntaxException {
+        if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         socialUserService.setUserDateOfBirth(userId, dateOfBirth);
@@ -70,8 +69,8 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/locations")
-    public ResponseEntity setLocation(@RequestBody LocationResource locationResource, @PathVariable("userId") Long userId) throws LocationProviderException, URISyntaxException {
-        if (!getUserPrincipal().getId().equals(userId)) {
+    public ResponseEntity setLocation(@RequestBody LocationResource locationResource, @PathVariable("userId") Long userId, @ActiveUser User principal) throws LocationProviderException, URISyntaxException {
+        if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 

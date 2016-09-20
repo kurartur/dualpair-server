@@ -54,7 +54,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
         }
         resource.setPhotos(photos);
 
-        resource.add(linkTo(methodOn(SearchParametersController.class).getSearchParameters(entity.getId())).withRel("search-parameters"));
+        resource.add(linkTo(methodOn(SearchParametersController.class).getSearchParameters(entity.getId(), entity)).withRel("search-parameters"));
 
         return resource;
     }

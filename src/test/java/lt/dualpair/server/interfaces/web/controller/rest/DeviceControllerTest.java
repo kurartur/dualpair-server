@@ -3,14 +3,12 @@ package lt.dualpair.server.interfaces.web.controller.rest;
 import lt.dualpair.server.domain.model.user.Device;
 import lt.dualpair.server.domain.model.user.DeviceRepository;
 import lt.dualpair.server.domain.model.user.User;
-import org.junit.After;
+import lt.dualpair.server.domain.model.user.UserTestUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Optional;
 
@@ -21,22 +19,17 @@ public class DeviceControllerTest {
 
     private DeviceController deviceController = new DeviceController();
     private DeviceRepository deviceRepository = mock(DeviceRepository.class);
+    private User principal = UserTestUtils.createUser(1L);
 
     @Before
     public void setUp() throws Exception {
         deviceController.setDeviceRepository(deviceRepository);
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(createUser(1L), null));
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        SecurityContextHolder.clearContext();
     }
 
     @Test
     public void testRegisterDevice() throws Exception {
         doReturn(Optional.empty()).when(deviceRepository).findOne("123");
-        ResponseEntity responseEntity = deviceController.registerDevice("123");
+        ResponseEntity responseEntity = deviceController.registerDevice("123", principal);
         ArgumentCaptor<Device> deviceCaptor = ArgumentCaptor.forClass(Device.class);
         verify(deviceRepository, times(1)).save(deviceCaptor.capture());
         assertEquals("123", deviceCaptor.getValue().getId());
@@ -47,14 +40,9 @@ public class DeviceControllerTest {
     @Test
     public void testRegisterDevice_alreadyExists() throws Exception {
         doReturn(Optional.of(new Device("123", new User()))).when(deviceRepository).findOne("123");
-        ResponseEntity responseEntity = deviceController.registerDevice("123");
+        ResponseEntity responseEntity = deviceController.registerDevice("123", principal);
         verify(deviceRepository, never()).save(any(Device.class));
         assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
     }
 
-    private User createUser(Long id) {
-        User user = new User();
-        user.setId(id);
-        return user;
-    }
 }

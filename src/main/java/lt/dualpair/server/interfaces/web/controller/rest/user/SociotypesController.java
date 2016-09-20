@@ -1,7 +1,8 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
 import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.interfaces.web.controller.rest.BaseController;
+import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.infrastructure.authentication.ActiveUser;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,16 +16,16 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/user/{userId:[0-9]+}")
-public class SociotypesController extends BaseController {
+public class SociotypesController {
 
     private SocialUserService socialUserService;
 
     @RequestMapping(method = RequestMethod.PUT, value = "/sociotypes")
-    public ResponseEntity setSociotypes(@PathVariable Long userId, @RequestBody String[] codes) throws URISyntaxException {
-        if (!getUserPrincipal().getId().equals(userId)) {
+    public ResponseEntity setSociotypes(@PathVariable Long userId, @RequestBody String[] codes, @ActiveUser User principal) throws URISyntaxException {
+        if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        socialUserService.setUserSociotypes(getUserPrincipal().getId(), convertToEnumCodes(codes));
+        socialUserService.setUserSociotypes(principal.getId(), convertToEnumCodes(codes));
         return ResponseEntity.created(new URI("/api/user/" + userId)).build();
     }
 

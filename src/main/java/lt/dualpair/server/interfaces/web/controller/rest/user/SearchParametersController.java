@@ -2,9 +2,9 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 
 import lt.dualpair.server.domain.model.match.SearchParameters;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.infrastructure.authentication.ActiveUser;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResource;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResourceAssembler;
-import lt.dualpair.server.interfaces.web.controller.rest.BaseController;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,14 +16,14 @@ import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping(value = "/api/user/{userId:[0-9]+}")
-public class SearchParametersController extends BaseController {
+public class SearchParametersController {
 
     private SocialUserService socialUserService;
     private SearchParametersResourceAssembler searchParametersResourceAssembler;
 
     @RequestMapping(method = RequestMethod.PUT, value = "/search-parameters")
-    public ResponseEntity setSearchParameters(@PathVariable Long userId, @RequestBody SearchParametersResource resource) throws URISyntaxException {
-        if (!getUserPrincipal().getId().equals(userId)) {
+    public ResponseEntity setSearchParameters(@PathVariable Long userId, @RequestBody SearchParametersResource resource, @ActiveUser User principal) throws URISyntaxException {
+        if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         SearchParameters searchParameters = new SearchParameters();
@@ -36,8 +36,8 @@ public class SearchParametersController extends BaseController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search-parameters")
-    public ResponseEntity getSearchParameters(@PathVariable Long userId) {
-        if (!getUserPrincipal().getId().equals(userId)) {
+    public ResponseEntity getSearchParameters(@PathVariable Long userId, @ActiveUser User principal) {
+        if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         User user = socialUserService.loadUserById(userId);

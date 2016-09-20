@@ -8,13 +8,10 @@ import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.match.MatchResource;
 import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
 import lt.dualpair.server.service.match.MatchService;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -30,21 +27,15 @@ public class MatchControllerTest {
     @Before
     public void setUp() throws Exception {
         userPrincipal = UserTestUtils.createUser(1L);
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userPrincipal, null));
         matchController.setMatchService(matchService);
         matchController.setMatchResourceAssembler(matchResourceAssembler);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        SecurityContextHolder.clearContext();
     }
 
     @Test
     public void testNext_exception() throws Exception {
         doThrow(new MatchRequestException("Error")).when(matchService).nextFor(1L, null);
         try {
-            matchController.next(null);
+            matchController.next(null, userPrincipal);
             fail();
         } catch (MatchRequestException mre) {
             assertEquals("Error", mre.getMessage());
@@ -57,14 +48,14 @@ public class MatchControllerTest {
         Match match = new Match();
         doReturn(match).when(matchService).nextFor(1L, null);
         doReturn(matchResource).when(matchResourceAssembler).toResource(new UserAwareMatch(userPrincipal, match));
-        ResponseEntity<MatchResource> responseEntity = matchController.next(null);
+        ResponseEntity<MatchResource> responseEntity = matchController.next(null, userPrincipal);
         assertEquals(matchResource, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
     public void testNext_noMatches() throws Exception {
-        ResponseEntity responseEntity = matchController.next(null);
+        ResponseEntity responseEntity = matchController.next(null, userPrincipal);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
 
