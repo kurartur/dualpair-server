@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -22,21 +21,11 @@ public class MatchServiceImpl implements MatchService {
     private RepositoryMatchFinder repositoryMatchFinder;
     private MatchRepository matchRepository;
     private UserService userService;
-    private MatchRequestValidator matchRequestValidator;
     private NotificationSender notificationSender;
 
     @Override
     @Transactional
-    public Match nextFor(Long userId, List<Long> excludeOpponents) throws MatchRequestException {
-        User user = userService.loadUserById(userId);
-        matchRequestValidator.validateMatchRequest(user, user.getSearchParameters());
-        MatchRequestBuilder builder =  MatchRequestBuilder.findFor(user)
-                .apply(user.getSearchParameters())
-                .location(user.getRecentLocation().getLatitude(), user.getRecentLocation().getLongitude(), user.getRecentLocation().getCountryCode());
-        if (excludeOpponents != null) {
-            builder.excludeOpponents(excludeOpponents);
-        }
-        MatchRequest matchRequest = builder.build();
+    public Match nextFor(MatchRequest matchRequest) throws MatchRequestException {
         Match match = repositoryMatchFinder.findOne(matchRequest);
         if (match == null) {
             match = defaultMatchFinder.findOne(matchRequest);
@@ -88,11 +77,6 @@ public class MatchServiceImpl implements MatchService {
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
-    }
-
-    @Autowired
-    public void setMatchRequestValidator(MatchRequestValidator matchRequestValidator) {
-        this.matchRequestValidator = matchRequestValidator;
     }
 
     @Autowired

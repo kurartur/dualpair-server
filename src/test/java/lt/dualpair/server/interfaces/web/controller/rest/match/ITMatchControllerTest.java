@@ -26,36 +26,36 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_next_noMatches.xml")
     public void testNext_noMatches() throws Exception {
-        mockMvc.perform(get("/api/match/next").with(bearerToken(1L)))
+        mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N").with(bearerToken(1L)))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     @DatabaseSetup(value = "matchTest_preciseAge.xml")
     public void testNext_preciseAge() throws Exception {
-        doTestAge();
+        doTestAge(25, 25);
     }
 
     @Test
     @DatabaseSetup(value = "matchTest_ageRange1.xml")
     public void testNext_ageRange1() throws Exception {
-        doTestAge();
+        doTestAge(25, 30);
     }
 
     @Test
     @DatabaseSetup(value = "matchTest_ageRange2.xml")
     public void testNext_ageRange2() throws Exception {
-        doTestAge();
+        doTestAge(20, 25);
     }
 
     @Test
     @DatabaseSetup(value = "matchTest_ageRange3.xml")
     public void testNext_ageRange3() throws Exception {
-        doTestAge();
+        doTestAge(20, 30);
     }
 
-    private void doTestAge() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/match/next").with(bearerToken(1L)))
+    private void doTestAge(int minAge, int maxAge) throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/match/next?mia=" + minAge + "&maa=" + maxAge + "&sf=Y&sm=N").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
@@ -68,7 +68,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_maleFemale.xml")
     public void testNext_gender_maleFemale() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/match/next").with(bearerToken(1L)))
+        MvcResult result = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
@@ -81,7 +81,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_femaleMale.xml")
     public void testNext_gender_femaleMale() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/match/next").with(bearerToken(10L)))
+        MvcResult result = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=N&sm=Y").with(bearerToken(10L)))
                 .andExpect(status().isOk())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
@@ -94,7 +94,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_maleAll_male.xml")
     public void testNext_gender_maleAll_male() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/match/next").with(bearerToken(1L)))
+        MvcResult result = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=Y").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
@@ -106,7 +106,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_maleAll_female.xml")
     public void testNext_gender_maleAll_female() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/match/next").with(bearerToken(1L)))
+        MvcResult result = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=Y").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
@@ -119,7 +119,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_femaleAll_male.xml")
     public void testNext_gender_femaleAll_male() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/match/next").with(bearerToken(10L)))
+        MvcResult result = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=Y").with(bearerToken(10L)))
                 .andExpect(status().isOk())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
@@ -132,7 +132,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_femaleAll_female.xml")
     public void testNext_gender_femaleAll_female() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/match/next").with(bearerToken(10L)))
+        MvcResult result = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=Y").with(bearerToken(10L)))
                 .andExpect(status().isOk())
                 .andReturn();
         String content = result.getResponse().getContentAsString();
@@ -145,12 +145,12 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_next_inRepo.xml")
     public void testNext_inRepo() throws Exception {
-        String content = mockMvc.perform(get("/api/match/next").with(bearerToken(1L)))
+        String content = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertMatch(content,"Diana");
 
-        content = mockMvc.perform(get("/api/match/next").with(bearerToken(1L)))
+        content = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertMatch(content, "Diana");
@@ -159,12 +159,12 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_next_inRepo.xml")
     public void testNext_inRepo_excludeOpponents() throws Exception {
-        String content = mockMvc.perform(get("/api/match/next?exclopp[]=2&exclopp[]=3").with(bearerToken(1L)))
+        String content = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N&exo=2,3").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertMatch(content, "Stephanie");
 
-        content = mockMvc.perform(get("/api/match/next?exclopp[]=2&exclopp[]=3&exclopp[]=4").with(bearerToken(1L)))
+        content = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N&exo=2,3,4").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertMatch(content, "Lucie");
@@ -173,7 +173,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_next_noDuplicates.xml")
     public void textNext_noDuplicates() throws Exception {
-        String content = mockMvc.perform(get("/api/match/next").with(bearerToken(1L)))
+        String content = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertMatch(content, "Melanie");

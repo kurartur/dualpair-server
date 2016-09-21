@@ -28,6 +28,8 @@ public class MatchRequest {
 
     private List<Long> excludedOpponentIds = new ArrayList<>();
 
+    MatchRequest() {}
+
     public List<Long> getExcludedOpponentIds() {
         return excludedOpponentIds;
     }
