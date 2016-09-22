@@ -17,13 +17,6 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
                 .body(ErrorResponse.from(e, HttpStatus.BAD_REQUEST));
     }
 
-    @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ErrorResponse> forbiddenExceptionHandler(ForbiddenException fe) {
-        logger.error(fe.getMessage(), fe);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ErrorResponse.from(fe, HttpStatus.FORBIDDEN));
-    }
-
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> illegalStateExceptionHandler(IllegalStateException ise) {
         logger.error(ise.getMessage(), ise);

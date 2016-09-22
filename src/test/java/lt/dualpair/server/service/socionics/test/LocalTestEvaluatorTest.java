@@ -32,8 +32,8 @@ public class LocalTestEvaluatorTest {
         localTestEvaluator.setSociotypeRepository(sociotypeRepository);
         db = new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.HSQL)
-                .addScript("db/sql/socionics/test/create-db.sql")
-                .addScript("db/sql/socionics/test/insert-data.sql")
+                .addScript("lt/dualpair/server/service/socionics/test/create-db.sql")
+                .addScript("lt/dualpair/server/service/socionics/test/insert-data.sql")
                 .build();
         localTestEvaluator.setJdbcTemplate(new JdbcTemplate(db));
     }

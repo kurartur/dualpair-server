@@ -44,7 +44,7 @@ public class SignupController {
         try {
             user = socialUserService.loadOrCreate(connection);
         } catch (SocialDataException sce) {
-            // TODO throw
+            // TODO redirect to error page?
             throw new RuntimeException(sce);
         }
         SocialAuthenticationToken socialAuthenticationToken = new SocialAuthenticationToken(connection, user, null, user.getAuthorities());
