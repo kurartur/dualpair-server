@@ -31,6 +31,7 @@ public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<Oppo
 
         UserResource resource = new UserResource();
 
+        resource.setUserId(entity.getId()); // TODO should we expose user id?
         resource.setName(entity.getName());
         resource.setAge(entity.getAge());
         resource.setDescription(entity.getDescription());
