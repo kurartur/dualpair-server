@@ -2,6 +2,7 @@ package lt.dualpair.server.interfaces.resource.user;
 
 import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.domain.model.user.UserLocation;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;
 import lt.dualpair.server.interfaces.web.controller.rest.user.SearchParametersController;
@@ -42,6 +43,8 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
             LocationResource locationResource = new LocationResource();
             locationResource.setCountryCode(userLocation.getCountryCode());
             locationResource.setCity(userLocation.getCity());
+            locationResource.setLatitude(userLocation.getLatitude());
+            locationResource.setLongitude(userLocation.getLongitude());
             locations.add(locationResource);
         }
         resource.setLocations(locations);
@@ -53,6 +56,15 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
             photos.add(photoResource);
         }
         resource.setPhotos(photos);
+
+        Set<UserAccountResource> userAccounts = new HashSet<>();
+        for (UserAccount userAccount : entity.getUserAccounts()) {
+            UserAccountResource accountResource = new UserAccountResource();
+            accountResource.setAccountType(userAccount.getAccountType().getCode());
+            accountResource.setAccountId(userAccount.getAccountId());
+            userAccounts.add(accountResource);
+        }
+        resource.setAccounts(userAccounts);
 
         resource.add(linkTo(methodOn(SearchParametersController.class).getSearchParameters(entity.getId(), entity)).withRel("search-parameters"));
 

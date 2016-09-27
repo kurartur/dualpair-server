@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +31,7 @@ public class MatchController {
     private UserService userService;
 
     @RequestMapping(method = RequestMethod.GET, value = "/match/next")
-    public ResponseEntity next(SearchQuery searchQuery, @ActiveUser User principal) throws MatchRequestException {
+    public ResponseEntity next(@Valid SearchQuery searchQuery, @ActiveUser User principal) throws MatchRequestException {
 
         User freshUser = userService.loadUserById(principal.getId());
 

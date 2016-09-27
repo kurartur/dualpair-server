@@ -3,6 +3,7 @@ package lt.dualpair.server.interfaces.resource.user;
 import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.domain.model.user.UserLocation;
 import lt.dualpair.server.interfaces.resource.BaseResourceAssemblerTest;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResource;
@@ -49,6 +50,10 @@ public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
         Photo photo = new Photo();
         user.setPhotos(Arrays.asList(photo));
 
+        UserAccount userAccount = new UserAccount(user);
+        userAccount.setAccountType(UserAccount.Type.FACEBOOK);
+        user.setUserAccounts(new HashSet<>(Arrays.asList(userAccount)));
+
         UserResource userResource = userResourceAssembler.toResource(user);
 
         assertEquals("name", userResource.getName());
@@ -59,6 +64,7 @@ public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
         assertEquals(sociotypeResources, userResource.getSociotypes());
         assertEquals(1, userResource.getLocations().size());
         assertEquals(1, userResource.getPhotos().size());
+        assertEquals(1, userResource.getAccounts().size());
     }
 
 }
