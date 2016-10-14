@@ -1,15 +1,21 @@
 package lt.dualpair.server.service.user;
 
+import lt.dualpair.server.domain.model.match.Match;
 import lt.dualpair.server.domain.model.match.SearchParameters;
+import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserTestUtils;
+import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -19,11 +25,13 @@ public class UserServiceImplTest {
     private UserServiceImpl userService = new UserServiceImpl();
     private UserRepository userRepository = mock(UserRepository.class);
     private SociotypeRepository sociotypeRepository = mock(SociotypeRepository.class);
+    private MatchRepository matchRepository = mock(MatchRepository.class);
 
     @Before
     public void setUp() throws Exception {
         userService.setUserRepository(userRepository);
         userService.setSociotypeRepository(sociotypeRepository);
+        userService.setMatchRepository(matchRepository);
     }
 
     @Test
@@ -52,76 +60,120 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testSetUserSociotypes_nullParameters() throws Exception {
+    public void testSetUserSociotypes_invalidCount() throws Exception {
+        Set<Sociotype> sociotypes = new HashSet<>();
+        User user = UserTestUtils.createUser();
+
+        try {
+            userService.setUserSociotypes(user, sociotypes);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("User must have 1 or 2 sociotypes", iae.getMessage());
+        }
+        verify(userRepository, never()).save(any(User.class));
+        verify(matchRepository, never()).delete(any(Match.class));
+
+        sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.IEE).build());
+        sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.LSE).build());
+        sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.IEI).build());
+
+        try {
+            userService.setUserSociotypes(user, sociotypes);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("User must have 1 or 2 sociotypes", iae.getMessage());
+        }
+        verify(userRepository, never()).save(any(User.class));
+        verify(matchRepository, never()).delete(any(Match.class));
+    }
+
+    @Test
+    public void testSetUserSociotypes_invalidParameters() throws Exception {
         try {
             userService.setUserSociotypes(null, null);
             fail();
         } catch (IllegalArgumentException iae) {
-            assertEquals("User id is mandatory", iae.getMessage());
+            assertEquals("User is mandatory", iae.getMessage());
         }
-        
+
         try {
-            userService.setUserSociotypes(1L, null);
+            userService.setUserSociotypes(UserTestUtils.createUser(), null);
             fail();
         } catch (IllegalArgumentException iae) {
-            assertEquals("Sociotype codes are mandatory", iae.getMessage());
+            assertEquals("Sociotypes are mandatory", iae.getMessage());
         }
-    }
 
-    @Test
-    public void testSetUserSociotypes_sociotypesNotFound() throws Exception {
-        Set<Sociotype.Code1> codes = new HashSet<>();
-        codes.add(Sociotype.Code1.EII);
-        List<Sociotype.Code1> codeList = new ArrayList<>(codes);
-        User user = UserTestUtils.createUser(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(sociotypeRepository.findByCode1List(codeList)).thenReturn(new HashSet<>());
         try {
-            userService.setUserSociotypes(1L, codes);
+            Set<Sociotype> sociotypes = new HashSet<>();
+            sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.IEE).build());
+            userService.setUserSociotypes(null, sociotypes);
             fail();
-        } catch (IllegalStateException ise) {
-            assertEquals("Zero sociotypes found", ise.getMessage());
+        } catch (IllegalArgumentException iae) {
+            assertEquals("User is mandatory", iae.getMessage());
+        }
+
+        try {
+            userService.setUserSociotypes(UserTestUtils.createUser(), new HashSet<>());
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
         }
     }
 
     @Test
-    public void testSetUserSociotypes() throws Exception {
-        Set<Sociotype> sociotypes = new HashSet<>();
-        sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.EII).build());
-        Set<Sociotype.Code1> codes = new HashSet<>();
-        codes.add(Sociotype.Code1.EII);
-        ArrayList<Sociotype.Code1> codeList = new ArrayList<>(codes);
-        User user = UserTestUtils.createUser(1L);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(sociotypeRepository.findByCode1List(codeList)).thenReturn(sociotypes);
-        userService.setUserSociotypes(1L, codes);
-        assertEquals(sociotypes, user.getSociotypes());
+    public void testSetUserSociotypes_sameSociotype() throws Exception {
+        User user = UserTestUtils.createUser();
+        Set<Sociotype> newSociotypes = new HashSet<>(user.getSociotypes());
+        Sociotype opposite = new Sociotype.Builder().code1(Sociotype.Code1.LSI).build();
+        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.IEE, RelationType.Code.DUAL)).thenReturn(opposite);
+        userService.setUserSociotypes(user, newSociotypes);
+        verify(matchRepository, never()).findBySociotype(any(User.class), any(Sociotype.class));
+        assertEquals(Sociotype.Code1.IEE, user.getSociotypes().iterator().next().getCode1());
         verify(userRepository, times(1)).save(user);
     }
 
     @Test
-    public void testSetUserSociotypes_invalidCount() throws Exception {
-        Set<Sociotype.Code1> codes = new HashSet<>();
+    public void testSetUserSociotypes_differentSociotype() throws Exception {
+        User user = UserTestUtils.createUser();
+        Sociotype oldSociotype = user.getSociotypes().iterator().next();
+        Set<Sociotype> newSociotypes = new HashSet<>();
+        newSociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.EII).build());
+        Sociotype opposite = new Sociotype.Builder().code1(Sociotype.Code1.LSI).build();
+        Match match = new Match();
+        Set<Match> matches = new HashSet<>();
+        matches.add(match);
+        when(matchRepository.findBySociotype(user, oldSociotype)).thenReturn(matches);
+        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.IEE, RelationType.Code.DUAL)).thenReturn(opposite);
+        userService.setUserSociotypes(user, newSociotypes);
+        verify(matchRepository, times(1)).findBySociotype(user, oldSociotype);
+        verify(matchRepository, times(1)).delete(match);
+        verify(userRepository, times(1)).save(user);
+    }
 
-        try {
-            userService.setUserSociotypes(1L, codes);
-            fail();
-        } catch (IllegalArgumentException iae) {
-            assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
-        }
-        verify(userRepository, never()).save(any(User.class));
-
-        codes.add(Sociotype.Code1.EII);
-        codes.add(Sociotype.Code1.LSE);
-        codes.add(Sociotype.Code1.IEI);
-
-        try {
-            userService.setUserSociotypes(1L, codes);
-            fail();
-        } catch (IllegalArgumentException iae) {
-            assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
-        }
-        verify(userRepository, never()).save(any(User.class));
+    @Test
+    public void testSetUserSociotypes_oneSameOneDifferentSociotype() throws Exception {
+        User user = UserTestUtils.createUser();
+        Sociotype oldSociotype1 = new Sociotype.Builder().code1(Sociotype.Code1.ILE).build();
+        Sociotype oldsociotype2 = new Sociotype.Builder().code1(Sociotype.Code1.LSE).build();
+        Set<Sociotype> oldSociotypes = new HashSet<>();
+        oldSociotypes.add(oldSociotype1);
+        oldSociotypes.add(oldsociotype2);
+        user.setSociotypes(oldSociotypes);
+        Sociotype newSociotype1 = new Sociotype.Builder().code1(Sociotype.Code1.LSE).build();
+        Sociotype newSociotype2 = new Sociotype.Builder().code1(Sociotype.Code1.SEE).build();
+        Set<Sociotype> newSociotypes = new HashSet<>();
+        newSociotypes.add(newSociotype1);
+        newSociotypes.add(newSociotype2);
+        Sociotype opposite = new Sociotype.Builder().code1(Sociotype.Code1.LSI).build();
+        Match match = new Match();
+        Set<Match> matches = new HashSet<>();
+        matches.add(match);
+        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.LSE, RelationType.Code.DUAL)).thenReturn(opposite);
+        when(matchRepository.findBySociotype(user, oldSociotype1)).thenReturn(matches);
+        userService.setUserSociotypes(user, newSociotypes);
+        verify(matchRepository, times(1)).findBySociotype(user, oldSociotype1);
+        verify(matchRepository, times(1)).delete(match);
+        verify(userRepository, times(1)).save(user);
     }
 
     @Test

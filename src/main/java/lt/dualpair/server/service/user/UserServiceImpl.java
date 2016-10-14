@@ -5,6 +5,7 @@ import lt.dualpair.server.domain.model.match.SearchParameters;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserLocation;
+import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import org.slf4j.Logger;
@@ -13,13 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.util.Validate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
@@ -32,6 +31,7 @@ public class UserServiceImpl implements UserService {
     protected UserRepository userRepository;
     private SociotypeRepository sociotypeRepository;
     protected UserDetailsService userDetailsService;
+    private MatchRepository matchRepository;
 
     @Override
     public User loadUserById(Long userId) throws UserNotFoundException {
@@ -70,8 +70,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void setUserSociotypes(Long userId, Set<Sociotype.Code1> codes) {
-        Validate.notNull(userId, "User id is mandatory");
+    public void setUserSociotypes(User user, Set<Sociotype> sociotypes) {
+        /*Validate.notNull(userId, "User id is mandatory");
         Validate.notNull(codes, "Sociotype codes are mandatory");
         if (codes.size() < 1 || codes.size() > 2) {
             throw new IllegalArgumentException("Invalid sociotype code count. Must be 1 or 2");
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("Zero sociotypes found");
         }
         user.setSociotypes(sociotypes);
-        updateUser(user);
+        updateUser(user);*/
     }
 
     @Override
@@ -129,5 +129,10 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setUserDetailsService(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
+    }
+
+    @Autowired
+    public void setMatchRepository(MatchRepository matchRepository) {
+        this.matchRepository = matchRepository;
     }
 }

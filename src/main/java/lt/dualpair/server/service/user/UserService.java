@@ -17,7 +17,7 @@ public interface UserService {
 
     UserLocation addLocation(Long userId, Location location);
 
-    void setUserSociotypes(Long userId, Set<Sociotype.Code1> codes);
+    void setUserSociotypes(User user, Set<Sociotype> sociotypes);
 
     void setUserDateOfBirth(Long userId, Date date);
 

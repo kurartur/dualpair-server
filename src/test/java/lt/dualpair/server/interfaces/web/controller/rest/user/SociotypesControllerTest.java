@@ -3,12 +3,14 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserTestUtils;
+import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,11 +23,16 @@ public class SociotypesControllerTest {
 
     private SociotypesController sociotypesController = new SociotypesController();
     private SocialUserService socialUserService = mock(SocialUserService.class);
+    private SociotypeRepository sociotypeRepository = mock(SociotypeRepository.class);
     private User principal = UserTestUtils.createUser(1L);
+    private Set<Sociotype> sociotypes = new HashSet<>();
 
     @Before
     public void setUp() throws Exception {
         sociotypesController.setSocialUserService(socialUserService);
+        sociotypesController.setSociotypeRepository(sociotypeRepository);
+        sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.EII).build());
+        when(sociotypeRepository.findByCode1List(Arrays.asList(Sociotype.Code1.EII))).thenReturn(sociotypes);
     }
 
     @Test
@@ -34,7 +41,7 @@ public class SociotypesControllerTest {
         Set<Sociotype.Code1> sociotypeCodes = new HashSet<>();
         sociotypeCodes.add(Sociotype.Code1.EII);
         ResponseEntity response = sociotypesController.setSociotypes(1L, codes, principal);
-        verify(socialUserService, times(1)).setUserSociotypes(1L, sociotypeCodes);
+        verify(socialUserService, times(1)).setUserSociotypes(principal, sociotypes);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("/api/user/1", response.getHeaders().getLocation().toString());
     }
@@ -43,7 +50,7 @@ public class SociotypesControllerTest {
     public void testSetSociotypes_invalidUser() throws Exception {
         String[] codes = {"EII"};
         ResponseEntity response = sociotypesController.setSociotypes(2L, codes, principal);
-        verify(socialUserService, never()).setUserSociotypes(any(Long.class), any(Set.class));
+        verify(socialUserService, never()).setUserSociotypes(any(User.class), any(Set.class));
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
@@ -52,7 +59,7 @@ public class SociotypesControllerTest {
         String[] codes = {"EII"};
         Set<Sociotype.Code1> sociotypeCodes = new HashSet<>();
         sociotypeCodes.add(Sociotype.Code1.EII);
-        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSociotypes(1L, sociotypeCodes);
+        doThrow(new RuntimeException("Error")).when(socialUserService).setUserSociotypes(principal, sociotypes);
         try {
             sociotypesController.setSociotypes(1L, codes, principal);
             fail();
