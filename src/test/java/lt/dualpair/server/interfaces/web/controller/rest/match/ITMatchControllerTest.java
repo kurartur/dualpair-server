@@ -159,7 +159,7 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
     @Test
     @DatabaseSetup(value = "matchTest_next_inRepo.xml")
     public void testNext_inRepo_excludeOpponents() throws Exception {
-        String content = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N&exo=2,3").with(bearerToken(1L)))
+        String content = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N&exo=2,3,5").with(bearerToken(1L)))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertMatch(content, "Stephanie");
@@ -168,6 +168,16 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertMatch(content, "Lucie");
+    }
+
+    @Test
+    @DatabaseSetup(value = "matchTest_next_inRepo.xml")
+    public void testNext_inRepo_deleteInvalid() throws Exception {
+        String content = mockMvc.perform(get("/api/match/next?mia=25&maa=25&sf=Y&sm=N&exo=2,3,4").with(bearerToken(1L)))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertMatch(content, "Lucie");
+        assertEquals((Integer)0, jdbcTemplate.queryForObject("select count(*) from matches where id=5", Integer.class));
     }
 
     @Test

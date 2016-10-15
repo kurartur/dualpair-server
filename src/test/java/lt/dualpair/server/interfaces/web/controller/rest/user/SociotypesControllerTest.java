@@ -33,6 +33,7 @@ public class SociotypesControllerTest {
         sociotypesController.setSociotypeRepository(sociotypeRepository);
         sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.EII).build());
         when(sociotypeRepository.findByCode1List(Arrays.asList(Sociotype.Code1.EII))).thenReturn(sociotypes);
+        when(socialUserService.loadUserById(1L)).thenReturn(principal);
     }
 
     @Test

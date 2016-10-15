@@ -19,7 +19,7 @@ public class Match implements Serializable, Identifiable<Long> {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "relation_type_id")
     private RelationType relationType;
 

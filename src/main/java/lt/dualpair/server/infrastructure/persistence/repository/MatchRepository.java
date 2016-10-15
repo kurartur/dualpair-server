@@ -22,6 +22,9 @@ public interface MatchRepository extends CrudRepository<Match, Long> {
     @Query("select mp.match from MatchParty mp where mp.user = ?1 and mp.response = ?2")
     Set<Match> findByUser(User user, Response response);
 
+    @Query("select mp.match from MatchParty mp where mp.user = ?1")
+    Set<Match> findForPossibleRemoval(User user);
+
     @Query(" select m from Match m, MatchParty mp1, MatchParty mp2 " +
             "where mp1.user.id = ?1 and mp2.user.id <> ?1 and mp1.match = mp2.match " +
             "and m = mp1.match and m = mp2.match " +
@@ -42,8 +45,9 @@ public interface MatchRepository extends CrudRepository<Match, Long> {
             "   and (mp2.response = lt.dualpair.server.domain.model.match.Response.UNDEFINED or mp2.response = lt.dualpair.server.domain.model.match.Response.YES) and mp1.response = lt.dualpair.server.domain.model.match.Response.UNDEFINED ")
     Set<Match> findNotReviewed(User user, List<Long> excludeOpponents);
 
-    @Query("" +
-            "")
-    Set<Match> findBySociotype(User user, Sociotype sociotype);
+    @Query(" select m from Match m, MatchParty mp1, MatchParty mp2 " +
+            "where mp1.user = ?1 and mp2.user <> ?1 and mp1.match = mp2.match and mp1.match = m and mp2.match = m " +
+            "   and ?2 not member of mp2.user.sociotypes")
+    Set<Match> findPossibleInvalidByOpponentsSociotype(User user, Sociotype opponentSociotype);
 
 }

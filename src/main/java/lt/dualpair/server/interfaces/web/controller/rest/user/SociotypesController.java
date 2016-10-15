@@ -28,7 +28,10 @@ public class SociotypesController {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        socialUserService.setUserSociotypes(principal, getSociotypesFromCodes(convertToEnumCodes(codes)));
+        if (codes.length == 0) {
+            throw new IllegalArgumentException("Invalid sociotype code count. Must be 1 or 2");
+        }
+        socialUserService.setUserSociotypes(socialUserService.loadUserById(userId), getSociotypesFromCodes(convertToEnumCodes(codes)));
         return ResponseEntity.created(new URI("/api/user/" + userId)).build();
     }
 

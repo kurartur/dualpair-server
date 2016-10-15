@@ -2,6 +2,7 @@ package lt.dualpair.server.service.user;
 
 import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.match.SearchParameters;
+import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserLocation;
@@ -14,14 +15,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
@@ -70,20 +74,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void setUserSociotypes(User user, Set<Sociotype> sociotypes) {
-        /*Validate.notNull(userId, "User id is mandatory");
-        Validate.notNull(codes, "Sociotype codes are mandatory");
-        if (codes.size() < 1 || codes.size() > 2) {
-            throw new IllegalArgumentException("Invalid sociotype code count. Must be 1 or 2");
-        }
+        Assert.notNull(user, "User is mandatory");
+        Assert.notNull(sociotypes, "Sociotypes are mandatory");
 
-        User user = loadUserById(userId);
-        Set<Sociotype> sociotypes = sociotypeRepository.findByCode1List(new ArrayList<>(codes));
-        if (sociotypes.isEmpty()) {
-            throw new IllegalStateException("Zero sociotypes found");
-        }
+        boolean changed = !user.getSociotypes().containsAll(sociotypes);
+
         user.setSociotypes(sociotypes);
-        updateUser(user);*/
+        updateUser(user);
+
+        if (changed) {
+            removeInvalidMatches(user, sociotypes.stream()
+                    .map(sociotype -> sociotypeRepository.findOppositeByRelationType(sociotype.getCode1(), RelationType.Code.DUAL))
+                    .collect(Collectors.toSet()));
+        }
+    }
+
+    private void removeInvalidMatches(final User user, final Set<Sociotype> validSociotypes) {
+        matchRepository.findForPossibleRemoval(user).forEach(match -> {
+            if (Collections.disjoint(match.getOppositeMatchParty(user.getId()).getUser().getSociotypes(), validSociotypes)) {
+                matchRepository.delete(match);
+            }
+        });
     }
 
     @Override

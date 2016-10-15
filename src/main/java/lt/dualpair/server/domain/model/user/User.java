@@ -143,7 +143,7 @@ public class User implements SocialUserDetails, Serializable {
     public void setSociotypes(Set<Sociotype> sociotypes) {
         Validate.notNull(sociotypes, "Sociotypes are mandatory");
         if (sociotypes.size() > 2 || sociotypes.size() == 0) {
-            throw new IllegalArgumentException("User must have 1 or 2 sociotypes");
+            throw new IllegalArgumentException("Invalid sociotype code count. Must be 1 or 2");
         }
         this.sociotypes = sociotypes;
     }

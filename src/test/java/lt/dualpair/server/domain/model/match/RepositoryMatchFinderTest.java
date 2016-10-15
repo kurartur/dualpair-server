@@ -8,7 +8,10 @@ import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -32,7 +35,9 @@ public class RepositoryMatchFinderTest {
         User user = UserTestUtils.createUser();
         List<Long> exclude = Arrays.asList(1L);
         Set<Match> matchSet = new HashSet<>();
-        Match match = new Match();
+        Match match = MatchTestUtils.createMatch(1L,
+                MatchPartyTestUtils.createMatchParty(1L, user, Response.UNDEFINED),
+                MatchPartyTestUtils.createMatchParty(2L, UserTestUtils.createUser(2L), Response.UNDEFINED));
         matchSet.add(match);
         when(matchRepository.findNotReviewed(user, exclude)).thenReturn(matchSet);
         when(suitabilityVerifier.verify(any(VerificationContext.class), any(VerificationContext.class))).thenReturn(true);
@@ -44,9 +49,11 @@ public class RepositoryMatchFinderTest {
     public void testFindOne_notSuitable() throws Exception {
         User user = UserTestUtils.createUser();
         Set<Match> matchSet = new HashSet<>();
-        Match match = new Match();
+        Match match = MatchTestUtils.createMatch(1L,
+                MatchPartyTestUtils.createMatchParty(1L, user, Response.UNDEFINED),
+                MatchPartyTestUtils.createMatchParty(2L, UserTestUtils.createUser(2L), Response.UNDEFINED));
         matchSet.add(match);
-        when(matchRepository.findNotReviewed(user, new ArrayList<>())).thenReturn(matchSet);
+        when(matchRepository.findNotReviewed(user, Arrays.asList(-1L))).thenReturn(matchSet);
         when(suitabilityVerifier.verify(any(VerificationContext.class), any(VerificationContext.class))).thenReturn(false);
         Match resultMatch = repositoryMatchFinder.findOne(new MatchRequestBuilder(user).build());
         assertNull(resultMatch);

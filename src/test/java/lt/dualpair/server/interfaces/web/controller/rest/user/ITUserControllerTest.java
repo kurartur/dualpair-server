@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@DatabaseSetup("userTest.xml")
+@DatabaseSetup({"../socionicsData.xml", "userTest.xml"})
 public class ITUserControllerTest extends BaseRestControllerTest {
 
     @Test
@@ -97,6 +97,24 @@ public class ITUserControllerTest extends BaseRestControllerTest {
                       .content(data.getBytes()))
                     .andExpect(status().isBadRequest())
                     .andExpect(content().string("{\"statusCode\":400,\"message\":\"Invalid sociotype code count. Must be 1 or 2\"}"));
+    }
+
+    @Test
+    @DatabaseSetup("userTest_setSociotypes.xml")
+    public void testSetSociotypes_matchRemoval() throws Exception {
+        String data = "[\"ILE\", \"LSI\"]";
+        mockMvc.perform(put("/api/user/2/sociotypes")
+                        .with(bearerToken(2L))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(data.getBytes()))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/api/user/2"))
+                .andExpect(content().string(""));
+        flushPersistenceContext();
+        Integer c = jdbcTemplate.queryForObject("select count(*) from matches where id in (1, 2)", Integer.class);
+        assertEquals((Integer)0, c);
+        c = jdbcTemplate.queryForObject("select count(*) from matches where id in (3, 4)", Integer.class);
+        assertEquals((Integer)2, c);
     }
 
     @Test

@@ -39,6 +39,27 @@ public class Sociotype implements Serializable {
         return code2;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Sociotype sociotype = (Sociotype) o;
+
+        if (id != null ? !id.equals(sociotype.id) : sociotype.id != null) return false;
+        if (code1 != sociotype.code1) return false;
+        return code2 == sociotype.code2;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (code1 != null ? code1.hashCode() : 0);
+        result = 31 * result + (code2 != null ? code2.hashCode() : 0);
+        return result;
+    }
+
     public static class Builder {
 
         protected Integer id;

@@ -1,7 +1,6 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.match.Match;
-import lt.dualpair.server.domain.model.match.SearchParameters;
+import lt.dualpair.server.domain.model.match.*;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
@@ -68,7 +67,7 @@ public class UserServiceImplTest {
             userService.setUserSociotypes(user, sociotypes);
             fail();
         } catch (IllegalArgumentException iae) {
-            assertEquals("User must have 1 or 2 sociotypes", iae.getMessage());
+            assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
         }
         verify(userRepository, never()).save(any(User.class));
         verify(matchRepository, never()).delete(any(Match.class));
@@ -81,7 +80,7 @@ public class UserServiceImplTest {
             userService.setUserSociotypes(user, sociotypes);
             fail();
         } catch (IllegalArgumentException iae) {
-            assertEquals("User must have 1 or 2 sociotypes", iae.getMessage());
+            assertEquals("Invalid sociotype code count. Must be 1 or 2", iae.getMessage());
         }
         verify(userRepository, never()).save(any(User.class));
         verify(matchRepository, never()).delete(any(Match.class));
@@ -127,7 +126,7 @@ public class UserServiceImplTest {
         Sociotype opposite = new Sociotype.Builder().code1(Sociotype.Code1.LSI).build();
         when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.IEE, RelationType.Code.DUAL)).thenReturn(opposite);
         userService.setUserSociotypes(user, newSociotypes);
-        verify(matchRepository, never()).findBySociotype(any(User.class), any(Sociotype.class));
+        verify(matchRepository, never()).findForPossibleRemoval(any(User.class));
         assertEquals(Sociotype.Code1.IEE, user.getSociotypes().iterator().next().getCode1());
         verify(userRepository, times(1)).save(user);
     }
@@ -139,19 +138,34 @@ public class UserServiceImplTest {
         Set<Sociotype> newSociotypes = new HashSet<>();
         newSociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.EII).build());
         Sociotype opposite = new Sociotype.Builder().code1(Sociotype.Code1.LSI).build();
-        Match match = new Match();
+        Match match = MatchTestUtils.createMatch();
         Set<Match> matches = new HashSet<>();
         matches.add(match);
-        when(matchRepository.findBySociotype(user, oldSociotype)).thenReturn(matches);
-        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.IEE, RelationType.Code.DUAL)).thenReturn(opposite);
+        when(matchRepository.findForPossibleRemoval(user)).thenReturn(matches);
+        when(sociotypeRepository.findOppositeByRelationType(oldSociotype.getCode1(), RelationType.Code.DUAL)).thenReturn(opposite);
         userService.setUserSociotypes(user, newSociotypes);
-        verify(matchRepository, times(1)).findBySociotype(user, oldSociotype);
+        verify(matchRepository, times(1)).findForPossibleRemoval(user);
         verify(matchRepository, times(1)).delete(match);
         verify(userRepository, times(1)).save(user);
     }
 
+    /**
+     *  Users were linked by one sociotype, that gets removed.
+     *  Match should be removed.
+     */
     @Test
-    public void testSetUserSociotypes_oneSameOneDifferentSociotype() throws Exception {
+    public void testSetUserSociotypes_invalidMatch() throws Exception {
+        Sociotype sleSociotype = new Sociotype.Builder().code1(Sociotype.Code1.SLE).build();
+        Sociotype sliSociotype = new Sociotype.Builder().code1(Sociotype.Code1.SLI).build();
+        Sociotype iliSociotype = new Sociotype.Builder().code1(Sociotype.Code1.ILI).build();
+        Sociotype eseSociotype = new Sociotype.Builder().code1(Sociotype.Code1.ESE).build();
+
+        User opponentUser = UserTestUtils.createUser(2L);
+        Set<Sociotype> opponentSociotypes = new HashSet<>();
+        opponentSociotypes.add(sleSociotype);
+        opponentSociotypes.add(sliSociotype);
+        opponentUser.setSociotypes(opponentSociotypes);
+
         User user = UserTestUtils.createUser();
         Sociotype oldSociotype1 = new Sociotype.Builder().code1(Sociotype.Code1.ILE).build();
         Sociotype oldsociotype2 = new Sociotype.Builder().code1(Sociotype.Code1.LSE).build();
@@ -159,20 +173,76 @@ public class UserServiceImplTest {
         oldSociotypes.add(oldSociotype1);
         oldSociotypes.add(oldsociotype2);
         user.setSociotypes(oldSociotypes);
+
         Sociotype newSociotype1 = new Sociotype.Builder().code1(Sociotype.Code1.LSE).build();
         Sociotype newSociotype2 = new Sociotype.Builder().code1(Sociotype.Code1.SEE).build();
         Set<Sociotype> newSociotypes = new HashSet<>();
         newSociotypes.add(newSociotype1);
         newSociotypes.add(newSociotype2);
-        Sociotype opposite = new Sociotype.Builder().code1(Sociotype.Code1.LSI).build();
-        Match match = new Match();
+
+        Match match = MatchTestUtils.createMatch(1L,
+                MatchPartyTestUtils.createMatchParty(1L, user, Response.UNDEFINED),
+                MatchPartyTestUtils.createMatchParty(2L, opponentUser, Response.UNDEFINED)
+        );
         Set<Match> matches = new HashSet<>();
         matches.add(match);
-        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.LSE, RelationType.Code.DUAL)).thenReturn(opposite);
-        when(matchRepository.findBySociotype(user, oldSociotype1)).thenReturn(matches);
+
+        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.ILE, RelationType.Code.DUAL)).thenReturn(sleSociotype);
+        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.LSE, RelationType.Code.DUAL)).thenReturn(eseSociotype);
+        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.SEE, RelationType.Code.DUAL)).thenReturn(iliSociotype);
+        when(matchRepository.findForPossibleRemoval(user)).thenReturn(matches);
+
         userService.setUserSociotypes(user, newSociotypes);
-        verify(matchRepository, times(1)).findBySociotype(user, oldSociotype1);
+        verify(matchRepository, times(1)).findForPossibleRemoval(user);
         verify(matchRepository, times(1)).delete(match);
+        verify(userRepository, times(1)).save(user);
+    }
+
+    /**
+     * Users were linked by two sociotypes, now first user updates his sociotypes so that now
+     * they are linked only by one.
+     * Match must not be removed in this case.
+     */
+    @Test
+    public void testSetUserSociotypes_validMatch() throws Exception {
+        Sociotype sleSociotype = new Sociotype.Builder().code1(Sociotype.Code1.SLE).build();
+        Sociotype sliSociotype = new Sociotype.Builder().code1(Sociotype.Code1.SLI).build();
+        Sociotype iliSociotype = new Sociotype.Builder().code1(Sociotype.Code1.ILI).build();
+
+        User opponentUser = UserTestUtils.createUser(2L);
+        Set<Sociotype> opponentSociotypes = new HashSet<>();
+        opponentSociotypes.add(sleSociotype);
+        opponentSociotypes.add(sliSociotype);
+        opponentUser.setSociotypes(opponentSociotypes);
+
+        User user = UserTestUtils.createUser();
+        Sociotype oldSociotype1 = new Sociotype.Builder().code1(Sociotype.Code1.ILE).build();
+        Sociotype oldsociotype2 = new Sociotype.Builder().code1(Sociotype.Code1.LSE).build();
+        Set<Sociotype> oldSociotypes = new HashSet<>();
+        oldSociotypes.add(oldSociotype1);
+        oldSociotypes.add(oldsociotype2);
+        user.setSociotypes(oldSociotypes);
+
+        Sociotype newSociotype1 = new Sociotype.Builder().code1(Sociotype.Code1.LSE).build();
+        Sociotype newSociotype2 = new Sociotype.Builder().code1(Sociotype.Code1.SEE).build();
+        Set<Sociotype> newSociotypes = new HashSet<>();
+        newSociotypes.add(newSociotype1);
+        newSociotypes.add(newSociotype2);
+
+        Match match = MatchTestUtils.createMatch(1L,
+                MatchPartyTestUtils.createMatchParty(1L, user, Response.UNDEFINED),
+                MatchPartyTestUtils.createMatchParty(2L, opponentUser, Response.UNDEFINED)
+        );
+        Set<Match> matches = new HashSet<>();
+        matches.add(match);
+
+        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.LSE, RelationType.Code.DUAL)).thenReturn(sliSociotype);
+        when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.SEE, RelationType.Code.DUAL)).thenReturn(iliSociotype);
+        when(matchRepository.findForPossibleRemoval(user)).thenReturn(matches);
+
+        userService.setUserSociotypes(user, newSociotypes);
+        verify(matchRepository, times(1)).findForPossibleRemoval(user);
+        verify(matchRepository, never()).delete(match);
         verify(userRepository, times(1)).save(user);
     }
 
