@@ -1,6 +1,7 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
 import lt.dualpair.server.domain.model.match.Match;
+import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
@@ -33,25 +34,41 @@ public class UserMatchControllerTest {
     }
 
     @Test
-    public void testGetMutualMatches_invalidUser() throws Exception {
-        ResponseEntity response = userMatchController.getMutualMatches(2L,
+    public void testGetMatches_invalidUser() throws Exception {
+        ResponseEntity response = userMatchController.getMatches(2L,
                 mock(Pageable.class),
                 mock(PagedResourcesAssembler.class),
                 1L,
-                UserTestUtils.createUser(1L));
+                UserTestUtils.createUser(1L),
+                null);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
-    public void testGetMutualMatches() throws Exception {
+    public void testGetMatches_mutual() throws Exception {
+        User user = UserTestUtils.createUser();
         PagedResourcesAssembler pagedResourcesAssembler = mock(PagedResourcesAssembler.class);
         Pageable pageable = mock(Pageable.class);
         Date date = Date.from(Instant.ofEpochSecond(1472087710L));
         Page<Match> page = new PageImpl<>(new ArrayList<Match>());
-        when(matchRepository.findMutualByUser(1L, date, pageable)).thenReturn(page);
-        userMatchController.getMutualMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, UserTestUtils.createUser(1L));
+        when(matchRepository.findMutual(user, date, pageable)).thenReturn(page);
+        userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, user, UserMatchController.MatchType.mu);
 
-        verify(matchRepository, times(1)).findMutualByUser(1L, date, pageable);
+        verify(matchRepository, times(1)).findMutual(user, date, pageable);
+        verify(pagedResourcesAssembler, times(1)).toResource(any(Page.class), eq(matchResourceAssembler));
+    }
+
+    @Test
+    public void testGetMatches_reviewed() throws Exception {
+        User user = UserTestUtils.createUser();
+        PagedResourcesAssembler pagedResourcesAssembler = mock(PagedResourcesAssembler.class);
+        Pageable pageable = mock(Pageable.class);
+        Date date = Date.from(Instant.ofEpochSecond(1472087710L));
+        Page<Match> page = new PageImpl<>(new ArrayList<Match>());
+        when(matchRepository.findReviewed(user, date, pageable)).thenReturn(page);
+        userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, user, UserMatchController.MatchType.re);
+
+        verify(matchRepository, times(1)).findReviewed(user, date, pageable);
         verify(pagedResourcesAssembler, times(1)).toResource(any(Page.class), eq(matchResourceAssembler));
     }
 }

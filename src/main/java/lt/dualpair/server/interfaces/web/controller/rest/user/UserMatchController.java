@@ -26,29 +26,39 @@ public class UserMatchController {
     private MatchRepository matchRepository;
     private MatchResourceAssembler matchResourceAssembler;
 
-    @RequestMapping(method = RequestMethod.GET, path = "/mutual-matches", produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity getMutualMatches(@PathVariable Long userId,
-                                           Pageable pageable,
-                                           PagedResourcesAssembler pagedResourcesAssembler,
-                                           @RequestParam Long timestamp,
-                                           @ActiveUser User principal) {
-        if (!principal.getId().equals(userId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        Page<Match> matches = matchRepository.findMutualByUser(userId, Date.from(Instant.ofEpochSecond(timestamp)), pageable);
-        return ResponseEntity.ok(pagedResourcesAssembler.toResource(matches.map(source -> new UserAwareMatch(userId, source)), matchResourceAssembler));
-    }
-
-    @RequestMapping(method = RequestMethod.GET, path = "/mutual-matches/{matchId:[0-9]+}")
-    public ResponseEntity getMutualMatch(@PathVariable Long userId, @PathVariable Long matchId, @ActiveUser User user) {
+    @RequestMapping(method = RequestMethod.GET, path = "/matches/{matchId:[0-9]+}")
+    public ResponseEntity getMatch(@PathVariable Long userId, @PathVariable Long matchId, @ActiveUser User user) {
         if (!user.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Optional<Match> match = matchRepository.findOneMutualByUser(userId, matchId);
+        Optional<Match> match = matchRepository.findOneByUser(userId, matchId);
         if (!match.isPresent()) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(matchResourceAssembler.toResource(new UserAwareMatch(user, match.get())));
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "/matches", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity getMatches(@PathVariable Long userId,
+                                     Pageable pageable,
+                                     PagedResourcesAssembler pagedResourcesAssembler,
+                                     @RequestParam Long timestamp,
+                                     @ActiveUser User principal,
+                                     @RequestParam("mt") MatchType matchType) {
+        if (!principal.getId().equals(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        Page<Match> matches = getMatchesByType(principal, matchType, timestamp, pageable);
+        return ResponseEntity.ok(pagedResourcesAssembler.toResource(matches.map(source -> new UserAwareMatch(userId, source)), matchResourceAssembler));
+    }
+
+    private Page<Match> getMatchesByType(User user, MatchType matchType, Long timestamp, Pageable pageable) {
+        Date date = Date.from(Instant.ofEpochSecond(timestamp));
+        if (matchType == MatchType.mu) {
+            return matchRepository.findMutual(user, date, pageable);
+        } else {
+            return matchRepository.findReviewed(user, date, pageable);
+        }
     }
 
     @Autowired
@@ -59,5 +69,9 @@ public class UserMatchController {
     @Autowired
     public void setMatchResourceAssembler(MatchResourceAssembler matchResourceAssembler) {
         this.matchResourceAssembler = matchResourceAssembler;
+    }
+
+    enum MatchType {
+        mu, re;
     }
 }
