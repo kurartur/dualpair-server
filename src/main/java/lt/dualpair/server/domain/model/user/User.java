@@ -96,10 +96,6 @@ public class User implements SocialUserDetails, Serializable {
         this.email = email;
     }
 
-    public void activate() {
-
-    }
-
     public Status getStatus() {
         return status;
     }

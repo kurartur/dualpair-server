@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import lt.dualpair.server.interfaces.resource.match.MatchResource;
 import lt.dualpair.server.interfaces.web.controller.rest.BaseRestControllerTest;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -195,31 +194,4 @@ public class ITMatchControllerTest extends BaseRestControllerTest {
         assertEquals(expectedOpponent, matchResource.getOpponent().getUser().getName());
     }
 
-    @Test
-    @Ignore // TODO
-    public void testMatch_unauthorized() throws Exception {
-        mockMvc.perform(get("/api/match/1"))
-          .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @Ignore // TODO
-    @DatabaseSetup(value = "matchTest_match.xml")
-    public void testMatch_forbidden() throws Exception {
-        mockMvc.perform(get("/api/match/1").with(bearerToken(3L)))
-          .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @Ignore // TODO
-    @DatabaseSetup(value = "matchTest_match.xml")
-    public void testMatch() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/match/1").with(bearerToken(1L)))
-          .andExpect(status().isOk())
-          .andReturn();
-        String content = result.getResponse().getContentAsString();
-        MatchResource matchResource = new ObjectMapper().readValue(content, MatchResource.class);
-        assertTrue(matchResource.getUser().getLink("user").getHref().endsWith("/me"));
-        assertEquals("Linda", matchResource.getOpponent().getUser().getName());
-    }
 }

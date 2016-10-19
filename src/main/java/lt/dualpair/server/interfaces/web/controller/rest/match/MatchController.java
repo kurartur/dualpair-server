@@ -11,7 +11,6 @@ import lt.dualpair.server.service.match.MatchService;
 import lt.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,11 +47,6 @@ public class MatchController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().body(matchResourceAssembler.toResource(new UserAwareMatch(principal, match)));
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/match/{matchId:[0-9]+}")
-    public ResponseEntity match(@PathVariable Long matchId) {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Autowired

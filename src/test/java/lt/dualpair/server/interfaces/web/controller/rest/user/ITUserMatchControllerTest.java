@@ -96,6 +96,12 @@ public class ITUserMatchControllerTest extends BaseRestControllerTest {
     }
 
     @Test
+    public void testGetMatch_invalidUser() throws Exception {
+        mockMvc.perform(get("/api/user/1/matches/6").with(bearerToken(2L)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden()).andReturn();
+    }
+
+    @Test
     public void testGetReviewedMatches() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087710&mt=re").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

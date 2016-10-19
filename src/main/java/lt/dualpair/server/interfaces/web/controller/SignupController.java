@@ -49,7 +49,7 @@ public class SignupController {
         }
         SocialAuthenticationToken socialAuthenticationToken = new SocialAuthenticationToken(connection, user, null, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(socialAuthenticationToken);
-        providerSignInUtils.doPostSignUp(user.getUserId(), request);
+        providerSignInUtils.doPostSignUp(user.getUsername(), request);
 
         HttpServletRequest req = (HttpServletRequest)request.getNativeRequest();
         HttpServletResponse resp = (HttpServletResponse)request.getNativeResponse();
