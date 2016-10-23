@@ -19,5 +19,8 @@ spring:
     facebook:
       appId: 454804811371783
       appSecret: 593c01a75ec0c4eba76f96abff6a069e
+    vkontakte:
+      appId: 5680310
+      appSecret: VkqmRK68x2QjArW6VHjm
 
 googleApiKey: fakeKey
