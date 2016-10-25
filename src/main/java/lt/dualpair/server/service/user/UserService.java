@@ -23,4 +23,5 @@ public interface UserService {
 
     void setUserSearchParameters(Long userId, SearchParameters sp);
 
+    void deleteUserPhoto(Long userId, Long photoId);
 }

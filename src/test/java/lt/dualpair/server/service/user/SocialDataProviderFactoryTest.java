@@ -43,7 +43,7 @@ public class SocialDataProviderFactoryTest {
     @Test
     public void testGetProvider_nullParameters() throws Exception {
         try {
-            socialDataProviderFactory.getProvider(null, "1");
+            socialDataProviderFactory.getProvider(null, 1L);
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("Account type required", iae.getMessage());
@@ -60,8 +60,8 @@ public class SocialDataProviderFactoryTest {
     @Test
     public void testGetProvider_facebook() throws Exception {
         ConnectionRepository connectionRepository = mock(ConnectionRepository.class);
-        doReturn(connectionRepository).when(usersConnectionRepository).createConnectionRepository("userId");
-        SocialDataProvider provider = socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, "userId");
+        doReturn(connectionRepository).when(usersConnectionRepository).createConnectionRepository("1");
+        SocialDataProvider provider = socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, 1L);
         assertTrue(provider instanceof FacebookDataProvider);
         verify(connectionRepository, times(1)).findPrimaryConnection(Facebook.class);
     }

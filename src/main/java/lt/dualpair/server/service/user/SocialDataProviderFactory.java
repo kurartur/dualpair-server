@@ -24,11 +24,11 @@ public class SocialDataProviderFactory {
         }
     }
 
-    public SocialDataProvider getProvider(UserAccount.Type accountType, String userId) {
+    public SocialDataProvider getProvider(UserAccount.Type accountType, Long userId) {
         Validate.notNull(accountType, "Account type required");
         Validate.notNull(userId, "User id required");
 
-        ConnectionRepository connectionRepository = usersConnectionRepository.createConnectionRepository(userId);
+        ConnectionRepository connectionRepository = usersConnectionRepository.createConnectionRepository(userId.toString());
         if (accountType == UserAccount.Type.FACEBOOK) {
             return new FacebookDataProvider(connectionRepository.findPrimaryConnection(Facebook.class));
         } else {

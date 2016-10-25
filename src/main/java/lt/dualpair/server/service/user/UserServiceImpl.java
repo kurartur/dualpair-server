@@ -7,6 +7,7 @@ import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserLocation;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
+import lt.dualpair.server.infrastructure.persistence.repository.PhotoRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private SociotypeRepository sociotypeRepository;
     protected UserDetailsService userDetailsService;
     private MatchRepository matchRepository;
+    private PhotoRepository photoRepository;
 
     @Override
     public User loadUserById(Long userId) throws UserNotFoundException {
@@ -129,6 +131,16 @@ public class UserServiceImpl implements UserService {
         return userLocation;
     }
 
+    @Override
+    @Transactional
+    public void deleteUserPhoto(Long userId, Long photoId) {
+        User user = userRepository.findById(userId).get();
+        if (user.getPhotos().size() < 2) {
+            throw new IllegalStateException("User must have at least one photo");
+        }
+        photoRepository.delete(photoId);
+    }
+
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -147,5 +159,10 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setMatchRepository(MatchRepository matchRepository) {
         this.matchRepository = matchRepository;
+    }
+
+    @Autowired
+    public void setPhotoRepository(PhotoRepository photoRepository) {
+        this.photoRepository = photoRepository;
     }
 }

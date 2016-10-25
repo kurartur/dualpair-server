@@ -55,6 +55,11 @@ public class FacebookDataProvider implements SocialDataProvider {
         return user;
     }
 
+    @Override
+    public List<Photo> getPhotos() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
     private User.Gender resolveGender(String gender) throws SocialDataException {
         if ("male".equals(gender)) {
             return User.Gender.MALE;
