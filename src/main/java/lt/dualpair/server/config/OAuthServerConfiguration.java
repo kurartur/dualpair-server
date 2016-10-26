@@ -38,8 +38,8 @@ public class OAuthServerConfiguration {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http
-                    .antMatcher("/api/**")
-                    .authorizeRequests().anyRequest().authenticated();
+                    .requestMatchers().antMatchers("/api/**").antMatchers("/connect/**").and()
+                    .authorizeRequests().antMatchers("/**").authenticated();
         }
     }
 

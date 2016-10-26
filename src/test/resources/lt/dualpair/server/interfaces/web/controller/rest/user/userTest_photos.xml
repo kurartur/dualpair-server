@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+
+    <users id="1" username="1" gender="M" age="25" name="Artur"/>
+    <user_photos id="1" user_id="1" account_type="FB" id_on_account="1" source_link="a" position="0"/>
+
+    <users id="2" username="2" gender="M" age="25" name="Artur"/>
+    <user_photos id="2" user_id="2" account_type="FB" id_on_account="1" source_link="a" position="0"/>
+    <user_photos id="3" user_id="2" account_type="FB" id_on_account="2" source_link="b" position="0"/>
+
+</dataset>

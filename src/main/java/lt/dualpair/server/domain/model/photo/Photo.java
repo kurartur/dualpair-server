@@ -19,7 +19,6 @@ public class Photo implements Serializable {
     private User user;
 
     @Column(name = "account_type")
-    @Enumerated
     private UserAccount.Type accountType;
 
     @Column(name = "id_on_account")

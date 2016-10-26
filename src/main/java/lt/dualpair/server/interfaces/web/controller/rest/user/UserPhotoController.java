@@ -10,10 +10,7 @@ import lt.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user/{userId:[0-9]+}")
@@ -24,7 +21,7 @@ public class UserPhotoController {
     private UserService userService;
 
     @RequestMapping(method = RequestMethod.DELETE, path = "/photos/{photoId:[0-9]+}")
-    public ResponseEntity deletePhoto(Long userId, Long photoId, @ActiveUser User principal) {
+    public ResponseEntity deletePhoto(@PathVariable Long userId, @PathVariable Long photoId, @ActiveUser User principal) {
         if (!userId.equals(principal.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

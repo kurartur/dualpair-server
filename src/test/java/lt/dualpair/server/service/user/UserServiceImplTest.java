@@ -1,20 +1,19 @@
 package lt.dualpair.server.service.user;
 
 import lt.dualpair.server.domain.model.match.*;
+import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
+import lt.dualpair.server.infrastructure.persistence.repository.PhotoRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -25,12 +24,14 @@ public class UserServiceImplTest {
     private UserRepository userRepository = mock(UserRepository.class);
     private SociotypeRepository sociotypeRepository = mock(SociotypeRepository.class);
     private MatchRepository matchRepository = mock(MatchRepository.class);
+    private PhotoRepository photoRepository = mock(PhotoRepository.class);
 
     @Before
     public void setUp() throws Exception {
         userService.setUserRepository(userRepository);
         userService.setSociotypeRepository(sociotypeRepository);
         userService.setMatchRepository(matchRepository);
+        userService.setPhotoRepository(photoRepository);
     }
 
     @Test
@@ -293,5 +294,36 @@ public class UserServiceImplTest {
         userService.updateUser(user);
         verify(userRepository, times(1)).save(user);
         assertNotNull(user.getDateUpdated());
+    }
+
+    @Test
+    public void deleteUserPhoto_invalidCount() throws Exception {
+        User user = UserTestUtils.createUser();
+        List<Photo> photos = new ArrayList<>();
+        photos.add(new Photo());
+        user.setPhotos(photos);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        try {
+            userService.deleteUserPhoto(1L, 1L);
+            fail();
+        } catch (IllegalStateException ise) {
+            assertEquals("User must have at least one photo", ise.getMessage());
+        }
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    public void deleteUserPhoto() throws Exception {
+        User user = UserTestUtils.createUser();
+        List<Photo> photos = new ArrayList<>();
+        photos.add(new Photo());
+        Photo photo = new Photo();
+        photos.add(photo);
+        user.setPhotos(photos);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(photoRepository.findUserPhoto(1L, 1L)).thenReturn(Optional.of(photo));
+        userService.deleteUserPhoto(1L, 1L);
+        verify(userRepository, times(1)).save(user);
+        assertEquals(1, user.getPhotos().size());
     }
 }

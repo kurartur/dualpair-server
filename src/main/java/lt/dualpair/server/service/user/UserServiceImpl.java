@@ -2,6 +2,7 @@ package lt.dualpair.server.service.user;
 
 import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.match.SearchParameters;
+import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
@@ -138,7 +139,9 @@ public class UserServiceImpl implements UserService {
         if (user.getPhotos().size() < 2) {
             throw new IllegalStateException("User must have at least one photo");
         }
-        photoRepository.delete(photoId);
+        Photo photo = photoRepository.findUserPhoto(userId, photoId).get();
+        user.getPhotos().remove(photo);
+        userRepository.save(user);
     }
 
     @Autowired
