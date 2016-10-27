@@ -57,17 +57,13 @@ public class OAuthServerConfiguration {
         protected UserDetailsService userService;
 
         @Autowired
-        @Qualifier("defaultTokenServices")
-        protected AuthorizationServerTokenServices tokenServices;
-
-        @Autowired
         protected ClientDetailsService clientDetailsService;
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
             endpoints
                     .tokenStore(tokenStore)
-                    .tokenServices(tokenServices)
+                    .tokenServices(tokenServices())
                     .authenticationManager(authenticationManager)
                     .userDetailsService(userService);
         }
@@ -86,12 +82,13 @@ public class OAuthServerConfiguration {
         @Bean
         @Primary
         @Qualifier("defaultTokenServices")
-        public DefaultTokenServices tokenServices() {
+        public AuthorizationServerTokenServices tokenServices() {
             DefaultTokenServices tokenServices = new DefaultTokenServices();
             tokenServices.setSupportRefreshToken(true);
             tokenServices.setTokenStore(this.tokenStore);
             return tokenServices;
         }
+
     }
 
 }
