@@ -7,11 +7,13 @@ import org.jboss.logging.Logger;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.facebook.api.Album;
 import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.MediaOperations;
 import org.springframework.social.facebook.api.PagedList;
 import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -57,7 +59,17 @@ public class FacebookDataProvider implements SocialDataProvider {
 
     @Override
     public List<Photo> getPhotos() {
-        throw new UnsupportedOperationException("Not implemented");
+        Facebook facebook = facebookConnection.getApi();
+        MediaOperations mediaOperations = facebook.mediaOperations();
+        List<Photo> photos = new ArrayList<>();
+        mediaOperations.getAlbums().forEach(album -> mediaOperations.getPhotos(album.getId()).forEach(fbPhoto -> {
+            Photo photo = new Photo();
+            photo.setSourceLink(fbPhoto.getSource());
+            photo.setAccountType(UserAccount.Type.FACEBOOK);
+            photo.setIdOnAccount(fbPhoto.getId());
+            photos.add(photo);
+        }));
+        return photos;
     }
 
     private User.Gender resolveGender(String gender) throws SocialDataException {

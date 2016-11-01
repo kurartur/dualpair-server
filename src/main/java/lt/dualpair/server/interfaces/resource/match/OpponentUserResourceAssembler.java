@@ -6,7 +6,7 @@ import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.domain.model.user.UserLocation;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
-import lt.dualpair.server.interfaces.resource.user.PhotoResource;
+import lt.dualpair.server.interfaces.resource.user.PhotoResourceAssembler;
 import lt.dualpair.server.interfaces.resource.user.UserAccountResource;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.web.controller.rest.user.UserController;
@@ -20,6 +20,7 @@ import java.util.*;
 public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<OpponentUserResourceAssembler.AssemblingContext, UserResource> {
 
     private SociotypeResourceAssembler sociotypeResourceAssembler;
+    private PhotoResourceAssembler photoResourceAssembler;
 
     public OpponentUserResourceAssembler() {
         super(UserController.class, UserResource.class);
@@ -46,21 +47,15 @@ public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<Oppo
         }
         resource.setLocations(locations);
 
-        List<PhotoResource> photos = new ArrayList<>();
         List<Photo> sortedPhotos = new ArrayList<>(entity.getPhotos());
         Collections.sort(sortedPhotos, (o1, o2) -> o2.getPosition() - o1.getPosition());
-        for (Photo photo : sortedPhotos) {
-            PhotoResource photoResource = new PhotoResource();
-            photoResource.setSourceUrl(photo.getSourceLink());
-            photos.add(photoResource);
-        }
-        resource.setPhotos(photos);
+        resource.setPhotos(photoResourceAssembler.toResources(sortedPhotos));
 
         if (context.isMutualMatch()) {
-            Set<UserAccountResource> accountResources = new HashSet<>();
+            List<UserAccountResource> accountResources = new ArrayList<>();
             for (UserAccount userAccount : entity.getUserAccounts()) {
                 UserAccountResource userAccountResource = new UserAccountResource();
-                userAccountResource.setAccountType(userAccount.getAccountType().name());
+                userAccountResource.setAccountType(userAccount.getAccountType().getCode());
                 userAccountResource.setAccountId(userAccount.getAccountId());
                 accountResources.add(userAccountResource);
             }
@@ -73,6 +68,11 @@ public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<Oppo
     @Autowired
     public void setSociotypeResourceAssembler(SociotypeResourceAssembler sociotypeResourceAssembler) {
         this.sociotypeResourceAssembler = sociotypeResourceAssembler;
+    }
+
+    @Autowired
+    public void setPhotoResourceAssembler(PhotoResourceAssembler photoResourceAssembler) {
+        this.photoResourceAssembler = photoResourceAssembler;
     }
 
     public static class AssemblingContext {

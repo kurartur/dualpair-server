@@ -124,6 +124,11 @@ public class User implements SocialUserDetails, Serializable {
         this.userAccounts = userAccounts;
     }
 
+    public void addUserAccount(UserAccount userAccount) {
+        Assert.notNull(userAccount);
+        userAccounts.add(userAccount);
+    }
+
     public Set<Sociotype> getSociotypes() {
         return sociotypes;
     }

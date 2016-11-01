@@ -15,19 +15,20 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
 
     private UserResourceAssembler userResourceAssembler = new UserResourceAssembler();
     private SociotypeResourceAssembler sociotypeResourceAssembler = mock(SociotypeResourceAssembler.class);
+    private PhotoResourceAssembler photoResourceAssembler = mock(PhotoResourceAssembler.class);
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
         userResourceAssembler.setSociotypeResourceAssembler(sociotypeResourceAssembler);
+        userResourceAssembler.setPhotoResourceAssembler(photoResourceAssembler);
     }
 
     @Test
@@ -50,6 +51,9 @@ public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
         Photo photo = new Photo();
         user.setPhotos(Arrays.asList(photo));
 
+        List<PhotoResource> photoResources = new ArrayList<>();
+        when(photoResourceAssembler.toResources(user.getPhotos())).thenReturn(photoResources);
+
         UserAccount userAccount = new UserAccount(user);
         userAccount.setAccountType(UserAccount.Type.FACEBOOK);
         user.setUserAccounts(new HashSet<>(Arrays.asList(userAccount)));
@@ -63,7 +67,7 @@ public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
         assertTrue(userResource.getLink("search-parameters").getHref().endsWith("user/1/search-parameters"));
         assertEquals(sociotypeResources, userResource.getSociotypes());
         assertEquals(1, userResource.getLocations().size());
-        assertEquals(1, userResource.getPhotos().size());
+        assertEquals(photoResources, userResource.getPhotos());
         assertEquals(1, userResource.getAccounts().size());
     }
 

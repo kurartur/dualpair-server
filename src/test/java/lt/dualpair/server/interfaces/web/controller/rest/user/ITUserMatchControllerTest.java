@@ -11,7 +11,7 @@ import org.springframework.hateoas.PagedResources;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.Set;
+import java.util.List;
 import java.util.TimeZone;
 
 import static org.junit.Assert.*;
@@ -83,9 +83,9 @@ public class ITUserMatchControllerTest extends BaseRestControllerTest {
         MvcResult result = mockMvc.perform(get("/api/user/1/matches/1").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
         MatchResource resource = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MatchResource.class);
-        Set<UserAccountResource> accounts = resource.getOpponent().getUser().getAccounts();
+        List<UserAccountResource> accounts = resource.getOpponent().getUser().getAccounts();
         UserAccountResource userAccountResource = accounts.iterator().next();
-        assertEquals("FACEBOOK", userAccountResource.getAccountType());
+        assertEquals("FB", userAccountResource.getAccountType());
         assertEquals("100", userAccountResource.getAccountId());
     }
 

@@ -7,6 +7,8 @@ public class PhotoResource extends ResourceSupport {
 
     @JsonProperty("id")
     private Long photoId;
+    private String accountType;
+    private String idOnAccount;
     private String sourceUrl;
 
     public Long getPhotoId() {
@@ -15,6 +17,22 @@ public class PhotoResource extends ResourceSupport {
 
     public void setPhotoId(Long photoId) {
         this.photoId = photoId;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
+
+    public String getIdOnAccount() {
+        return idOnAccount;
+    }
+
+    public void setIdOnAccount(String idOnAccount) {
+        this.idOnAccount = idOnAccount;
     }
 
     public String getSourceUrl() {

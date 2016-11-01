@@ -16,6 +16,8 @@ public class PhotoResourceAssembler extends ResourceAssemblerSupport<Photo, Phot
     public PhotoResource toResource(Photo entity) {
         PhotoResource resource = new PhotoResource();
         resource.setPhotoId(entity.getId());
+        resource.setAccountType(entity.getAccountType().getCode());
+        resource.setIdOnAccount(entity.getIdOnAccount());
         resource.setSourceUrl(entity.getSourceLink());
         return resource;
     }

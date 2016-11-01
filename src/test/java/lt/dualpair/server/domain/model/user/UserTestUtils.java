@@ -14,6 +14,7 @@ public class UserTestUtils {
     public static User createUser() {
         User user = new User();
         user.setId(1L);
+        user.setUsername("username");
         user.setDateOfBirth(Date.from(LocalDate.now().minusYears(5).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
         Set<Sociotype> sociotypes = new HashSet<>();

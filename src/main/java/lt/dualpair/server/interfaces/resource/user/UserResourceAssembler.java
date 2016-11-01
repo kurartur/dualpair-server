@@ -1,6 +1,5 @@
 package lt.dualpair.server.interfaces.resource.user;
 
-import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.domain.model.user.UserLocation;
@@ -23,6 +22,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserResource> {
 
     private SociotypeResourceAssembler sociotypeResourceAssembler;
+    private PhotoResourceAssembler photoResourceAssembler;
 
     public UserResourceAssembler() {
         super(UserController.class, UserResource.class);
@@ -49,15 +49,9 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
         }
         resource.setLocations(locations);
 
-        List<PhotoResource> photos = new ArrayList<>();
-        for (Photo photo : entity.getPhotos()) {
-            PhotoResource photoResource = new PhotoResource();
-            photoResource.setSourceUrl(photo.getSourceLink());
-            photos.add(photoResource);
-        }
-        resource.setPhotos(photos);
+        resource.setPhotos(photoResourceAssembler.toResources(entity.getPhotos()));
 
-        Set<UserAccountResource> userAccounts = new HashSet<>();
+        List<UserAccountResource> userAccounts = new ArrayList<>();
         for (UserAccount userAccount : entity.getUserAccounts()) {
             UserAccountResource accountResource = new UserAccountResource();
             accountResource.setAccountType(userAccount.getAccountType().getCode());
@@ -74,5 +68,10 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
     @Autowired
     public void setSociotypeResourceAssembler(SociotypeResourceAssembler sociotypeResourceAssembler) {
         this.sociotypeResourceAssembler = sociotypeResourceAssembler;
+    }
+
+    @Autowired
+    public void setPhotoResourceAssembler(PhotoResourceAssembler photoResourceAssembler) {
+        this.photoResourceAssembler = photoResourceAssembler;
     }
 }

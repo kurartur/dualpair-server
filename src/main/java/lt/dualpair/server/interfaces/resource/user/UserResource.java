@@ -21,7 +21,7 @@ public class UserResource extends ResourceSupport {
     private Set<SociotypeResource> sociotypes;
     private Set<LocationResource> locations;
     private List<PhotoResource> photos;
-    private Set<UserAccountResource> accounts;
+    private List<UserAccountResource> accounts;
 
     public Long getUserId() {
         return userId;
@@ -87,11 +87,11 @@ public class UserResource extends ResourceSupport {
         this.photos = photos;
     }
 
-    public Set<UserAccountResource> getAccounts() {
+    public List<UserAccountResource> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(Set<UserAccountResource> accounts) {
+    public void setAccounts(List<UserAccountResource> accounts) {
         this.accounts = accounts;
     }
 }

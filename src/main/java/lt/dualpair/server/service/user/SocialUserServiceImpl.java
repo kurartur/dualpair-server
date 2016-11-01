@@ -1,6 +1,7 @@
 package lt.dualpair.server.service.user;
 
 import lt.dualpair.server.domain.model.match.SearchParameters;
+import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.social.connect.Connection;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.Validate;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
@@ -88,5 +90,15 @@ public class SocialUserServiceImpl extends UserServiceImpl implements SocialUser
     @Autowired
     public void setSocialDataProviderFactory(SocialDataProviderFactory socialDataProviderFactory) {
         this.socialDataProviderFactory = socialDataProviderFactory;
+    }
+
+    @Override
+    @Transactional
+    public Photo addUserPhoto(Long userId, Photo photo) {
+        // TODO validate
+        User user = loadUserById(userId);
+        photo.setUser(user);
+        photoRepository.save(photo);
+        return photo;
     }
 }

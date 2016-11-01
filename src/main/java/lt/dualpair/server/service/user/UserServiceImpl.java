@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     private SociotypeRepository sociotypeRepository;
     protected UserDetailsService userDetailsService;
     private MatchRepository matchRepository;
-    private PhotoRepository photoRepository;
+    protected PhotoRepository photoRepository;
 
     @Override
     public User loadUserById(Long userId) throws UserNotFoundException {

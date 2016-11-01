@@ -1,8 +1,10 @@
 package lt.dualpair.server.service.user;
 
 import lt.dualpair.server.domain.model.match.SearchParameters;
+import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
+import lt.dualpair.server.infrastructure.persistence.repository.PhotoRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,11 +24,13 @@ public class SocialUserServiceImplTest {
     private SocialUserServiceImpl socialUserService = new SocialUserServiceImpl();
     private UserRepository userRepository = mock(UserRepository.class);
     private SocialDataProviderFactory socialDataProviderFactory = mock(SocialDataProviderFactory.class);
+    private PhotoRepository photoRepository = mock(PhotoRepository.class);
 
     @Before
     public void setUp() throws Exception {
         socialUserService.setUserRepository(userRepository);
         socialUserService.setSocialDataProviderFactory(socialDataProviderFactory);
+        socialUserService.setPhotoRepository(photoRepository);
     }
 
     @Test
@@ -79,5 +83,15 @@ public class SocialUserServiceImplTest {
         assertEquals((Integer)8, searchParameters.getMaxAge());
         assertTrue(searchParameters.getSearchFemale());
         assertFalse(searchParameters.getSearchMale());
+    }
+
+    @Test
+    public void testAddUserPhoto() throws Exception {
+        Photo photo = new Photo();
+        User user = new User();
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        assertEquals(photo, socialUserService.addUserPhoto(1L, photo));
+        assertEquals(user, photo.getUser());
+        verify(photoRepository, times(1)).save(photo);
     }
 }

@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -101,6 +102,15 @@ public class FacebookDataProviderTest {
         User user = new User();
         facebookDataProvider.enhanceUser(user);
         assertEquals((Integer) 5, user.getAge());
+    }
+
+    @Test
+    public void testGetPhotos() throws Exception {
+        doReturn(new PagedList<>(Arrays.asList(createAlbum("1", "Profile pictures"), createAlbum("2", "Cool pics")), null, null)).when(mediaOperations).getAlbums();
+        doReturn(new PagedList<>(Arrays.asList(createPhoto("1"), createPhoto("2")), null, null)).when(mediaOperations).getPhotos("1");
+        doReturn(new PagedList<>(Arrays.asList(createPhoto("3"), createPhoto("4")), null, null)).when(mediaOperations).getPhotos("2");
+        List<Photo> photos = facebookDataProvider.getPhotos();
+        assertEquals(4, photos.size());
     }
 
     private void assertUserPhoto(String expectedId, User expectedUser, Photo actualPhoto) throws Exception {

@@ -1,12 +1,14 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
+import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.infrastructure.authentication.ActiveUser;
+import lt.dualpair.server.interfaces.resource.user.PhotoResource;
 import lt.dualpair.server.interfaces.resource.user.PhotoResourceAssembler;
 import lt.dualpair.server.service.user.SocialDataProvider;
 import lt.dualpair.server.service.user.SocialDataProviderFactory;
-import lt.dualpair.server.service.user.UserService;
+import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,24 +20,37 @@ public class UserPhotoController {
 
     private SocialDataProviderFactory socialDataProviderFactory;
     private PhotoResourceAssembler photoResourceAssembler;
-    private UserService userService;
+    private SocialUserService socialUserService;
 
     @RequestMapping(method = RequestMethod.DELETE, path = "/photos/{photoId:[0-9]+}")
     public ResponseEntity deletePhoto(@PathVariable Long userId, @PathVariable Long photoId, @ActiveUser User principal) {
         if (!userId.equals(principal.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        userService.deleteUserPhoto(userId, photoId);
+        socialUserService.deleteUserPhoto(userId, photoId);
         return ResponseEntity.ok().build();
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/available-photos")
-    public ResponseEntity getAvailablePhotos(Long userId, @RequestParam("at") String accountType, @ActiveUser User principal) {
+    public ResponseEntity getAvailablePhotos(@PathVariable Long userId, @RequestParam("at") String accountType, @ActiveUser User principal) {
         if (!userId.equals(principal.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        SocialDataProvider socialDataProvider = socialDataProviderFactory.getProvider(UserAccount.Type.fromCode(accountType), userId);
+        SocialDataProvider socialDataProvider = socialDataProviderFactory.getProvider(UserAccount.Type.fromCode(accountType), principal.getUsername());
         return ResponseEntity.ok(photoResourceAssembler.toResources(socialDataProvider.getPhotos()));
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, path = "/photos")
+    public ResponseEntity addPhoto(@PathVariable Long userId, @RequestBody PhotoResource photoResource, @ActiveUser User principal) {
+        if (!userId.equals(principal.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        Photo photo = new Photo();
+        photo.setAccountType(UserAccount.Type.fromCode(photoResource.getAccountType()));
+        photo.setIdOnAccount(photoResource.getIdOnAccount());
+        photo.setSourceLink(photoResource.getSourceUrl());
+        photo = socialUserService.addUserPhoto(userId, photo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(photoResourceAssembler.toResource(photo));
     }
 
     @Autowired
@@ -49,7 +64,7 @@ public class UserPhotoController {
     }
 
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setSocialUserService(SocialUserService socialUserService) {
+        this.socialUserService = socialUserService;
     }
 }
