@@ -8,6 +8,7 @@ import org.springframework.social.vkontakte.api.VKontakte;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class VKontakteDataProvider implements SocialDataProvider {
 
@@ -32,5 +33,10 @@ public class VKontakteDataProvider implements SocialDataProvider {
     @Override
     public List<Photo> getPhotos() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public Optional<Photo> getPhoto(String idOnAccount) {
+        return null;
     }
 }

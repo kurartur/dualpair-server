@@ -13,13 +13,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class FacebookDataProviderTest {
@@ -111,6 +107,31 @@ public class FacebookDataProviderTest {
         doReturn(new PagedList<>(Arrays.asList(createPhoto("3"), createPhoto("4")), null, null)).when(mediaOperations).getPhotos("2");
         List<Photo> photos = facebookDataProvider.getPhotos();
         assertEquals(4, photos.size());
+    }
+
+    @Test
+    public void testGetPhoto_nullPhoto() throws Exception {
+        assertFalse(facebookDataProvider.getPhoto("1").isPresent());
+    }
+
+    @Test
+    public void testGetPhoto_exception() throws Exception {
+        doThrow(new RuntimeException("Exception")).when(mediaOperations).getPhoto("1");
+        assertFalse(facebookDataProvider.getPhoto("1").isPresent());
+    }
+
+    @Test
+    public void testGetPhoto() throws Exception {
+        org.springframework.social.facebook.api.Photo fbPhoto = mock(org.springframework.social.facebook.api.Photo.class);
+        when(fbPhoto.getSource()).thenReturn("url");
+        when(fbPhoto.getId()).thenReturn("id");
+        doReturn(fbPhoto).when(mediaOperations).getPhoto("1");
+        Optional<Photo> optionalPhoto = facebookDataProvider.getPhoto("1");
+        assertTrue(optionalPhoto.isPresent());
+        Photo photo = optionalPhoto.get();
+        assertEquals("id", photo.getIdOnAccount());
+        assertEquals("url", photo.getSourceLink());
+        assertEquals(UserAccount.Type.FACEBOOK, photo.getAccountType());
     }
 
     private void assertUserPhoto(String expectedId, User expectedUser, Photo actualPhoto) throws Exception {

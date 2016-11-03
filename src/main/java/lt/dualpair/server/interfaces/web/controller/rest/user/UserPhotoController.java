@@ -45,11 +45,10 @@ public class UserPhotoController {
         if (!userId.equals(principal.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Photo photo = new Photo();
-        photo.setAccountType(UserAccount.Type.fromCode(photoResource.getAccountType()));
-        photo.setIdOnAccount(photoResource.getIdOnAccount());
-        photo.setSourceLink(photoResource.getSourceUrl());
-        photo = socialUserService.addUserPhoto(userId, photo);
+        Photo photo = socialUserService.addUserPhoto(userId,
+                UserAccount.Type.fromCode(photoResource.getAccountType()),
+                photoResource.getIdOnAccount(),
+                photoResource.getPosition());
         return ResponseEntity.status(HttpStatus.CREATED).body(photoResourceAssembler.toResource(photo));
     }
 

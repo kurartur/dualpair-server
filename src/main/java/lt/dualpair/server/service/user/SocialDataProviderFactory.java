@@ -2,6 +2,7 @@ package lt.dualpair.server.service.user;
 
 import lt.dualpair.server.domain.model.user.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UsersConnectionRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.util.Validate;
 
 @Component
+@Profile("!it")
 public class SocialDataProviderFactory {
 
     private UsersConnectionRepository usersConnectionRepository;

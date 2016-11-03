@@ -17,11 +17,13 @@ public class PhotoResourceAssemblerTest {
         photo.setIdOnAccount("idOnAccount");
         photo.setId(1L);
         photo.setSourceLink("url");
+        photo.setPosition(5);
         PhotoResource photoResource = photoResourceAssembler.toResource(photo);
         assertEquals("FB", photoResource.getAccountType());
         assertEquals("idOnAccount", photoResource.getIdOnAccount());
         assertEquals((Long)1L, photoResource.getPhotoId());
         assertEquals("url", photoResource.getSourceUrl());
+        assertEquals((Integer)5, photoResource.getPosition());
     }
 
 }

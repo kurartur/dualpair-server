@@ -13,10 +13,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class FacebookDataProvider implements SocialDataProvider {
 
@@ -70,6 +67,23 @@ public class FacebookDataProvider implements SocialDataProvider {
             photos.add(photo);
         }));
         return photos;
+    }
+
+    @Override
+    public Optional<Photo> getPhoto(String photoId) {
+        try {
+            org.springframework.social.facebook.api.Photo fbPhoto = facebookConnection.getApi().mediaOperations().getPhoto(photoId);
+            if (fbPhoto != null) {
+                Photo photo = new Photo();
+                photo.setIdOnAccount(fbPhoto.getId());
+                photo.setAccountType(UserAccount.Type.FACEBOOK);
+                photo.setSourceLink(fbPhoto.getSource());
+                return Optional.of(photo);
+            }
+            return Optional.empty();
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     private User.Gender resolveGender(String gender) throws SocialDataException {

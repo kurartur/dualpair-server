@@ -10,7 +10,6 @@ import lt.dualpair.server.service.user.SocialDataProviderFactory;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -26,12 +25,14 @@ public class UserPhotoControllerTest {
     private PhotoResourceAssembler photoResourceAssembler = mock(PhotoResourceAssembler.class);
     private SocialDataProviderFactory socialDataProviderFactory = mock(SocialDataProviderFactory.class);
     private SocialUserService socialUserService = mock(SocialUserService.class);
+    private SocialDataProvider socialDataProvider = mock(SocialDataProvider.class);
 
     @Before
     public void setUp() throws Exception {
         userPhotoController.setPhotoResourceAssembler(photoResourceAssembler);
         userPhotoController.setSocialDataProviderFactory(socialDataProviderFactory);
         userPhotoController.setSocialUserService(socialUserService);
+        when(socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, "username")).thenReturn(socialDataProvider);
     }
 
     @Test
@@ -78,19 +79,17 @@ public class UserPhotoControllerTest {
         PhotoResource photoResource = new PhotoResource();
         photoResource.setAccountType("FB");
         photoResource.setIdOnAccount("idOnAccount");
-        photoResource.setSourceUrl("url");
+        photoResource.setPosition(5);
+
         Photo photo = new Photo();
-        when(socialUserService.addUserPhoto(eq(1L), any(Photo.class))).thenReturn(photo);
+
+        when(socialUserService.addUserPhoto(1L, UserAccount.Type.FACEBOOK, "idOnAccount", 5)).thenReturn(photo);
+
         PhotoResource newPhotoResource = new PhotoResource();
         when(photoResourceAssembler.toResource(photo)).thenReturn(newPhotoResource);
+
         ResponseEntity responseEntity = userPhotoController.addPhoto(1L, photoResource, UserTestUtils.createUser());
-        ArgumentCaptor<Photo> argumentCaptor = ArgumentCaptor.forClass(Photo.class);
-        verify(socialUserService, times(1)).addUserPhoto(eq(1L), argumentCaptor.capture());
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(newPhotoResource, responseEntity.getBody());
-        Photo capturedPhoto = argumentCaptor.getValue();
-        assertEquals(UserAccount.Type.FACEBOOK, capturedPhoto.getAccountType());
-        assertEquals("idOnAccount", capturedPhoto.getIdOnAccount());
-        assertEquals("url", capturedPhoto.getSourceLink());
     }
 }

@@ -10,6 +10,7 @@ public class PhotoResource extends ResourceSupport {
     private String accountType;
     private String idOnAccount;
     private String sourceUrl;
+    private Integer position;
 
     public Long getPhotoId() {
         return photoId;
@@ -41,5 +42,13 @@ public class PhotoResource extends ResourceSupport {
 
     public void setSourceUrl(String sourceUrl) {
         this.sourceUrl = sourceUrl;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }

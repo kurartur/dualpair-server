@@ -9,6 +9,7 @@ import org.springframework.social.connect.support.OAuth2Connection;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.connect.FacebookAdapter;
 import org.springframework.social.facebook.connect.FacebookServiceProvider;
+import org.springframework.social.vkontakte.api.VKontakte;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -64,6 +65,15 @@ public class SocialDataProviderFactoryTest {
         SocialDataProvider provider = socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, "username");
         assertTrue(provider instanceof FacebookDataProvider);
         verify(connectionRepository, times(1)).findPrimaryConnection(Facebook.class);
+    }
+
+    @Test
+    public void testGetProvider_vkontakte() throws Exception {
+        ConnectionRepository connectionRepository = mock(ConnectionRepository.class);
+        doReturn(connectionRepository).when(usersConnectionRepository).createConnectionRepository("username");
+        SocialDataProvider provider = socialDataProviderFactory.getProvider(UserAccount.Type.VKONTAKTE, "username");
+        assertTrue(provider instanceof VKontakteDataProvider);
+        verify(connectionRepository, times(1)).findPrimaryConnection(VKontakte.class);
     }
 
 }

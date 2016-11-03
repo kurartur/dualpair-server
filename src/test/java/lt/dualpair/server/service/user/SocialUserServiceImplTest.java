@@ -86,12 +86,43 @@ public class SocialUserServiceImplTest {
     }
 
     @Test
+    public void testAddUserPhoto_photoDoesntExistOnSocialAccount() throws Exception {
+        prepareAddUserPhoto(false);
+        try {
+            socialUserService.addUserPhoto(1L, UserAccount.Type.FACEBOOK, "idOnAccount", 5);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("Photo doesn't exist on account or is not public", iae.getMessage());
+        }
+    }
+
+    @Test
     public void testAddUserPhoto() throws Exception {
-        Photo photo = new Photo();
-        User user = new User();
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        assertEquals(photo, socialUserService.addUserPhoto(1L, photo));
-        assertEquals(user, photo.getUser());
+        prepareAddUserPhoto(true);
+        Photo photo =socialUserService.addUserPhoto(1L, UserAccount.Type.FACEBOOK, "idOnAccount", 5);
+        assertEquals("username", photo.getUser().getUsername());
+        assertEquals(5, photo.getPosition());
+        assertEquals("idOnAccount", photo.getIdOnAccount());
+        assertEquals("url", photo.getSourceLink());
         verify(photoRepository, times(1)).save(photo);
     }
+
+    private void prepareAddUserPhoto(boolean photoExists) {
+        User user = new User();
+        user.setUsername("username");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        SocialDataProvider socialDataProvider = mock(SocialDataProvider.class);
+        when(socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, "username")).thenReturn(socialDataProvider);
+        if (photoExists) {
+            Photo photo = new Photo();
+            photo.setIdOnAccount("idOnAccount");
+            photo.setAccountType(UserAccount.Type.FACEBOOK);
+            photo.setSourceLink("url");
+            when(socialDataProvider.getPhoto("idOnAccount")).thenReturn(Optional.of(photo));
+        } else {
+            when(socialDataProvider.getPhoto("idOnAccount")).thenReturn(Optional.empty());
+        }
+    }
+
 }

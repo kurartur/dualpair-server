@@ -94,10 +94,15 @@ public class SocialUserServiceImpl extends UserServiceImpl implements SocialUser
 
     @Override
     @Transactional
-    public Photo addUserPhoto(Long userId, Photo photo) {
-        // TODO validate
+    public Photo addUserPhoto(Long userId, UserAccount.Type accountType, String idOnAccount, int position) {
         User user = loadUserById(userId);
+        Optional<Photo> photoOptional = socialDataProviderFactory.getProvider(accountType, user.getUsername()).getPhoto(idOnAccount);
+        if (!photoOptional.isPresent()) {
+            throw new IllegalArgumentException("Photo doesn't exist on account or is not public");
+        }
+        Photo photo = photoOptional.get();
         photo.setUser(user);
+        photo.setPosition(position);
         photoRepository.save(photo);
         return photo;
     }
