@@ -89,7 +89,14 @@
             a#facebook {
                 border-color: #2d5073;
                 background-color: #3b5998;
-                background-image: url(http://icons.iconarchive.com/icons/danleech/simple/512/facebook-icon.png);
+                background-image: url(/images/facebook-icon.png);
+            }
+
+            a#vkontakte {
+                margin-top: 20px;
+                border-color: #2d5073;
+                background-color: #45668e;
+                background-image: url(/images/vkontakte-256.png);
             }
 
             .terms-and-conditions {
@@ -169,6 +176,10 @@
 
             <a id="facebook" class="sign-in-button disabled" href="/auth/facebook?scope=public_profile,email,user_hometown,user_location,user_birthday,user_photos">
                 Sign in with Facebook
+            </a>
+
+            <a id="vkontakte" class="sign-in-button disabled" href="/auth/vkontakte">
+                Sign in with VKontakte
             </a>
 
             <div class="terms-and-conditions">

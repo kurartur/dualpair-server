@@ -22,7 +22,7 @@ public class VKontakteDataProvider implements SocialDataProvider {
 
     @Override
     public String getAccountId() {
-        return null;
+        return Long.toString(vkontakteConnection.getApi().usersOperations().getUser().getId());
     }
 
     @Override
