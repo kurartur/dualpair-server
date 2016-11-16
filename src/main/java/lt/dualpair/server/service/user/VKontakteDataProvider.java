@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class VKontakteDataProvider implements SocialDataProvider {
 
-    private static final Logger logger = Logger.getLogger(FacebookDataProvider.class.getName());
+    private static final Logger logger = Logger.getLogger(VKontakteDataProvider.class.getName());
 
     private Connection<? extends VKontakte> vkontakteConnection;
 
