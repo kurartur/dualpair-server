@@ -2,7 +2,6 @@ package lt.dualpair.server.service.user;
 
 import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.match.SearchParameters;
-import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
 import lt.dualpair.server.domain.model.user.User;
@@ -33,6 +32,8 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class.getName());
+
+    private static final int MAX_NUMBER_OF_LOCATIONS_TO_STORE = 5;
 
     protected UserRepository userRepository;
     private SociotypeRepository sociotypeRepository;
@@ -127,7 +128,7 @@ public class UserServiceImpl implements UserService {
     public UserLocation addLocation(Long userId, Location location) {
         User user = loadUserById(userId);
         UserLocation userLocation = new UserLocation(user, location.getLatitude(), location.getLongitude(), location.getCountryCode(), location.getCity());
-        user.addLocation(userLocation);
+        user.addLocation(userLocation, MAX_NUMBER_OF_LOCATIONS_TO_STORE);
         userRepository.save(user);
         return userLocation;
     }
@@ -139,9 +140,10 @@ public class UserServiceImpl implements UserService {
         if (user.getPhotos().size() < 2) {
             throw new IllegalStateException("User must have at least one photo");
         }
-        Photo photo = photoRepository.findUserPhoto(userId, photoId).get();
-        user.getPhotos().remove(photo);
-        userRepository.save(user);
+        photoRepository.findUserPhoto(userId, photoId).ifPresent(photo -> {
+            user.deletePhoto(photo);
+            userRepository.save(user);
+        });
     }
 
     @Autowired

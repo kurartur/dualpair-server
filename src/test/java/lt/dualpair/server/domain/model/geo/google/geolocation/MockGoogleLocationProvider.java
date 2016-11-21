@@ -10,7 +10,7 @@ public class MockGoogleLocationProvider extends GoogleLocationProvider {
 
     @Override
     public Location getLocation(double latitude, double longitude) {
-        return new Location(54.63, 25.32, "LT", "Vilnius");
+        return new Location(latitude, longitude, "LT", "Vilnius");
     }
 
 }

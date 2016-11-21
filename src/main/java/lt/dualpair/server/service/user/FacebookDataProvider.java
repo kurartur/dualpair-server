@@ -122,7 +122,7 @@ public class FacebookDataProvider implements SocialDataProvider {
             Album profilePictureAlbum = getProfilePictureAlbum(albums);
             if (profilePictureAlbum != null) {
                 for (org.springframework.social.facebook.api.Photo photo : facebook.mediaOperations().getPhotos(profilePictureAlbum.getId())) {
-                    user.getPhotos().add(buildPhoto(photo, user));
+                    user.addPhoto(buildPhoto(photo, user));
                 }
             }
         }

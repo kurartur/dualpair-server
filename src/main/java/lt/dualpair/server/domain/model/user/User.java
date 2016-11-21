@@ -65,7 +65,7 @@ public class User implements SocialUserDetails, Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<UserLocation> locations = new ArrayList<>();
 
     public User() {}
@@ -117,7 +117,7 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public Set<UserAccount> getUserAccounts() {
-        return userAccounts;
+        return Collections.unmodifiableSet(userAccounts);
     }
 
     public void setUserAccounts(Set<UserAccount> userAccounts) {
@@ -130,7 +130,7 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public Set<Sociotype> getSociotypes() {
-        return sociotypes;
+        return Collections.unmodifiableSet(sociotypes);
     }
 
     public Sociotype getRandomSociotype() {
@@ -202,7 +202,15 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public List<Photo> getPhotos() {
-        return photos;
+        return Collections.unmodifiableList(photos);
+    }
+
+    public void deletePhoto(Photo photo) {
+        photos.remove(photo);
+    }
+
+    public void addPhoto(Photo photo) {
+        photos.add(photo);
     }
 
     public void setPhotos(List<Photo> photos) {
@@ -214,12 +222,12 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public UserLocation getRecentLocation() {
-        return locations.isEmpty() ? null : locations.get(0);
+        return locations.isEmpty() ? null : locations.get(locations.size() - 1);
     }
 
-    public void addLocation(UserLocation location) {
-        this.locations.clear();
-        this.locations.add(location);
+    public void addLocation(UserLocation location, int locationCount) {
+        locations.removeIf(loc -> locations.indexOf(loc) <= (locations.size() - locationCount));
+        locations.add(location);
     }
 
     @Override

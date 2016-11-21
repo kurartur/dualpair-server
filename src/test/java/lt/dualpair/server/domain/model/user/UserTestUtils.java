@@ -22,7 +22,7 @@ public class UserTestUtils {
         user.setSociotypes(sociotypes);
 
         user.setGender(User.Gender.MALE);
-        user.addLocation(new UserLocation(user, 10.0, 11.0, "LT", "Vilnius"));
+        user.addLocation(new UserLocation(user, 10.0, 11.0, "LT", "Vilnius"), 1);
 
         return user;
     }

@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -222,6 +223,31 @@ public class ITUserControllerTest extends BaseRestControllerTest {
         assertEquals(25.32, locations.get("longitude"));
         assertEquals("LT", locations.get("country_code"));
         assertEquals("Vilnius", locations.get("city"));
+    }
+
+    @Test
+    @DatabaseSetup("userTest_setLocation.xml")
+    public void testSetLocation_oldLocationsDeleted() throws Exception {
+        for (double i = 0.0; i <= 10.0; i += 1.0) {
+            putLocation(i, i);
+        }
+        List<Map<String, Object>> locations = jdbcTemplate.queryForList("select * from user_locations where user_id=1 order by id asc");
+        assertEquals(5, locations.size());
+        double latLon = 6;
+        for (Map<String, Object> map : locations) {
+            assertEquals(latLon, map.get("latitude"));
+            assertEquals(latLon, map.get("longitude"));
+            latLon += 1.0;
+        }
+    }
+
+    private void putLocation(Double latitude, Double longitude) throws Exception {
+        String data = "{\"latitude\": " + latitude.toString() + ", \"longitude\": " + longitude.toString() + "}";
+        mockMvc.perform(put("/api/user/1/locations")
+                .with(bearerToken(1L))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(data.getBytes())).andExpect(status().isCreated());
+        flushPersistenceContext();
     }
 
     @Test

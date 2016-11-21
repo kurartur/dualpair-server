@@ -41,7 +41,7 @@ public class DefaultMatchFinderTest {
         User user = createUser(1L, Sociotype.Code1.EII);
         User opponent = createUser(2L, Sociotype.Code1.LSE);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
-        opponent.addLocation(UserLocationTestUtils.createUserLocation(12, "LT"));
+        opponent.addLocation(UserLocationTestUtils.createUserLocation(12, "LT"), 1);
         Set<User> opponents = new HashSet<>(Collections.singletonList(opponent));
         when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.EII, RelationType.Code.DUAL)).thenReturn(pairSociotype);
         when(userRepository.findOpponents(any(UserRepositoryImpl.FindOpponentsParams.class))).thenReturn(opponents);
@@ -59,7 +59,7 @@ public class DefaultMatchFinderTest {
         User user = createUser(1L, Sociotype.Code1.EII);
         User opponent = createUser(2L, Sociotype.Code1.LSE);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
-        opponent.addLocation(UserLocationTestUtils.createUserLocation(12, "LT"));
+        opponent.addLocation(UserLocationTestUtils.createUserLocation(12, "LT"), 1);
         Set<User> opponents = new HashSet<>(Collections.singletonList(opponent));
         when(sociotypeRepository.findOppositeByRelationType(Sociotype.Code1.EII, RelationType.Code.DUAL)).thenReturn(pairSociotype);
         when(userRepository.findOpponents(any(UserRepositoryImpl.FindOpponentsParams.class))).thenReturn(opponents);
@@ -75,9 +75,9 @@ public class DefaultMatchFinderTest {
         User opponent2 = createUser(3L, Sociotype.Code1.LSE);
         User opponent3 = createUser(4L, Sociotype.Code1.LSE);
         Sociotype pairSociotype = createSociotype(Sociotype.Code1.LSE);
-        opponent1.addLocation(UserLocationTestUtils.createUserLocation(12, "LT"));
-        opponent2.addLocation(UserLocationTestUtils.createUserLocation(13, "LT"));
-        opponent3.addLocation(UserLocationTestUtils.createUserLocation(14, "LT"));
+        opponent1.addLocation(UserLocationTestUtils.createUserLocation(12, "LT"), 5);
+        opponent2.addLocation(UserLocationTestUtils.createUserLocation(13, "LT"), 5);
+        opponent3.addLocation(UserLocationTestUtils.createUserLocation(14, "LT"), 5);
         Set<User> opponents = new LinkedHashSet<>();
         opponents.add(opponent1);
         opponents.add(opponent2);

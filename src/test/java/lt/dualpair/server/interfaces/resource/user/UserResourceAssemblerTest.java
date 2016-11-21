@@ -46,7 +46,7 @@ public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
         doReturn(new ArrayList<>(sociotypeResources)).when(sociotypeResourceAssembler).toResources(sociotypes);
 
         UserLocation location = new UserLocation(user, 10.0, 11.0, "LT", "Vilnius");
-        user.addLocation(location);
+        user.addLocation(location, 1);
 
         Photo photo = new Photo();
         user.setPhotos(Arrays.asList(photo));
