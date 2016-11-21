@@ -8,6 +8,8 @@ import org.junit.Test;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.facebook.api.*;
+import org.springframework.social.support.URIBuilder;
+import org.springframework.web.client.RestOperations;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -25,6 +27,7 @@ public class FacebookDataProviderTest {
     private Facebook facebook = mock(Facebook.class);
     private UserOperations userOperations = mock(UserOperations.class);
     private MediaOperations mediaOperations = mock(MediaOperations.class);
+    private RestOperations restOperations = mock(RestOperations.class);
     private org.springframework.social.facebook.api.User facebookUser = mock(org.springframework.social.facebook.api.User.class);
     private UserProfile userProfile = new UserProfile("id", "name", "firstName", "lastName", "email", "username");
 
@@ -35,6 +38,7 @@ public class FacebookDataProviderTest {
         when(facebookConnection.fetchUserProfile()).thenReturn(userProfile);
         when(facebook.userOperations()).thenReturn(userOperations);
         when(facebook.mediaOperations()).thenReturn(mediaOperations);
+        when(facebook.restOperations()).thenReturn(restOperations);
         when(userOperations.getUserProfile()).thenReturn(facebookUser);
     }
 
@@ -116,7 +120,7 @@ public class FacebookDataProviderTest {
 
     @Test
     public void testGetPhoto_exception() throws Exception {
-        doThrow(new RuntimeException("Exception")).when(mediaOperations).getPhoto("1");
+        doThrow(new RuntimeException("Exception")).when(restOperations).getForObject(URIBuilder.fromUri("https://graph.facebook.com/v2.5/1?fields=source").build(), org.springframework.social.facebook.api.Photo.class);
         assertFalse(facebookDataProvider.getPhoto("1").isPresent());
     }
 
@@ -125,7 +129,7 @@ public class FacebookDataProviderTest {
         org.springframework.social.facebook.api.Photo fbPhoto = mock(org.springframework.social.facebook.api.Photo.class);
         when(fbPhoto.getSource()).thenReturn("url");
         when(fbPhoto.getId()).thenReturn("id");
-        doReturn(fbPhoto).when(mediaOperations).getPhoto("1");
+        doReturn(fbPhoto).when(restOperations).getForObject(URIBuilder.fromUri("https://graph.facebook.com/v2.5/1?fields=source").build(), org.springframework.social.facebook.api.Photo.class);
         Optional<Photo> optionalPhoto = facebookDataProvider.getPhoto("1");
         assertTrue(optionalPhoto.isPresent());
         Photo photo = optionalPhoto.get();

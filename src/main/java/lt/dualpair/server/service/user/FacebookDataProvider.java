@@ -9,8 +9,11 @@ import org.springframework.social.facebook.api.Album;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.MediaOperations;
 import org.springframework.social.facebook.api.PagedList;
+import org.springframework.social.support.URIBuilder;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestOperations;
 
+import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -72,7 +75,9 @@ public class FacebookDataProvider implements SocialDataProvider {
     @Override
     public Optional<Photo> getPhoto(String photoId) {
         try {
-            org.springframework.social.facebook.api.Photo fbPhoto = facebookConnection.getApi().mediaOperations().getPhoto(photoId);
+            RestOperations restOperations = facebookConnection.getApi().restOperations();
+            URI uri = URIBuilder.fromUri("https://graph.facebook.com/v2.5/" + photoId + "?fields=source").build();
+            org.springframework.social.facebook.api.Photo fbPhoto = restOperations.getForObject(uri, org.springframework.social.facebook.api.Photo.class);
             if (fbPhoto != null) {
                 Photo photo = new Photo();
                 photo.setIdOnAccount(fbPhoto.getId());
@@ -82,6 +87,7 @@ public class FacebookDataProvider implements SocialDataProvider {
             }
             return Optional.empty();
         } catch (Exception e) {
+            logger.warn(e);
             return Optional.empty();
         }
     }

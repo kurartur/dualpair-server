@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +21,9 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class OAuthServerConfiguration {
@@ -47,7 +51,28 @@ public class OAuthServerConfiguration {
     @EnableAuthorizationServer
     protected static class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
-        private TokenStore tokenStore = new InMemoryTokenStore();
+        @Configuration
+        protected static class TokenStoreConfiguration {
+
+            @Autowired
+            protected DataSource dataSource;
+
+            @Bean(name = "tokenStore")
+            @Profile("!it")
+            public TokenStore jdbcTokenStore(DataSource dataSource) {
+                return new JdbcTokenStore(dataSource);
+            }
+
+            @Bean(name = "tokenStore")
+            @Profile("it")
+            public TokenStore inMemoryTokenStore() {
+                return new InMemoryTokenStore();
+            }
+
+        }
+
+        @Autowired
+        protected TokenStore tokenStore;
 
         @Autowired
         @Qualifier("authenticationManagerBean")
@@ -85,7 +110,7 @@ public class OAuthServerConfiguration {
         public AuthorizationServerTokenServices tokenServices() {
             DefaultTokenServices tokenServices = new DefaultTokenServices();
             tokenServices.setSupportRefreshToken(true);
-            tokenServices.setTokenStore(this.tokenStore);
+            tokenServices.setTokenStore(tokenStore);
             return tokenServices;
         }
 
