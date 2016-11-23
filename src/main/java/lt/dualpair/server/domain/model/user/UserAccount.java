@@ -47,7 +47,8 @@ public class UserAccount implements Serializable {
 
     public enum Type {
         FACEBOOK("FB"),
-        VKONTAKTE("VK");
+        VKONTAKTE("VK"),
+        FAKE("FK");
         private String code;
         Type(String code) {
             this.code = code;
