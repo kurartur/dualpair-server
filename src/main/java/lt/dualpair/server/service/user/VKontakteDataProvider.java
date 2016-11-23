@@ -2,6 +2,7 @@ package lt.dualpair.server.service.user;
 
 import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.UserAccount;
 import org.jboss.logging.Logger;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.vkontakte.api.VKontakte;
@@ -11,10 +12,8 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class VKontakteDataProvider implements SocialDataProvider {
 
@@ -28,7 +27,7 @@ public class VKontakteDataProvider implements SocialDataProvider {
 
     @Override
     public String getAccountId() {
-        return Long.toString(vkontakteConnection.getApi().usersOperations().getUser().getId());
+        return Long.toString(getUserId());
     }
 
     @Override
@@ -49,15 +48,25 @@ public class VKontakteDataProvider implements SocialDataProvider {
             }
         }
 
-        //addPhotos(user, vKontakte);
+        user.setPhotos(vKontakte.mediaOperations().getProfilePhotos(vkUser.getId(), 5)
+                .getItems()
+                .stream()
+                .map(vkPhoto -> {
+                    Photo photo = new Photo();
+                    photo.setUser(user);
+                    photo.setSourceLink(vkPhoto.getPhoto604());
+                    photo.setIdOnAccount(Long.toString(vkPhoto.getPhotoId()));
+                    photo.setAccountType(UserAccount.Type.VKONTAKTE);
+                    return photo;
+                }).collect(Collectors.toList()));
 
         return user;
     }
 
     private User.Gender resolveGender(String gender) throws SocialDataException {
-        if ("2".equals(gender)) {
+        if ("M".equals(gender)) {
             return User.Gender.MALE;
-        } else if ("1".equals(gender)) {
+        } else if ("W".equals(gender)) {
             return User.Gender.FEMALE;
         } else {
             logger.error("Invalid gender " + gender);
@@ -75,11 +84,35 @@ public class VKontakteDataProvider implements SocialDataProvider {
 
     @Override
     public List<Photo> getPhotos() {
-        return new ArrayList<>();
+        return vkontakteConnection.getApi().mediaOperations().getAll(getUserId(), 20)
+                .getItems()
+                .stream()
+                .map(vkPhoto -> {
+                    Photo photo = new Photo();
+                    photo.setAccountType(UserAccount.Type.VKONTAKTE);
+                    photo.setIdOnAccount(Long.toString(vkPhoto.getPhotoId()));
+                    photo.setSourceLink(vkPhoto.getPhoto604());
+                    return photo;
+                }).collect(Collectors.toList());
     }
 
     @Override
     public Optional<Photo> getPhoto(String idOnAccount) {
-        return null;
+        Map<String, String> userAndPhotoIds = new HashMap<>();
+        userAndPhotoIds.put(getAccountId(), idOnAccount);
+        List<org.springframework.social.vkontakte.api.attachment.Photo> vkPhotos = vkontakteConnection.getApi().mediaOperations().getById(userAndPhotoIds);
+        if (vkPhotos == null || vkPhotos.isEmpty()) {
+            return Optional.empty();
+        }
+        org.springframework.social.vkontakte.api.attachment.Photo vkPhoto = vkPhotos.get(0);
+        Photo photo = new Photo();
+        photo.setIdOnAccount(idOnAccount);
+        photo.setAccountType(UserAccount.Type.VKONTAKTE);
+        photo.setSourceLink(vkPhoto.getPhoto604());
+        return Optional.of(photo);
+    }
+
+    private Long getUserId() {
+        return vkontakteConnection.getApi().usersOperations().getUser().getId();
     }
 }

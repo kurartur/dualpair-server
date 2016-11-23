@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 @Service("socialUserService")
 public class SocialUserServiceImpl extends UserServiceImpl implements SocialUserService {
@@ -36,6 +37,8 @@ public class SocialUserServiceImpl extends UserServiceImpl implements SocialUser
         UserAccount.Type accountType;
         if (socialDataProvider instanceof FacebookDataProvider) {
             accountType = UserAccount.Type.FACEBOOK;
+        } else if (socialDataProvider instanceof VKontakteDataProvider) {
+            accountType = UserAccount.Type.VKONTAKTE;
         } else {
             throw new IllegalArgumentException("Unsupported connection type");
         }
@@ -96,11 +99,8 @@ public class SocialUserServiceImpl extends UserServiceImpl implements SocialUser
     @Transactional
     public Photo addUserPhoto(Long userId, UserAccount.Type accountType, String idOnAccount, int position) {
         User user = loadUserById(userId);
-        Optional<Photo> photoOptional = socialDataProviderFactory.getProvider(accountType, user.getUsername()).getPhoto(idOnAccount);
-        if (!photoOptional.isPresent()) {
-            throw new IllegalArgumentException("Photo doesn't exist on account or is not public");
-        }
-        Photo photo = photoOptional.get();
+        Photo photo = socialDataProviderFactory.getProvider(accountType, user.getUsername())
+                .getPhoto(idOnAccount).orElseThrow((Supplier<RuntimeException>) () -> new IllegalArgumentException("Photo doesn't exist on account or is not public"));
         photo.setUser(user);
         photo.setPosition(position);
         photoRepository.save(photo);

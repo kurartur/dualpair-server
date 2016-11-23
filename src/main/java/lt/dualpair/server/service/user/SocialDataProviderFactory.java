@@ -22,6 +22,8 @@ public class SocialDataProviderFactory {
 
         if (connection.getApi() instanceof Facebook) {
             return new FacebookDataProvider(connection);
+        } else if (connection.getApi() instanceof VKontakte) {
+            return new VKontakteDataProvider(connection);
         } else {
             throw new IllegalArgumentException("Provider not found");
         }
