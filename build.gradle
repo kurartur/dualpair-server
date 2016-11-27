@@ -10,6 +10,10 @@ repositories {
     mavenCentral()
     maven {
         url "http://192.168.1.110:8081/repository/maven-snapshots/"
+        credentials {
+            username mavenLocalUsername
+            password mavenLocalPassword
+        }
         //url "http://fugru.com/archiva/repository/snapshots"
     }
 }
