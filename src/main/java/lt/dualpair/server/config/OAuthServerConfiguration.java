@@ -98,7 +98,7 @@ public class OAuthServerConfiguration {
             clients
                     .inMemory()
                         .withClient("dualpairandroid")
-                        .authorizedGrantTypes("authorization_code")
+                        .authorizedGrantTypes("authorization_code", "refresh_token")
                         .secret("secret")
                         .scopes("trust")
                         .autoApprove(true);

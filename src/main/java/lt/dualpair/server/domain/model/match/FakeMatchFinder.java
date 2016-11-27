@@ -31,9 +31,11 @@ public class FakeMatchFinder implements MatchFinder {
         Set<User.Gender> genders = matchRequest.getGenders();
         int index = random.nextInt(genders.size());
         User.Gender gender = new ArrayList<>(genders).get(index);
-        RandomUser randomUser = getRestTemplate().getForObject(buildUrl(gender), RandomUser.class);
+        RandomResults randomResults = getRestTemplate().getForObject(buildUrl(gender), RandomResults.class);
+        RandomUser randomUser = randomResults.results.get(0);
 
         User user = new User();
+        user.setUsername(randomUser.email);
         user.setGender(gender);
         user.setEmail(randomUser.email);
         user.setName(randomUser.name.first);
@@ -49,7 +51,7 @@ public class FakeMatchFinder implements MatchFinder {
         // accounts
         UserAccount userAccount = new UserAccount(user);
         userAccount.setAccountType(UserAccount.Type.FAKE);
-        userAccount.setAccountId(randomUser.id.name + randomUser.id.value);
+        userAccount.setAccountId(randomUser.email);
         Set<UserAccount> userAccounts = new HashSet<>();
         user.setUserAccounts(userAccounts);
 
@@ -64,15 +66,22 @@ public class FakeMatchFinder implements MatchFinder {
 
         // photos
         Photo photo1 = new Photo();
+        photo1.setUser(user);
         photo1.setAccountType(UserAccount.Type.FAKE);
-        photo1.setSourceLink(randomUser.picture.medium);
+        photo1.setSourceLink(randomUser.picture.large);
         photo1.setIdOnAccount("1");
         Photo photo2 = new Photo();
+        photo2.setUser(user);
         photo2.setAccountType(UserAccount.Type.FAKE);
-        photo2.setSourceLink(randomUser.picture.medium);
+        photo2.setSourceLink(randomUser.picture.large);
         photo2.setIdOnAccount("2");
         List<Photo> photos = Arrays.asList(photo1, photo2);
         user.setPhotos(photos);
+
+        // search parameters
+        SearchParameters searchParameters = new SearchParameters();
+        searchParameters.setUser(user);
+        user.setSearchParameters(searchParameters);
 
         userRepository.save(user);
 
@@ -118,39 +127,37 @@ public class FakeMatchFinder implements MatchFinder {
         this.relationTypeRepository = relationTypeRepository;
     }
 
+    public static final class RandomResults {
+
+        public List<RandomUser> results;
+
+    }
+
     public static final class RandomUser {
 
-        private String gender;
-        private RandomUserName name;
-        private String email;
-        private RandomUserId id;
-        private RandomUserPicture picture;
-        private RandomUserLocation location;
+        public String gender;
+        public RandomUserName name;
+        public String email;
+        public RandomUserPicture picture;
+        public RandomUserLocation location;
 
     }
 
     public static final class RandomUserName {
 
-        private String first;
-
-    }
-
-    public static final class RandomUserId {
-
-        private String name;
-        private String value;
+        public String first;
 
     }
 
     public static final class RandomUserPicture {
 
-        private String medium;
+        public String large;
 
     }
 
     public static final class RandomUserLocation {
 
-        private String city;
+        public String city;
     }
 
     /*

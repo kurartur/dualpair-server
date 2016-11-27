@@ -1,3 +1,6 @@
+server:
+    port: 80
+
 logging:
   level:
     org.springframework.security: DEBUG
@@ -17,10 +20,11 @@ spring:
       enabled: true
   social:
     facebook:
-      appId: 454804811371783
-      appSecret: 593c01a75ec0c4eba76f96abff6a069e
+      appId: fake
+      appSecret: fake
     vkontakte:
-      appId: 5680310
-      appSecret: VkqmRK68x2QjArW6VHjm
+      appId: fake
+      appSecret: fake
 
 googleApiKey: fakeKey
+fakeMatches: false

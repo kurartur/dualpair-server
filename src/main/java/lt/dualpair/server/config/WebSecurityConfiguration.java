@@ -61,7 +61,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                     }
                 })
             .and().authorizeRequests()
-                .antMatchers("/auth/**", "/signup/**", "/signin/**", "/oauth/**", "/images/**", "/js/**").permitAll()
+                .antMatchers("/auth/**", "/signup/**", "/signin/**", "/oauth/**", "/images/**", "/js/**", "/privacy").permitAll()
                 .antMatchers("/**").authenticated()
             .and().rememberMe()
             .and().csrf().disable()

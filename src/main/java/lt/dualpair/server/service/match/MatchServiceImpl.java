@@ -8,6 +8,7 @@ import lt.dualpair.server.infrastructure.notification.NotificationType;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -22,6 +23,10 @@ public class MatchServiceImpl implements MatchService {
     private MatchRepository matchRepository;
     private UserService userService;
     private NotificationSender notificationSender;
+    private FakeMatchFinder fakeMatchFinder;
+
+    @Value("${fakeMatches}")
+    private boolean fakeMatches;
 
     @Override
     @Transactional
@@ -29,6 +34,9 @@ public class MatchServiceImpl implements MatchService {
         Match match = repositoryMatchFinder.findOne(matchRequest);
         if (match == null) {
             match = defaultMatchFinder.findOne(matchRequest);
+        }
+        if (match == null && fakeMatches) {
+            match = fakeMatchFinder.findOne(matchRequest);
         }
         if (match != null) {
             matchRepository.save(match);
@@ -84,4 +92,8 @@ public class MatchServiceImpl implements MatchService {
         this.notificationSender = notificationSender;
     }
 
+    @Autowired
+    public void setFakeMatchFinder(FakeMatchFinder fakeMatchFinder) {
+        this.fakeMatchFinder = fakeMatchFinder;
+    }
 }
