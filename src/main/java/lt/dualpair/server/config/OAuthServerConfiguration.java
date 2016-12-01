@@ -1,5 +1,6 @@
 package lt.dualpair.server.config;
 
+import lt.dualpair.server.infrastructure.authentication.SocialTokenGranter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -17,13 +18,17 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.CompositeTokenGranter;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+import org.springframework.social.security.SocialAuthenticationServiceLocator;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
 
 @Configuration
 public class OAuthServerConfiguration {
@@ -79,6 +84,9 @@ public class OAuthServerConfiguration {
         protected AuthenticationManager authenticationManager;
 
         @Autowired
+        protected SocialAuthenticationServiceLocator authServiceLocator;
+
+        @Autowired
         protected UserDetailsService userService;
 
         @Autowired
@@ -86,7 +94,12 @@ public class OAuthServerConfiguration {
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+            CompositeTokenGranter tokenGranter = new CompositeTokenGranter(Arrays.asList(endpoints.getTokenGranter()));
+            tokenGranter.addTokenGranter(new SocialTokenGranter(authenticationManager, authServiceLocator,
+                    tokenServices(), clientDetailsService, new DefaultOAuth2RequestFactory(clientDetailsService)));
+
             endpoints
+                    .tokenGranter(tokenGranter)
                     .tokenStore(tokenStore)
                     .tokenServices(tokenServices())
                     .authenticationManager(authenticationManager)
@@ -98,10 +111,10 @@ public class OAuthServerConfiguration {
             clients
                     .inMemory()
                         .withClient("dualpairandroid")
-                        .authorizedGrantTypes("authorization_code", "refresh_token")
-                        .secret("secret")
-                        .scopes("trust")
-                        .autoApprove(true);
+                            .authorizedGrantTypes("social", "refresh_token")
+                            .secret("secret")
+                            .scopes("trust")
+                            .autoApprove(true);
         }
 
         @Bean

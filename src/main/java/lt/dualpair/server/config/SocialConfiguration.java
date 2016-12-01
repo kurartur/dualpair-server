@@ -1,5 +1,7 @@
 package lt.dualpair.server.config;
 
+import lt.dualpair.server.infrastructure.authentication.ConnectionSignUpImpl;
+import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,10 +11,7 @@ import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.social.config.annotation.ConnectionFactoryConfigurer;
 import org.springframework.social.config.annotation.EnableSocial;
 import org.springframework.social.config.annotation.SocialConfigurerAdapter;
-import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionFactoryLocator;
-import org.springframework.social.connect.ConnectionRepository;
-import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.*;
 import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.mem.InMemoryUsersConnectionRepository;
 import org.springframework.social.connect.web.GenericConnectionStatusView;
@@ -24,16 +23,28 @@ import javax.sql.DataSource;
 @Configuration
 public class SocialConfiguration {
 
+
+
     @Configuration
     @Profile("!it")
     protected static class JdbcUsersConnectionRepositoryConfigurerAdapter extends SocialConfigurerAdapter {
 
         @Autowired
+        protected SocialUserService socialUserService;
+
+        @Autowired
         protected DataSource dataSource;
+
+        @Bean
+        protected ConnectionSignUp connectionSignUp() {
+            return new ConnectionSignUpImpl(socialUserService);
+        }
 
         @Override
         public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
-            return new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText()); // TODO text encryptor
+            JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText()); // TODO text encryptor
+            repository.setConnectionSignUp(connectionSignUp());
+            return repository;
         }
     }
 
