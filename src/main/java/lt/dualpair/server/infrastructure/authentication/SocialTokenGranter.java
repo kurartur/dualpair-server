@@ -1,6 +1,8 @@
 package lt.dualpair.server.infrastructure.authentication;
 
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AccountStatusException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.security.oauth2.provider.*;
@@ -13,6 +15,7 @@ import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.social.security.SocialAuthenticationServiceLocator;
 import org.springframework.social.security.SocialAuthenticationToken;
 import org.springframework.social.security.provider.SocialAuthenticationService;
+import org.springframework.util.StringUtils;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -43,11 +46,10 @@ public class SocialTokenGranter extends AbstractTokenGranter {
 
         String accessToken = parameters.get("access_token");
         String scope = parameters.get("scope");
-        String refreshToken = parameters.get("refresh_token");
-        Long expiresIn = Long.valueOf(parameters.get("expires_in"));
+        Long expiresIn = StringUtils.isEmpty(parameters.get("expires_in")) ? null : Long.valueOf(parameters.get("expires_in"));
         String authProviderId = parameters.get("provider");
 
-        AccessGrant accessGrant = new AccessGrant(accessToken, scope, refreshToken, expiresIn);
+        AccessGrant accessGrant = new AccessGrant(accessToken, scope, null, expiresIn);
 
         Set<String> authProviders = authServiceLocator.registeredAuthenticationProviderIds();
         if (authProviders.isEmpty() || authProviderId == null || !authProviders.contains(authProviderId)) {

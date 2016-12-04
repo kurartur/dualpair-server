@@ -1,7 +1,5 @@
 package lt.dualpair.server.config;
 
-import lt.dualpair.server.infrastructure.authentication.ConnectionSignUpImpl;
-import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,37 +13,41 @@ import org.springframework.social.connect.*;
 import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.mem.InMemoryUsersConnectionRepository;
 import org.springframework.social.connect.web.GenericConnectionStatusView;
+import org.springframework.social.security.SocialAuthenticationProvider;
+import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.vkontakte.api.VKontakte;
 import org.springframework.social.vkontakte.connect.VKontakteConnectionFactory;
 
 import javax.sql.DataSource;
 
 @Configuration
+@EnableSocial
 public class SocialConfiguration {
 
-
+    @Bean
+    @Autowired
+    public SocialAuthenticationProvider socialAuthenticationProvider(SocialUserDetailsService socialUserDetailsService,
+                                                                     UsersConnectionRepository usersConnectionRepository) {
+        return new SocialAuthenticationProvider(usersConnectionRepository, socialUserDetailsService);
+    }
 
     @Configuration
     @Profile("!it")
     protected static class JdbcUsersConnectionRepositoryConfigurerAdapter extends SocialConfigurerAdapter {
 
         @Autowired
-        protected SocialUserService socialUserService;
-
-        @Autowired
         protected DataSource dataSource;
 
-        @Bean
-        protected ConnectionSignUp connectionSignUp() {
-            return new ConnectionSignUpImpl(socialUserService);
-        }
+        @Autowired
+        protected ConnectionSignUp connectionSignUp;
 
         @Override
         public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
             JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText()); // TODO text encryptor
-            repository.setConnectionSignUp(connectionSignUp());
+            repository.setConnectionSignUp(connectionSignUp);
             return repository;
         }
+
     }
 
     @Configuration
@@ -60,7 +62,6 @@ public class SocialConfiguration {
 
 
     @Configuration
-    @EnableSocial
     @EnableConfigurationProperties(VKontakteConfigurerAdapter.VKontakteProperties.class)
     protected static class VKontakteConfigurerAdapter extends SocialConfigurerAdapter {
 

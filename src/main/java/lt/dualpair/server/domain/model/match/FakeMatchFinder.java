@@ -81,6 +81,10 @@ public class FakeMatchFinder implements MatchFinder {
         // search parameters
         SearchParameters searchParameters = new SearchParameters();
         searchParameters.setUser(user);
+        searchParameters.setMinAge(matchRequest.getMinAge());
+        searchParameters.setMaxAge(matchRequest.getMaxAge());
+        searchParameters.setSearchFemale(true);
+        searchParameters.setSearchMale(true);
         user.setSearchParameters(searchParameters);
 
         userRepository.save(user);

@@ -3,7 +3,6 @@ package lt.dualpair.server.service.user;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.facebook.api.Facebook;
@@ -16,18 +15,6 @@ import org.thymeleaf.util.Validate;
 public class SocialDataProviderFactory {
 
     private UsersConnectionRepository usersConnectionRepository;
-
-    public SocialDataProvider getProvider(Connection connection) {
-        Validate.notNull(connection, "Connection required");
-
-        if (connection.getApi() instanceof Facebook) {
-            return new FacebookDataProvider(connection);
-        } else if (connection.getApi() instanceof VKontakte) {
-            return new VKontakteDataProvider(connection);
-        } else {
-            throw new IllegalArgumentException("Provider not found");
-        }
-    }
 
     public SocialDataProvider getProvider(UserAccount.Type accountType, String username) {
         Validate.notNull(accountType, "Account type required");

@@ -5,10 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UsersConnectionRepository;
-import org.springframework.social.connect.support.OAuth2Connection;
 import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.connect.FacebookAdapter;
-import org.springframework.social.facebook.connect.FacebookServiceProvider;
 import org.springframework.social.vkontakte.api.VKontakte;
 
 import static org.junit.Assert.*;
@@ -22,23 +19,6 @@ public class SocialDataProviderFactoryTest {
     @Before
     public void setUp() throws Exception {
         socialDataProviderFactory.setUsersConnectionRepository(usersConnectionRepository);
-    }
-
-    @Test
-    public void testGetProvider_connection_nullParameters() throws Exception {
-        try {
-            socialDataProviderFactory.getProvider(null);
-            fail();
-        } catch (IllegalArgumentException iae) {
-            assertEquals("Connection required", iae.getMessage());
-        }
-    }
-
-    @Test
-    public void testGetProvider_connection_facebook() throws Exception {
-        FacebookServiceProvider facebookServiceProvider = new FacebookServiceProvider("appId", "appSecret", "appNamespace");
-        SocialDataProvider socialDataProvider = socialDataProviderFactory.getProvider(new OAuth2Connection<>(null, null, null, null, null, facebookServiceProvider, mock(FacebookAdapter.class)));
-        assertTrue(socialDataProvider instanceof FacebookDataProvider);
     }
 
     @Test

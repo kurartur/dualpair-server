@@ -54,12 +54,6 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void testBuildAlternativeId() throws Exception {
-        String hash = userService.buildUserId("mymail@google.com", 123456789L);
-        assertEquals("fb77d8e5c02d0dac8d7d12bcdff36f5a", hash);
-    }
-
-    @Test
     public void testSetUserSociotypes_invalidCount() throws Exception {
         Set<Sociotype> sociotypes = new HashSet<>();
         User user = UserTestUtils.createUser();

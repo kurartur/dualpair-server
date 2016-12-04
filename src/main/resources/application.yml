@@ -2,29 +2,30 @@ server:
     port: 80
 
 logging:
-  level:
-    org.springframework.security: DEBUG
-    org.hibernate: ERROR
-    #org.springframework.jdbc: DEBUG
-    #org.hibernate.type: TRACE
-    #org.springframework.web: DEBUG
+    level:
+        org.springframework.security: DEBUG
+        org.hibernate: ERROR
+        #org.springframework.jdbc: DEBUG
+        #org.hibernate.type: TRACE
+        #org.springframework.web: DEBUG
 
 spring:
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-  jpa:
-    database: MYSQL
-    show-sql: true
-  resources:
-    chain:
-      enabled: true
-  social:
-    facebook:
-      appId: fake
-      appSecret: fake
-    vkontakte:
-      appId: fake
-      appSecret: fake
+    datasource:
+        driver-class-name: com.mysql.jdbc.Driver
+    jpa:
+        database: MYSQL
+        show-sql: true
+    resources:
+        chain:
+            enabled: true
+    social:
+        auto-connection-views: true
+        facebook:
+            appId: fake
+            appSecret: fake
+        vkontakte:
+            appId: fake
+            appSecret: fake
 
 googleApiKey: fakeKey
 fakeMatches: false

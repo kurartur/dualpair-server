@@ -18,10 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
@@ -54,27 +50,6 @@ public class UserServiceImpl implements UserService {
     public void updateUser(User user) {
         user.setDateUpdated(new Date());
         userRepository.save(user);
-    }
-
-    protected String buildUserId(String accountId, Long time) {
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            outputStream.write(accountId.getBytes("UTF-8"));
-            outputStream.write(time.toString().getBytes("UTF-8"));
-
-            byte[] md5 = messageDigest.digest(outputStream.toByteArray());
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < md5.length; ++i)
-                sb.append(Integer.toHexString((md5[i] & 0xFF) | 0x100).substring(1,3));
-
-            return sb.toString();
-        } catch (IOException | NoSuchAlgorithmException e) {
-            logger.error("Was not able to generate user id: " + e.getMessage(), e);
-            return time.toString();
-        }
     }
 
     @Override

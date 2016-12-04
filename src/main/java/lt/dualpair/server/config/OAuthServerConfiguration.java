@@ -3,11 +3,15 @@ package lt.dualpair.server.config;
 import lt.dualpair.server.infrastructure.authentication.SocialTokenGranter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -19,19 +23,32 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
+import org.springframework.security.oauth2.provider.refresh.RefreshTokenGranter;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+import org.springframework.social.security.SocialAuthenticationProvider;
 import org.springframework.social.security.SocialAuthenticationServiceLocator;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class OAuthServerConfiguration {
+
+    @Bean
+    @Qualifier("authenticationManagerBean")
+    public AuthenticationManager authenticationManager(SocialAuthenticationProvider socialAuthenticationProvider) {
+        List<AuthenticationProvider> providers = new ArrayList<>();
+        providers.add(new AnonymousAuthenticationProvider("AnonymousAuthenticationProvider"));
+        providers.add(socialAuthenticationProvider);
+        return new ProviderManager(providers);
+    }
 
     @Configuration
     @EnableResourceServer
@@ -84,7 +101,7 @@ public class OAuthServerConfiguration {
         protected AuthenticationManager authenticationManager;
 
         @Autowired
-        protected SocialAuthenticationServiceLocator authServiceLocator;
+        protected ApplicationContext applicationContext;
 
         @Autowired
         protected UserDetailsService userService;
@@ -94,9 +111,13 @@ public class OAuthServerConfiguration {
 
         @Override
         public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-            CompositeTokenGranter tokenGranter = new CompositeTokenGranter(Arrays.asList(endpoints.getTokenGranter()));
-            tokenGranter.addTokenGranter(new SocialTokenGranter(authenticationManager, authServiceLocator,
-                    tokenServices(), clientDetailsService, new DefaultOAuth2RequestFactory(clientDetailsService)));
+
+            SocialAuthenticationServiceLocator authServiceLocator = applicationContext.getBean(SocialAuthenticationServiceLocator.class);
+            CompositeTokenGranter tokenGranter = new CompositeTokenGranter(Arrays.asList(
+                    new SocialTokenGranter(authenticationManager, authServiceLocator,
+                            tokenServices(), clientDetailsService, new DefaultOAuth2RequestFactory(clientDetailsService)),
+                    new RefreshTokenGranter(tokenServices(), clientDetailsService, new DefaultOAuth2RequestFactory(clientDetailsService))
+            ));
 
             endpoints
                     .tokenGranter(tokenGranter)
@@ -126,6 +147,8 @@ public class OAuthServerConfiguration {
             tokenServices.setTokenStore(tokenStore);
             return tokenServices;
         }
+
+
 
     }
 
