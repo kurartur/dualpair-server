@@ -8,11 +8,14 @@ import lt.dualpair.server.infrastructure.authentication.ActiveUser;
 import lt.dualpair.server.infrastructure.persistence.repository.MatchPartyRepository;
 import lt.dualpair.server.service.match.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api/party")
@@ -20,6 +23,9 @@ public class MatchPartyController {
 
     private MatchService matchService;
     private MatchPartyRepository matchPartyRepository;
+
+    @Value("${fakeMatches}")
+    boolean fakeMatches;
 
     @RequestMapping(method = RequestMethod.PUT, value = "/{partyId:[0-9]+}/response")
     public ResponseEntity response(@PathVariable Long partyId, @RequestBody String responseString, @ActiveUser User principal) {
@@ -35,6 +41,17 @@ public class MatchPartyController {
         matchParty.setResponse(response);
         matchPartyRepository.save(matchParty);
         Match match = matchParty.getMatch();
+
+        // send random yes/no response if fake match
+        if (fakeMatches) {
+            MatchParty opposite = match.getOppositeMatchParty(principal.getId());
+            String description = opposite.getUser().getDescription();
+            if (!StringUtils.isEmpty(description) && description.startsWith("Lorem ipsum") && description.endsWith("FAKE")) {
+                opposite.setResponse(new Random().nextInt(2) == 1 ? Response.YES : Response.NO);
+                matchPartyRepository.save(opposite);
+            }
+        }
+
         matchService.sendMutualMatchNotifications(match);
         return ResponseEntity.ok().build();
     }

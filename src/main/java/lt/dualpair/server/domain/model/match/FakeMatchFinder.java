@@ -38,8 +38,12 @@ public class FakeMatchFinder implements MatchFinder {
         user.setUsername(randomUser.email);
         user.setGender(gender);
         user.setEmail(randomUser.email);
-        user.setName(randomUser.name.first);
+        user.setName(randomUser.name.first.substring(0, 1).toUpperCase() + randomUser.name.first.substring(1));
         user.setDateOfBirth(matchRequest.getUser().getDateOfBirth());
+        user.setDescription("Lorem ipsum dolor sit amet, consectetur adipiscing elit," +
+                " sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." +
+                " Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." +
+                " FAKE");
 
         // sociotypes
         Set<Sociotype> sociotypes = new HashSet<>();
@@ -50,7 +54,7 @@ public class FakeMatchFinder implements MatchFinder {
 
         // accounts
         UserAccount userAccount = new UserAccount(user);
-        userAccount.setAccountType(UserAccount.Type.FAKE);
+        userAccount.setAccountType(UserAccount.Type.FACEBOOK);
         userAccount.setAccountId(randomUser.email);
         Set<UserAccount> userAccounts = new HashSet<>();
         user.setUserAccounts(userAccounts);
@@ -61,18 +65,18 @@ public class FakeMatchFinder implements MatchFinder {
                 matchRequest.getLatitude(),
                 matchRequest.getLongitude(),
                 matchRequest.getCountryCode(),
-                randomUser.location.city);
+                randomUser.location.city.substring(0, 1).toUpperCase() + randomUser.location.city.substring(1));
         user.addLocation(userLocation, 1);
 
         // photos
         Photo photo1 = new Photo();
         photo1.setUser(user);
-        photo1.setAccountType(UserAccount.Type.FAKE);
+        photo1.setAccountType(UserAccount.Type.FACEBOOK);
         photo1.setSourceLink(randomUser.picture.large);
         photo1.setIdOnAccount("1");
         Photo photo2 = new Photo();
         photo2.setUser(user);
-        photo2.setAccountType(UserAccount.Type.FAKE);
+        photo2.setAccountType(UserAccount.Type.FACEBOOK);
         photo2.setSourceLink(randomUser.picture.large);
         photo2.setIdOnAccount("2");
         List<Photo> photos = Arrays.asList(photo1, photo2);
