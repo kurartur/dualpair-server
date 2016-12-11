@@ -15,7 +15,7 @@ import java.util.Set;
 
 public interface MatchRepository extends CrudRepository<Match, Long> {
 
-    @Query("select mp.match from MatchParty mp where mp.match.id = ?1 and mp.user.id = ?2")
+    @Query("select mp.match from MatchParty mp where mp.match.id = ?2 and mp.user.id = ?1")
     Optional<Match> findOneByUser(Long userId, Long matchId);
 
     @Query("select mp.match from MatchParty mp where mp.user = ?1 and mp.response = ?2")

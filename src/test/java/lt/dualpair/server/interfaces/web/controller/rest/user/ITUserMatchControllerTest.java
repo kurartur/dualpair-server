@@ -91,7 +91,7 @@ public class ITUserMatchControllerTest extends BaseRestControllerTest {
 
     @Test
     public void testGetMatch_notFound() throws Exception {
-        mockMvc.perform(get("/api/user/1/matches/6").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/user/1/matches/7").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound()).andReturn();
     }
 

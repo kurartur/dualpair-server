@@ -43,7 +43,7 @@ public class DirectConnectController {
     public ResponseEntity connect(@ActiveUser User user,
                                   @RequestParam("provider") String authProviderId,
                                   @RequestParam("accessToken") String accessToken,
-                                  @RequestParam("expiresIn") Long expiresIn,
+                                  @RequestParam(value = "expiresIn", required = false) Long expiresIn,
                                   @RequestParam(value = "scope", required = false) String scope) {
 
         AccessGrant accessGrant = new AccessGrant(accessToken, scope, null, expiresIn);
