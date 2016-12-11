@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.social.config.annotation.ConnectionFactoryConfigurer;
@@ -33,6 +34,7 @@ public class SocialConfiguration {
 
     @Configuration
     @Profile("!it")
+    @Order(1)
     protected static class JdbcUsersConnectionRepositoryConfigurerAdapter extends SocialConfigurerAdapter {
 
         @Autowired
