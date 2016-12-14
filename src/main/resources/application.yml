@@ -12,6 +12,8 @@ logging:
 spring:
     datasource:
         driver-class-name: com.mysql.jdbc.Driver
+        tomcat:
+          connection-properties: useUnicode=true;characterEncoding=UTF-8;
     jpa:
         database: MYSQL
         show-sql: true
