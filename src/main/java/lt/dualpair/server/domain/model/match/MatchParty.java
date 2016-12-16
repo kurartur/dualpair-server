@@ -3,6 +3,7 @@ package lt.dualpair.server.domain.model.match;
 import lt.dualpair.server.domain.model.user.User;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "match_parties")
@@ -21,6 +22,10 @@ public class MatchParty {
     private User user;
 
     private Response response = Response.UNDEFINED;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "response_time")
+    private Date responseDate;
 
     public MatchParty() {}
 
@@ -59,5 +64,6 @@ public class MatchParty {
 
     public void setResponse(Response response) {
         this.response = response;
+        responseDate = new Date();
     }
 }

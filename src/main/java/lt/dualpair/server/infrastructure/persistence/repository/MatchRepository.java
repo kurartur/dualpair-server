@@ -28,14 +28,16 @@ public interface MatchRepository extends CrudRepository<Match, Long> {
             "where mp1.user = ?1 and mp2.user <> ?1 and mp1.match = mp2.match " +
             "and m = mp1.match and m = mp2.match " +
             "and mp1.response = lt.dualpair.server.domain.model.match.Response.YES and mp2.response = lt.dualpair.server.domain.model.match.Response.YES " +
-            "and mp1.match.dateCreated <= ?2")
+            "and mp1.match.dateCreated <= ?2 " +
+            "order by mp1.match.dateBecameMutual desc")
     Page<Match> findMutual(User user, Date createdBefore, Pageable pageable);
 
     @Query(" select m from Match m, MatchParty mp1, MatchParty mp2 " +
             "where mp1.user = ?1 and mp2.user <> ?1 and mp1.match = mp2.match " +
             "and m = mp1.match and m = mp2.match " +
             "and mp1.response <> lt.dualpair.server.domain.model.match.Response.UNDEFINED " +
-            "and mp1.match.dateCreated <= ?2")
+            "and mp1.match.dateCreated <= ?2 " +
+            "order by mp1.responseDate desc")
     Page<Match> findReviewed(User user, Date createdBefore, Pageable pageable);
 
     @Query(" select mp1.match from MatchParty mp1, MatchParty mp2 " +

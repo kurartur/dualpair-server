@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 
@@ -50,6 +51,10 @@ public class MatchPartyController {
                 opposite.setResponse(new Random().nextInt(2) == 1 ? Response.YES : Response.NO);
                 matchPartyRepository.save(opposite);
             }
+        }
+
+        if (match.isMutual()) {
+            match.setDateBecameMutual(new Date());
         }
 
         matchService.sendMutualMatchNotifications(match);
