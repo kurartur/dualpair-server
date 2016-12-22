@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static junit.framework.TestCase.fail;
 import static org.junit.Assert.assertEquals;
@@ -38,8 +39,8 @@ public class RemoteTestEvaluatorTest {
         when(choiceRepository.findByCode("CHOICE2")).thenReturn(createChoice(2, "CHOICE2", "1"));
         when(choiceRepository.findByCode("CHOICE3")).thenReturn(createChoice(3, "CHOICE3", "10"));
         when(choiceRepository.findByCode("CHOICE4")).thenReturn(createChoice(4, "CHOICE4", "1"));
-        when(choicePairRepository.findOne(1)).thenReturn(createChoicePair(1, "e1"));
-        when(choicePairRepository.findOne(2)).thenReturn(createChoicePair(2, "e2"));
+        when(choicePairRepository.findOne(1)).thenReturn(Optional.of(createChoicePair(1, "e1")));
+        when(choicePairRepository.findOne(2)).thenReturn(Optional.of(createChoicePair(2, "e2")));
         when(sociotypeRepository.findByCode1(Sociotype.Code1.LSE)).thenReturn(createSociotype(1, Sociotype.Code1.LSE));
         remoteTestEvaluator.setChoiceRepository(choiceRepository);
         remoteTestEvaluator.setChoicePairRepository(choicePairRepository);

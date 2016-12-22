@@ -51,7 +51,8 @@ public class RemoteTestEvaluator implements TestEvaluator {
         dataString.append("w1=on&w2=on&w4=on&w3=on&");
         for (Map.Entry<String, String> entry : choices.entrySet()) {
             Choice choice = choiceRepository.findByCode(entry.getValue());
-            ChoicePair choicePair = choicePairRepository.findOne(Integer.valueOf(entry.getKey()));
+            ChoicePair choicePair = choicePairRepository.findOne(Integer.valueOf(entry.getKey()))
+              .orElseThrow(() -> new RuntimeException("Choice pair " + entry.getKey() + " not found"));
             dataString
                     .append(choicePair.getRemoteId())
                     .append("=")

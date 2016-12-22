@@ -12,6 +12,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -28,7 +29,7 @@ public class LocalTestEvaluatorTest {
     public void setUp() throws Exception {
         localTestEvaluator = new LocalTestEvaluator();
         sociotypeRepository = mock(SociotypeRepository.class);
-        when(sociotypeRepository.findOne(1)).thenReturn(createSociotype(1, Sociotype.Code2.ESTJ));
+        when(sociotypeRepository.findOne(1)).thenReturn(Optional.of(createSociotype(1, Sociotype.Code2.ESTJ)));
         localTestEvaluator.setSociotypeRepository(sociotypeRepository);
         db = new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.HSQL)

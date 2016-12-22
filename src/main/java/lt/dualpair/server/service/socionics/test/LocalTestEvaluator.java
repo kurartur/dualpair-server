@@ -24,7 +24,7 @@ public class LocalTestEvaluator implements TestEvaluator {
     public Sociotype evaluate(Map<String, String> choices) throws SocionicsTestException {
         try {
             Integer sociotypeId = getSociotypeId(choices);
-            return sociotypeRepository.findOne(sociotypeId);
+            return sociotypeRepository.findOne(sociotypeId).orElseGet(() -> null);
         } catch (EmptyResultDataAccessException e) {
             return null;
         } catch (DataAccessException e) {
