@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class MatchPartyControllerTest {
@@ -56,10 +56,27 @@ public class MatchPartyControllerTest {
         MatchParty matchParty = MatchPartyTestUtils.createMatchParty(1L, userPrincipal, Response.UNDEFINED);
         Match match = new Match();
         matchParty.setMatch(match);
+        match.setMatchParties(matchParty, MatchPartyTestUtils.createMatchParty(2L, new User(), Response.UNDEFINED));
         when(matchPartyRepository.findById(1L)).thenReturn(Optional.of(matchParty));
         ResponseEntity responseEntity = matchPartyController.response(1L, "YES", userPrincipal);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(Response.YES, matchParty.getResponse());
+        verify(matchPartyRepository, times(1)).save(matchParty);
+        verify(matchService, times(1)).sendMutualMatchNotifications(match);
+    }
+
+    @Test
+    public void testResponse_mutual() throws Exception {
+        MatchParty matchParty = MatchPartyTestUtils.createMatchParty(1L, userPrincipal, Response.UNDEFINED);
+        Match match = new Match();
+        assertNull(match.getDateBecameMutual());
+        matchParty.setMatch(match);
+        match.setMatchParties(matchParty, MatchPartyTestUtils.createMatchParty(2L, new User(), Response.YES));
+        when(matchPartyRepository.findById(1L)).thenReturn(Optional.of(matchParty));
+        ResponseEntity responseEntity = matchPartyController.response(1L, "YES", userPrincipal);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(Response.YES, matchParty.getResponse());
+        assertNotNull(match.getDateBecameMutual());
         verify(matchPartyRepository, times(1)).save(matchParty);
         verify(matchService, times(1)).sendMutualMatchNotifications(match);
     }

@@ -32,6 +32,10 @@ public class Match implements Serializable, Identifiable<Long> {
     @Column(name = "create_time")
     private Date dateCreated = new Date();
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "mutual_time")
+    private Date dateBecameMutual;
+
     @Override
     public Long getId() {
         return id;
@@ -104,5 +108,13 @@ public class Match implements Serializable, Identifiable<Long> {
 
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
+    }
+
+    public Date getDateBecameMutual() {
+        return dateBecameMutual;
+    }
+
+    public void setDateBecameMutual(Date dateBecameMutual) {
+        this.dateBecameMutual = dateBecameMutual;
     }
 }
