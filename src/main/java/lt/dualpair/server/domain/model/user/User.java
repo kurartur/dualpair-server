@@ -214,7 +214,8 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public void setPhotos(List<Photo> photos) {
-        this.photos = photos;
+        this.photos.clear();
+        this.photos.addAll(photos);
     }
 
     public List<UserLocation> getLocations() {

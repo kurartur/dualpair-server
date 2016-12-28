@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/user/{userId:[0-9]+}")
 public class UserPhotoController {
@@ -50,6 +53,23 @@ public class UserPhotoController {
                 photoResource.getIdOnAccount(),
                 photoResource.getPosition());
         return ResponseEntity.status(HttpStatus.CREATED).body(photoResourceAssembler.toResource(photo));
+    }
+
+    @PostMapping("/photos")
+    public ResponseEntity setPhotos(@PathVariable Long userId, @RequestBody List<PhotoResource> photoResourceList, @ActiveUser User principal) {
+        if (!userId.equals(principal.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        List<SocialUserService.PhotoData> photoDataList = new ArrayList<>();
+        for (PhotoResource photoResource : photoResourceList) {
+            SocialUserService.PhotoData photoData = new SocialUserService.PhotoData();
+            photoData.accountType = UserAccount.Type.fromCode(photoResource.getAccountType());
+            photoData.idOnAccount = photoResource.getIdOnAccount();
+            photoData.position = photoResource.getPosition();
+            photoDataList.add(photoData);
+        }
+        socialUserService.setUserPhotos(userId, photoDataList);
+        return ResponseEntity.ok().build();
     }
 
     @Autowired

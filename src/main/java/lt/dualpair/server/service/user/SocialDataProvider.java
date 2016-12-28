@@ -14,6 +14,8 @@ public interface SocialDataProvider {
 
     List<Photo> getPhotos();
 
+    List<Photo> getPhotos(List<String> ids);
+
     Optional<Photo> getPhoto(String idOnAccount);
 
 }

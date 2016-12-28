@@ -42,6 +42,7 @@ dependencies {
     compile('org.springframework.security.oauth:spring-security-oauth2:2.0.11.RELEASE')
     compile('org.springframework.social:spring-social-facebook:2.0.3.RELEASE')
     compile('org.springframework.social:spring-social-vkontakte:1.1.0.BUILD-20161122.192840-9') { changing = true }
+    compile('com.vk.api:sdk:0.3.9')
     compile('org.springframework.social:spring-social-security:1.1.4.RELEASE')
     compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile('org.springframework:spring-jdbc')

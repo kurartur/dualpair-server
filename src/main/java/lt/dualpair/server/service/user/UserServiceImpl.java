@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class.getName());
 
     private static final int MAX_NUMBER_OF_LOCATIONS_TO_STORE = 5;
+    protected static final int MAX_NUMBER_OF_PHOTOS = 9;
 
     protected UserRepository userRepository;
     private SociotypeRepository sociotypeRepository;

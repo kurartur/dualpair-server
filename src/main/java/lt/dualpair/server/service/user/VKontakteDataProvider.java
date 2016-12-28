@@ -1,10 +1,17 @@
 package lt.dualpair.server.service.user;
 
+import com.vk.api.sdk.client.TransportClient;
+import com.vk.api.sdk.client.VkApiClient;
+import com.vk.api.sdk.client.actors.UserActor;
+import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.httpclient.HttpTransportClient;
 import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import org.jboss.logging.Logger;
 import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionData;
 import org.springframework.social.vkontakte.api.VKontakte;
 import org.springframework.social.vkontakte.api.VKontakteDate;
 import org.springframework.social.vkontakte.api.VKontakteProfile;
@@ -110,6 +117,29 @@ public class VKontakteDataProvider implements SocialDataProvider {
         photo.setAccountType(UserAccount.Type.VKONTAKTE);
         photo.setSourceLink(vkPhoto.getPhoto604());
         return Optional.of(photo);
+    }
+
+    @Override
+    public List<Photo> getPhotos(List<String> ids) {
+        ConnectionData connectionData = vkontakteConnection.createData();
+        UserActor userActor = new UserActor(Integer.valueOf(connectionData.getProviderUserId()), connectionData.getAccessToken());
+        TransportClient transportClient = HttpTransportClient.getInstance();
+        VkApiClient vk = new VkApiClient(transportClient);
+        List<Photo> photos = new ArrayList<>();
+        try {
+            List<String> userAndPhotoIds = ids.stream().map(photoId -> connectionData.getProviderUserId() + "_" + photoId).collect(Collectors.toList());
+            List<com.vk.api.sdk.objects.photos.Photo> vkPhotos = vk.photos().getById(userActor, userAndPhotoIds).execute();
+            for (com.vk.api.sdk.objects.photos.Photo vkPhoto : vkPhotos) {
+                Photo photo = new Photo();
+                photo.setIdOnAccount(Integer.toString(vkPhoto.getId()));
+                photo.setAccountType(UserAccount.Type.FACEBOOK);
+                photo.setSourceLink(vkPhoto.getPhoto604());
+                photos.add(photo);
+            }
+        } catch (ApiException | ClientException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return photos;
     }
 
     private Long getUserId() {

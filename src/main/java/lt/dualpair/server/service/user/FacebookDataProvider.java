@@ -92,6 +92,15 @@ public class FacebookDataProvider implements SocialDataProvider {
         }
     }
 
+    @Override
+    public List<Photo> getPhotos(List<String> ids) {
+        List<Photo> photos = new ArrayList<>();
+        for (String idOnAccount : ids) {
+            getPhoto(idOnAccount).ifPresent(photo -> photos.add(photo));
+        }
+        return photos;
+    }
+
     private User.Gender resolveGender(String gender) throws SocialDataException {
         if ("male".equals(gender)) {
             return User.Gender.MALE;

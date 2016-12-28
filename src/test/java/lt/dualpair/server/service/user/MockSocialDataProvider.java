@@ -5,6 +5,7 @@ import lt.dualpair.server.domain.model.user.User;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,5 +31,10 @@ public class MockSocialDataProvider implements SocialDataProvider {
     @Override
     public Optional<Photo> getPhoto(String idOnAccount) {
         return null;
+    }
+
+    @Override
+    public List<Photo> getPhotos(List<String> ids) {
+        return new ArrayList<>();
     }
 }
