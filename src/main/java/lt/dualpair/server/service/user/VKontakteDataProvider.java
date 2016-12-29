@@ -132,7 +132,7 @@ public class VKontakteDataProvider implements SocialDataProvider {
             for (com.vk.api.sdk.objects.photos.Photo vkPhoto : vkPhotos) {
                 Photo photo = new Photo();
                 photo.setIdOnAccount(Integer.toString(vkPhoto.getId()));
-                photo.setAccountType(UserAccount.Type.FACEBOOK);
+                photo.setAccountType(UserAccount.Type.VKONTAKTE);
                 photo.setSourceLink(vkPhoto.getPhoto604());
                 photos.add(photo);
             }
