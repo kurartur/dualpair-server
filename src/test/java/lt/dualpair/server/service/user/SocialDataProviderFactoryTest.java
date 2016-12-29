@@ -3,6 +3,8 @@ package lt.dualpair.server.service.user;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionData;
 import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.facebook.api.Facebook;
@@ -51,6 +53,9 @@ public class SocialDataProviderFactoryTest {
     public void testGetProvider_vkontakte() throws Exception {
         ConnectionRepository connectionRepository = mock(ConnectionRepository.class);
         doReturn(connectionRepository).when(usersConnectionRepository).createConnectionRepository("username");
+        Connection connection = mock(Connection.class);
+        doReturn(connection).when(connectionRepository).findPrimaryConnection(VKontakte.class);
+        doReturn(new ConnectionData("vkontakte", "1", null, null, null, null, null, null, null)).when(connection).createData();
         SocialDataProvider provider = socialDataProviderFactory.getProvider(UserAccount.Type.VKONTAKTE, "username");
         assertTrue(provider instanceof VKontakteDataProvider);
         verify(connectionRepository, times(1)).findPrimaryConnection(VKontakte.class);
