@@ -17,6 +17,8 @@ public class Choice {
     @Column(name = "remote_value")
     private String remoteValue;
 
+    private Choice() {}
+
     protected Choice(Integer id, String code, String remoteValue) {
         this.id = id;
         this.code = code;

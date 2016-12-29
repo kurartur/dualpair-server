@@ -20,9 +20,13 @@ public class ChoicePair {
     @JoinColumn(name = "choice2_id")
     private Choice choice2;
 
-    protected ChoicePair(Integer id, String remoteId) {
+    private ChoicePair() {}
+
+    protected ChoicePair(Integer id, String remoteId, Choice choice1, Choice choice2) {
         this.id = id;
         this.remoteId = remoteId;
+        this.choice1 = choice1;
+        this.choice2 = choice2;
     }
 
     public Integer getId() {
@@ -47,14 +51,22 @@ public class ChoicePair {
 
         private String remoteId;
 
+        private Choice choice1;
+
+        private Choice choice2;
+
         public Builder() {}
 
         public Builder id(Integer id) { this.id = id; return this; }
 
         public Builder remoteId(String remoteId) { this.remoteId = remoteId; return this; }
 
+        public Builder choice1(Choice choice) { this.choice1 = choice; return this; }
+
+        public Builder choice2(Choice choice) { this.choice2 = choice; return this; }
+
         public ChoicePair build() {
-            return new ChoicePair(id, remoteId);
+            return new ChoicePair(id, remoteId, choice1, choice2);
         }
     }
 }

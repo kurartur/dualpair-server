@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
@@ -60,18 +61,21 @@ public class SocionicsTestService {
         Set<CombinationChoice> combinationChoices = new HashSet<>();
         Combination combination = new Combination(combinationChoices, sociotype);
         for(Map.Entry<String, String> entry : choices.entrySet()) {
-            ChoicePair choicePair = choicePairRepository.findOne(Integer.valueOf(entry.getKey()))
-              .orElseThrow(() -> new RuntimeException("Choice pair " + entry.getKey() + " not found"));
+            String pairId = entry.getKey();
+            String choiceCode = entry.getValue();
+            ChoicePair choicePair = choicePairRepository.findOne(Integer.valueOf(pairId))
+              .orElseThrow(() -> new RuntimeException("Choice pair " + pairId + " not found"));
             Choice choice;
-            if (choicePair.getChoice1().getCode().equals(entry.getValue())) {
+            if (choicePair.getChoice1().getCode().equals(choiceCode)) {
                 choice = choicePair.getChoice1();
-            } else if (choicePair.getChoice2().getCode().equals(entry.getValue())) {
+            } else if (choicePair.getChoice2().getCode().equals(choiceCode)) {
                 choice = choicePair.getChoice2();
             } else {
-                throw new SocionicsTestException("Invalid choice " + entry.getValue() + " for choice pair " + entry.getKey());
+                throw new SocionicsTestException("Invalid choice " + choiceCode + " for choice pair " + pairId);
             }
             combinationChoices.add(new CombinationChoice(combination, choicePair, choice));
         }
+        Assert.isTrue(combinationChoices.size() == NUMBER_OF_PAIRS);
         return combination;
     }
 
