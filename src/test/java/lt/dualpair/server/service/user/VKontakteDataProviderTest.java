@@ -76,6 +76,7 @@ public class VKontakteDataProviderTest {
         when(query.execute()).thenReturn(response);
         when(query.albumId(any(String.class))).thenReturn(query);
         when(query.count(any(Integer.class))).thenReturn(query);
+        when(query.rev(true)).thenReturn(query);
         when(photos.get(any(UserActor.class))).thenReturn(query);
         when(response.getItems()).thenReturn(vkPhotos);
 
@@ -104,6 +105,7 @@ public class VKontakteDataProviderTest {
         when(query.execute()).thenReturn(response);
         when(query.albumId(any(String.class))).thenReturn(query);
         when(query.count(any(Integer.class))).thenReturn(query);
+        when(query.rev(true)).thenReturn(query);
         when(photos.get(any(UserActor.class))).thenReturn(query);
         when(response.getItems()).thenReturn(vkPhotos);
 
@@ -137,6 +139,7 @@ public class VKontakteDataProviderTest {
         when(query.execute()).thenReturn(response);
         when(query.albumId(any(String.class))).thenReturn(query);
         when(query.count(any(Integer.class))).thenReturn(query);
+        when(query.rev(true)).thenReturn(query);
         when(photos.get(any(UserActor.class))).thenReturn(query);
         when(response.getItems()).thenReturn(vkPhotos);
 

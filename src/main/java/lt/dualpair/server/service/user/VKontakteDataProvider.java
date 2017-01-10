@@ -73,6 +73,7 @@ public class VKontakteDataProvider implements SocialDataProvider {
             user.setPhotos(vkApiClient.photos().get(userActor)
                         .albumId("profile")
                         .count(5)
+                        .rev(true)
                         .execute().getItems()
                     .stream()
                     .map(vkPhoto -> {
