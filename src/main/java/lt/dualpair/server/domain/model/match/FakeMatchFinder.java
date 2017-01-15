@@ -53,10 +53,15 @@ public class FakeMatchFinder implements MatchFinder {
         user.setSociotypes(sociotypes);
 
         // accounts
+        Set<UserAccount> userAccounts = new HashSet<>();
         UserAccount userAccount = new UserAccount(user);
         userAccount.setAccountType(UserAccount.Type.FACEBOOK);
         userAccount.setAccountId(randomUser.email);
-        Set<UserAccount> userAccounts = new HashSet<>();
+        userAccounts.add(userAccount);
+        userAccount = new UserAccount(user);
+        userAccount.setAccountType(UserAccount.Type.VKONTAKTE);
+        userAccount.setAccountId(randomUser.email);
+        userAccounts.add(userAccount);
         user.setUserAccounts(userAccounts);
 
         //location
