@@ -16,7 +16,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 @Component
 public class FakeMatchFinder implements MatchFinder {
@@ -98,7 +104,7 @@ public class FakeMatchFinder implements MatchFinder {
 
         userRepository.save(user);
 
-        return createMatch(matchRequest.getUser(), user, matchRequest.getRelationType(), random.nextInt(300));
+        return createMatch(matchRequest.getUser(), user, matchRequest.getRelationType(), random.nextInt(300000));
     }
 
     private String buildUrl(User.Gender gender) {
