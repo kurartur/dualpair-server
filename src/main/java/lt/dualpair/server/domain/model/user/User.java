@@ -8,9 +8,33 @@ import org.springframework.social.security.SocialUserDetails;
 import org.springframework.util.Assert;
 import org.thymeleaf.util.Validate;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -20,6 +44,7 @@ public class User implements SocialUserDetails, Serializable {
 
     private static final int NAME_LENGTH = 100;
     private static final int DESCRIPTION_LENGTH = 255;
+    public static final int MAX_NUMBER_OF_PHOTOS = 9;
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -210,10 +235,12 @@ public class User implements SocialUserDetails, Serializable {
     }
 
     public void addPhoto(Photo photo) {
+        Assert.isTrue(photos.size() < MAX_NUMBER_OF_PHOTOS, "User can have max " + MAX_NUMBER_OF_PHOTOS + " photos.");
         photos.add(photo);
     }
 
     public void setPhotos(List<Photo> photos) {
+        Assert.isTrue(photos.size() <= MAX_NUMBER_OF_PHOTOS, "User can have max " + MAX_NUMBER_OF_PHOTOS + " photos.");
         this.photos.clear();
         this.photos.addAll(photos);
     }

@@ -16,7 +16,11 @@ import org.springframework.web.client.RestOperations;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 public class FacebookDataProvider implements SocialDataProvider {
 
@@ -130,8 +134,12 @@ public class FacebookDataProvider implements SocialDataProvider {
         if (albums != null) {
             Album profilePictureAlbum = getProfilePictureAlbum(albums);
             if (profilePictureAlbum != null) {
+                int c = 0;
                 for (org.springframework.social.facebook.api.Photo photo : facebook.mediaOperations().getPhotos(profilePictureAlbum.getId())) {
                     user.addPhoto(buildPhoto(photo, user));
+                    if (++c >= User.MAX_NUMBER_OF_PHOTOS) {
+                        break;
+                    }
                 }
             }
         }

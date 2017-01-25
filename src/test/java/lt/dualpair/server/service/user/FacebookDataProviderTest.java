@@ -7,7 +7,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
-import org.springframework.social.facebook.api.*;
+import org.springframework.social.facebook.api.Album;
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.MediaOperations;
+import org.springframework.social.facebook.api.PagedList;
+import org.springframework.social.facebook.api.UserOperations;
 import org.springframework.social.support.URIBuilder;
 import org.springframework.web.client.RestOperations;
 
@@ -15,7 +19,12 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -40,6 +49,8 @@ public class FacebookDataProviderTest {
         when(facebook.mediaOperations()).thenReturn(mediaOperations);
         when(facebook.restOperations()).thenReturn(restOperations);
         when(userOperations.getUserProfile()).thenReturn(facebookUser);
+
+        when(facebookUser.getGender()).thenReturn("male"); // default gender
     }
 
     @Test
@@ -102,6 +113,21 @@ public class FacebookDataProviderTest {
         User user = new User();
         facebookDataProvider.enhanceUser(user);
         assertEquals((Integer) 5, user.getAge());
+    }
+
+    @Test
+    public void testEnhanceUser_photoLimit() throws Exception {
+        doReturn(new PagedList<>(Arrays.asList(createAlbum("1", "Profile pictures")), null, null)).when(mediaOperations).getAlbums();
+        List<org.springframework.social.facebook.api.Photo> fbPhotos = new ArrayList<>();
+        for (int i = 0 ; i < User.MAX_NUMBER_OF_PHOTOS + 5; i++) {
+            fbPhotos.add(createPhoto(i + ""));
+        }
+        doReturn(new PagedList<>(fbPhotos, null, null)).when(mediaOperations).getPhotos("1");
+
+        User user = new User();
+        user = facebookDataProvider.enhanceUser(user);
+
+        assertEquals(User.MAX_NUMBER_OF_PHOTOS, user.getPhotos().size());
     }
 
     @Test

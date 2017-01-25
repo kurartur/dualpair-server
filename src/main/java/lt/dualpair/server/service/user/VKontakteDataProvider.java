@@ -72,7 +72,7 @@ public class VKontakteDataProvider implements SocialDataProvider {
         try {
             user.setPhotos(vkApiClient.photos().get(userActor)
                         .albumId("profile")
-                        .count(5)
+                        .count(User.MAX_NUMBER_OF_PHOTOS)
                         .rev(true)
                         .execute().getItems()
                     .stream()
