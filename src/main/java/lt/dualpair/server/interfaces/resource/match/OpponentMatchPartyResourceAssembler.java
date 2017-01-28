@@ -27,6 +27,10 @@ public class OpponentMatchPartyResourceAssembler extends ResourceAssemblerSuppor
         AssemblingContext assemblingContext = new AssemblingContext(user, isMatchMutual);
         resource.setUser(opponentUserResourceAssembler.toResource(assemblingContext));
 
+        if (isMatchMutual) {
+            resource.setResponse(entity.getResponse().name());
+        }
+
         return resource;
     }
 

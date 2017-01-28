@@ -9,6 +9,7 @@ public class OpponentMatchPartyResource extends ResourceSupport {
     @JsonProperty("id")
     private Long partyId;
     private UserResource user;
+    private String response;
 
     public Long getPartyId() {
         return partyId;
@@ -24,5 +25,13 @@ public class OpponentMatchPartyResource extends ResourceSupport {
 
     public void setUser(UserResource user) {
         this.user = user;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
     }
 }

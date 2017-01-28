@@ -44,6 +44,7 @@ public class OpponentMatchPartyResourceAssemblerTest extends BaseResourceAssembl
         AssemblingContext context = assemblingContextArgumentCaptor.getValue();
         assertEquals(user, context.getUser());
         assertEquals(false, context.isMutualMatch());
+        assertEquals(null, matchPartyResource.getResponse());
     }
 
     @Test
@@ -59,5 +60,6 @@ public class OpponentMatchPartyResourceAssemblerTest extends BaseResourceAssembl
         AssemblingContext context = assemblingContextArgumentCaptor.getValue();
         assertEquals(user, context.getUser());
         assertEquals(true, context.isMutualMatch());
+        assertEquals(Response.YES.name(), matchPartyResource.getResponse());
     }
 }
