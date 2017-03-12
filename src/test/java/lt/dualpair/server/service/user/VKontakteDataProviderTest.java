@@ -9,6 +9,7 @@ import com.vk.api.sdk.queries.photos.PhotosGetAllQuery;
 import com.vk.api.sdk.queries.photos.PhotosGetByIdQuery;
 import com.vk.api.sdk.queries.photos.PhotosGetQuery;
 import lt.dualpair.server.domain.model.photo.Photo;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import org.junit.Before;
@@ -83,7 +84,7 @@ public class VKontakteDataProviderTest {
         User user = vKontakteDataProvider.enhanceUser(new User());
         assertEquals("firstName", user.getName());
         assertEquals(new SimpleDateFormat("yyyy-MM-dd").parse("1990-02-01"), user.getDateOfBirth());
-        assertEquals(User.Gender.FEMALE, user.getGender());
+        assertEquals(Gender.FEMALE, user.getGender());
         assertEquals("mail@mail.com", user.getEmail());
         Photo photo = user.getPhotos().get(0);
         assertEquals("10", photo.getIdOnAccount());
@@ -110,11 +111,11 @@ public class VKontakteDataProviderTest {
         when(response.getItems()).thenReturn(vkPhotos);
 
         User user = vKontakteDataProvider.enhanceUser(new User());
-        assertEquals(User.Gender.FEMALE, user.getGender());
+        assertEquals(Gender.FEMALE, user.getGender());
 
         vKontakteProfile.setGender("M");
         user = vKontakteDataProvider.enhanceUser(new User());
-        assertEquals(User.Gender.MALE, user.getGender());
+        assertEquals(Gender.MALE, user.getGender());
 
         vKontakteProfile.setGender(null);
         try {

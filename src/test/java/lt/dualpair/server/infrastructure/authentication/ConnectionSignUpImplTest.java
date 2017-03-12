@@ -1,6 +1,7 @@
 package lt.dualpair.server.infrastructure.authentication;
 
 import lt.dualpair.server.domain.model.match.SearchParameters;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
@@ -59,7 +60,7 @@ public class ConnectionSignUpImplTest {
         when(socialDataProvider.enhanceUser(any(User.class))).thenAnswer(invocation -> {
             User user = (User)invocation.getArguments()[0];
             user.setDateOfBirth(dateOfBirth);
-            user.setGender(User.Gender.MALE);
+            user.setGender(Gender.MALE);
             return user;
         });
         when(socialDataProvider.getAccountId()).thenReturn("111");

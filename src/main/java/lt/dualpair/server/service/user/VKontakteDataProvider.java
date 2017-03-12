@@ -7,6 +7,7 @@ import com.vk.api.sdk.exceptions.ApiException;
 import com.vk.api.sdk.exceptions.ClientException;
 import com.vk.api.sdk.httpclient.HttpTransportClient;
 import lt.dualpair.server.domain.model.photo.Photo;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import org.jboss.logging.Logger;
@@ -92,11 +93,11 @@ public class VKontakteDataProvider implements SocialDataProvider {
         return user;
     }
 
-    private User.Gender resolveGender(String gender) throws SocialDataException {
+    private Gender resolveGender(String gender) throws SocialDataException {
         if ("M".equals(gender)) {
-            return User.Gender.MALE;
+            return Gender.MALE;
         } else if ("W".equals(gender)) {
-            return User.Gender.FEMALE;
+            return Gender.FEMALE;
         } else {
             logger.error("Invalid gender " + gender);
             throw new SocialDataException("Invalid gender '" + gender +"'");

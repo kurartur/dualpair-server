@@ -22,6 +22,8 @@ public class UserResource extends ResourceSupport {
     private Set<LocationResource> locations;
     private List<PhotoResource> photos;
     private List<UserAccountResource> accounts;
+    private String relationshipStatus;
+    private Set<String> purposesOfBeing;
 
     public Long getUserId() {
         return userId;
@@ -93,5 +95,21 @@ public class UserResource extends ResourceSupport {
 
     public void setAccounts(List<UserAccountResource> accounts) {
         this.accounts = accounts;
+    }
+
+    public String getRelationshipStatus() {
+        return relationshipStatus;
+    }
+
+    public void setRelationshipStatus(String relationshipStatus) {
+        this.relationshipStatus = relationshipStatus;
+    }
+
+    public Set<String> getPurposesOfBeing() {
+        return purposesOfBeing;
+    }
+
+    public void setPurposesOfBeing(Set<String> purposesOfBeing) {
+        this.purposesOfBeing = purposesOfBeing;
     }
 }

@@ -1,17 +1,14 @@
 package lt.dualpair.server.service.user;
 
 import lt.dualpair.server.domain.model.photo.Photo;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
-import org.springframework.social.facebook.api.Album;
-import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.MediaOperations;
-import org.springframework.social.facebook.api.PagedList;
-import org.springframework.social.facebook.api.UserOperations;
+import org.springframework.social.facebook.api.*;
 import org.springframework.social.support.URIBuilder;
 import org.springframework.web.client.RestOperations;
 
@@ -19,12 +16,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -69,7 +61,7 @@ public class FacebookDataProviderTest {
         assertEquals("email", user.getEmail());
         assertEquals((Integer) 5, user.getAge());
         assertEquals(Date.from(dateOfBirth.atStartOfDay(ZoneId.systemDefault()).toInstant()), user.getDateOfBirth());
-        assertEquals(User.Gender.MALE, user.getGender());
+        assertEquals(Gender.MALE, user.getGender());
         assertEquals(2, user.getPhotos().size());
         Iterator<Photo> photos = user.getPhotos().iterator();
         assertUserPhoto("1", user, photos.next());
@@ -81,7 +73,7 @@ public class FacebookDataProviderTest {
         when(facebookUser.getGender()).thenReturn("male");
         User user = new User();
         user = facebookDataProvider.enhanceUser(user);
-        assertEquals(User.Gender.MALE, user.getGender());
+        assertEquals(Gender.MALE, user.getGender());
     }
 
     @Test
@@ -89,7 +81,7 @@ public class FacebookDataProviderTest {
         when(facebookUser.getGender()).thenReturn("female");
         User user = new User();
         user = facebookDataProvider.enhanceUser(user);
-        assertEquals(User.Gender.FEMALE, user.getGender());
+        assertEquals(Gender.FEMALE, user.getGender());
     }
 
     @Test

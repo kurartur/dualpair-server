@@ -8,33 +8,9 @@ import org.springframework.social.security.SocialUserDetails;
 import org.springframework.util.Assert;
 import org.thymeleaf.util.Validate;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -92,6 +68,14 @@ public class User implements SocialUserDetails, Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<UserLocation> locations = new ArrayList<>();
+
+    @Column(name = "relationship_status")
+    private RelationshipStatus relationshipStatus = RelationshipStatus.NONE;
+
+    @ElementCollection(targetClass = PurposeOfBeing.class)
+    @CollectionTable(name = "user_purposes_of_being", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "purpose", nullable = false)
+    private Set<PurposeOfBeing> purposesOfBeing = new HashSet<>();
 
     public User() {}
 
@@ -293,24 +277,20 @@ public class User implements SocialUserDetails, Serializable {
         return status == Status.ACTIVE;
     }
 
-    public enum Gender {
-        MALE("M"), FEMALE("F");
-        private String code;
-        private static Map<String, Gender> gendersByCode = new HashMap<>();
-        static {
-            for (Gender gender: Gender.values()) {
-                gendersByCode.put(gender.code, gender);
-            }
-        }
-        Gender(String code) {
-            this.code = code;
-        }
-        public String getCode() {
-            return code;
-        }
-        public static Gender fromCode(String code) {
-            return gendersByCode.get(code);
-        }
+    public RelationshipStatus getRelationshipStatus() {
+        return relationshipStatus;
+    }
+
+    public void setRelationshipStatus(RelationshipStatus relationshipStatus) {
+        this.relationshipStatus = relationshipStatus;
+    }
+
+    public Set<PurposeOfBeing> getPurposesOfBeing() {
+        return purposesOfBeing;
+    }
+
+    public void setPurposesOfBeing(Set<PurposeOfBeing> purposesOfBeing) {
+        this.purposesOfBeing = purposesOfBeing;
     }
 
 }

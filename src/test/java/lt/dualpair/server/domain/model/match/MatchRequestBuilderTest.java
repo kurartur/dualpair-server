@@ -1,6 +1,6 @@
 package lt.dualpair.server.domain.model.match;
 
-import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.server.domain.model.user.Gender;
 import org.junit.Test;
 
 import java.util.*;
@@ -35,9 +35,9 @@ public class MatchRequestBuilderTest {
 
     @Test
     public void testGenders() throws Exception {
-        MatchRequest mr = new MatchRequestBuilder(null).genders(new HashSet<>(Arrays.asList(User.Gender.FEMALE, User.Gender.MALE))).build();
-        assertTrue(mr.getGenders().contains(User.Gender.FEMALE));
-        assertTrue(mr.getGenders().contains(User.Gender.MALE));
+        MatchRequest mr = new MatchRequestBuilder(null).genders(new HashSet<>(Arrays.asList(Gender.FEMALE, Gender.MALE))).build();
+        assertTrue(mr.getGenders().contains(Gender.FEMALE));
+        assertTrue(mr.getGenders().contains(Gender.MALE));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -52,7 +52,7 @@ public class MatchRequestBuilderTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGenders_nullElements() throws Exception {
-        Set<User.Gender> genders = new HashSet<>();
+        Set<Gender> genders = new HashSet<>();
         genders.add(null);
         new MatchRequestBuilder(null).genders(genders);
     }
@@ -103,8 +103,8 @@ public class MatchRequestBuilderTest {
         MatchRequest mr = new MatchRequestBuilder(null).apply(searchParameters).build();
         assertEquals(10, mr.getMinAge());
         assertEquals(20, mr.getMaxAge());
-        assertTrue(mr.getGenders().contains(User.Gender.FEMALE));
-        assertTrue(mr.getGenders().contains(User.Gender.MALE));
+        assertTrue(mr.getGenders().contains(Gender.FEMALE));
+        assertTrue(mr.getGenders().contains(Gender.MALE));
     }
 
     @Test(expected = IllegalArgumentException.class)

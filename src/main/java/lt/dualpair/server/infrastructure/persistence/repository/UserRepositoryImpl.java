@@ -1,6 +1,7 @@
 package lt.dualpair.server.infrastructure.persistence.repository;
 
 import lt.dualpair.server.domain.model.socionics.Sociotype;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import org.springframework.util.Assert;
 
@@ -60,11 +61,11 @@ public class UserRepositoryImpl implements CustomUserRepository {
         protected Sociotype sociotype;
         protected int minAge;
         protected int maxAge;
-        protected Set<User.Gender> genders;
+        protected Set<Gender> genders;
         protected String countryCode;
         protected List<Long> excludeOpponents;
 
-        public FindOpponentsParams(User user, Sociotype sociotype, int minAge, int maxAge, Set<User.Gender> genders, String countryCode, List<Long> excludeOpponents) {
+        public FindOpponentsParams(User user, Sociotype sociotype, int minAge, int maxAge, Set<Gender> genders, String countryCode, List<Long> excludeOpponents) {
             this.user = user;
             this.sociotype = sociotype;
             this.minAge = minAge;

@@ -41,13 +41,20 @@ public class ITUserControllerTest extends BaseRestControllerTest {
 
     @Test
     public void testUpdateUser() throws Exception {
-        String content = "{ \"description\": \"descr\"}";
+        String content = "{ \"description\": \"descr\", \"relationshipStatus\":\"SI\", \"purposesOfBeing\":[\"FIFR\",\"FILO\"] }";
         mockMvc.perform(
                     patch("/api/user/1")
                         .with(bearerToken(1L))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andExpect(status().isNoContent());
+        flushPersistenceContext();
+        Map<String, Object> user = jdbcTemplate.queryForMap("select * from users where id=1");
+        assertEquals("SI", user.get("relationship_status"));
+        assertEquals("descr", user.get("description"));
+        List<String> purposes = jdbcTemplate.queryForList("select purpose from user_purposes_of_being where user_id=1", String.class);
+        assertTrue(purposes.contains("FIFR"));
+        assertTrue(purposes.contains("FILO"));
     }
 
     @Test

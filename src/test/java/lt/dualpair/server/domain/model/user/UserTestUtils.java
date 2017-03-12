@@ -21,7 +21,7 @@ public class UserTestUtils {
         sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.IEE).build());
         user.setSociotypes(sociotypes);
 
-        user.setGender(User.Gender.MALE);
+        user.setGender(Gender.MALE);
         user.addLocation(new UserLocation(user, 10.0, 11.0, "LT", "Vilnius"), 1);
 
         return user;

@@ -1,6 +1,7 @@
 package lt.dualpair.server.domain.model.match;
 
 import lt.dualpair.server.domain.model.geo.Location;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserLocation;
 import org.springframework.util.Assert;
@@ -45,7 +46,7 @@ public class MatchRequestBuilder {
         return this;
     }
 
-    public MatchRequestBuilder genders(Set<User.Gender> genders) {
+    public MatchRequestBuilder genders(Set<Gender> genders) {
         Assert.notEmpty(genders);
         Assert.noNullElements(genders.toArray());
         matchRequest.setGenders(genders);

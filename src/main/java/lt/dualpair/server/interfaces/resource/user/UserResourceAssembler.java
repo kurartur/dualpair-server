@@ -1,5 +1,6 @@
 package lt.dualpair.server.interfaces.resource.user;
 
+import lt.dualpair.server.domain.model.user.PurposeOfBeing;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.domain.model.user.UserLocation;
@@ -59,6 +60,14 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
             userAccounts.add(accountResource);
         }
         resource.setAccounts(userAccounts);
+
+        resource.setRelationshipStatus(entity.getRelationshipStatus().getCode());
+
+        Set<String> purposesOfBeing = new HashSet<>();
+        for (PurposeOfBeing purposeOfBeing : entity.getPurposesOfBeing()) {
+            purposesOfBeing.add(purposeOfBeing.getCode());
+        }
+        resource.setPurposesOfBeing(purposesOfBeing);
 
         resource.add(linkTo(methodOn(SearchParametersController.class).getSearchParameters(entity.getId(), entity)).withRel("search-parameters"));
 

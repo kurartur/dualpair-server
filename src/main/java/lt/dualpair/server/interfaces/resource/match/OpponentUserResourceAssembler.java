@@ -62,6 +62,8 @@ public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<Oppo
             resource.setAccounts(accountResources);
         }
 
+        resource.setRelationshipStatus(entity.getRelationshipStatus().getCode());
+
         return resource;
     }
 

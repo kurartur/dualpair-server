@@ -3,6 +3,7 @@ package lt.dualpair.server.domain.model.match;
 import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.domain.model.user.UserLocation;
@@ -16,13 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class FakeMatchFinder implements MatchFinder {
@@ -34,9 +29,9 @@ public class FakeMatchFinder implements MatchFinder {
     @Override
     public Match findOne(MatchRequest matchRequest) {
         Random random = new Random();
-        Set<User.Gender> genders = matchRequest.getGenders();
+        Set<Gender> genders = matchRequest.getGenders();
         int index = random.nextInt(genders.size());
-        User.Gender gender = new ArrayList<>(genders).get(index);
+        Gender gender = new ArrayList<>(genders).get(index);
         RandomResults randomResults = getRestTemplate().getForObject(buildUrl(gender), RandomResults.class);
         RandomUser randomUser = randomResults.results.get(0);
 
@@ -107,7 +102,7 @@ public class FakeMatchFinder implements MatchFinder {
         return createMatch(matchRequest.getUser(), user, matchRequest.getRelationType(), random.nextInt(300000));
     }
 
-    private String buildUrl(User.Gender gender) {
+    private String buildUrl(Gender gender) {
         return "https://randomuser.me/api/?gender=" + gender.name().toLowerCase();
     }
 

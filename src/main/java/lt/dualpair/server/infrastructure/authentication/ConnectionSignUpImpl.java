@@ -1,6 +1,7 @@
 package lt.dualpair.server.infrastructure.authentication;
 
 import lt.dualpair.server.domain.model.match.SearchParameters;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserAccount;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
@@ -68,7 +69,7 @@ public class ConnectionSignUpImpl implements ConnectionSignUp {
             searchParameters.setMinAge(user.getAge() - DEFAULT_SEARCH_AGE_GAP);
             searchParameters.setMaxAge(user.getAge() + DEFAULT_SEARCH_AGE_GAP);
         }
-        if (user.getGender() == User.Gender.MALE) {
+        if (user.getGender() == Gender.MALE) {
             searchParameters.setSearchFemale(true);
             searchParameters.setSearchMale(false);
         } else {

@@ -1,6 +1,7 @@
 package lt.dualpair.server.domain.model.match;
 
 import lt.dualpair.server.domain.model.socionics.RelationType;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class MatchRequest {
     private int minAge;
     private int maxAge;
 
-    private Set<User.Gender> genders = new HashSet<>();
+    private Set<Gender> genders = new HashSet<>();
 
     private double latitude;
     private double longitude;
@@ -90,11 +91,11 @@ public class MatchRequest {
         return relationType;
     }
 
-    public Set<User.Gender> getGenders() {
+    public Set<Gender> getGenders() {
         return genders;
     }
 
-    public void setGenders(Set<User.Gender> genders) {
+    public void setGenders(Set<Gender> genders) {
         this.genders = genders;
     }
 

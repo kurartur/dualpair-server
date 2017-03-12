@@ -1,6 +1,7 @@
 package lt.dualpair.server.infrastructure.persistence.repository;
 
 import lt.dualpair.server.domain.model.socionics.Sociotype;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,11 +32,11 @@ public class UserRepositoryImplTest {
     public void testFindOpponent() throws Exception {
         User user = new User();
         user.setDateOfBirth(new Date());
-        user.setGender(User.Gender.MALE);
+        user.setGender(Gender.MALE);
         Sociotype sociotype = new Sociotype.Builder().code2(Sociotype.Code2.ISFJ).build();
-        Set<User.Gender> genders = new HashSet<>();
-        genders.add(User.Gender.MALE);
-        genders.add(User.Gender.FEMALE);
+        Set<Gender> genders = new HashSet<>();
+        genders.add(Gender.MALE);
+        genders.add(Gender.FEMALE);
         UserRepositoryImpl.FindOpponentsParams params = new UserRepositoryImpl.FindOpponentsParams(
                 user,
                 sociotype,

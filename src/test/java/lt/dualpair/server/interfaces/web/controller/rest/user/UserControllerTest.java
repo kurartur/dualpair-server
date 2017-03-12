@@ -3,6 +3,8 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.geo.LocationProvider;
 import lt.dualpair.server.domain.model.geo.LocationProviderException;
+import lt.dualpair.server.domain.model.user.PurposeOfBeing;
+import lt.dualpair.server.domain.model.user.RelationshipStatus;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
@@ -17,11 +19,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class UserControllerTest {
@@ -72,6 +75,8 @@ public class UserControllerTest {
         data.put("description", "descr");
         data.put("name", "name");
         data.put("dateOfBirth", "1990-07-01T12:13:14");
+        data.put("relationshipStatus", "SI");
+        data.put("purposesOfBeing", Arrays.asList("FIFR", "FILO"));
         User user = new User();
         when(socialUserService.loadUserById(1L)).thenReturn(user);
         ResponseEntity responseEntity = userController.updateUser(1L, data, principal);
@@ -82,6 +87,24 @@ public class UserControllerTest {
         assertEquals("name", user.getName());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         assertEquals("1990-07-01T12:13:14", sdf.format(user.getDateOfBirth()));
+        assertEquals(RelationshipStatus.SINGLE, user.getRelationshipStatus());
+        Set<PurposeOfBeing> purposes = user.getPurposesOfBeing();
+        assertEquals(2, purposes.size());
+        assertTrue(purposes.contains(PurposeOfBeing.FIND_FRIEND));
+        assertTrue(purposes.contains(PurposeOfBeing.FIND_LOVE));
+    }
+
+    @Test
+    public void testUpdateUser_whenRelationshipStatusEmpty_setAsNone() throws Exception {
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("relationshipStatus", "");
+        User user = new User();
+        user.setRelationshipStatus(RelationshipStatus.SINGLE);
+        when(socialUserService.loadUserById(1L)).thenReturn(user);
+        ResponseEntity responseEntity = userController.updateUser(1L, data, principal);
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+        verify(socialUserService, times(1)).updateUser(user);
+        assertEquals(RelationshipStatus.NONE, user.getRelationshipStatus());
     }
 
     @Test

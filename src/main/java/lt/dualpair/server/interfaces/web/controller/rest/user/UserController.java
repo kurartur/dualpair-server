@@ -3,6 +3,8 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 import lt.dualpair.server.domain.model.geo.Location;
 import lt.dualpair.server.domain.model.geo.LocationProvider;
 import lt.dualpair.server.domain.model.geo.LocationProviderException;
+import lt.dualpair.server.domain.model.user.PurposeOfBeing;
+import lt.dualpair.server.domain.model.user.RelationshipStatus;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.authentication.ActiveUser;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
@@ -15,14 +17,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -55,6 +57,20 @@ public class UserController {
             user.setName((String)data.get("name"));
         if (data.containsKey("dateOfBirth"))
             user.setDateOfBirth(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse((String)data.get("dateOfBirth")));
+        if (data.containsKey("relationshipStatus")) {
+            if (StringUtils.isEmpty(data.get("relationshipStatus"))) {
+                user.setRelationshipStatus(RelationshipStatus.NONE);
+            } else {
+                user.setRelationshipStatus(RelationshipStatus.fromCode((String)data.get("relationshipStatus")));
+            }
+        }
+        if (data.containsKey("purposesOfBeing")) {
+            Set<PurposeOfBeing> purposesOfBeing = new HashSet<>();
+            for (String purpose : (List<String>) data.get("purposesOfBeing")) {
+                purposesOfBeing.add(PurposeOfBeing.fromCode(purpose));
+            }
+            user.setPurposesOfBeing(purposesOfBeing);
+        }
         socialUserService.updateUser(user);
         return ResponseEntity.noContent().location(new URI("/api/user/" + userId)).build();
     }

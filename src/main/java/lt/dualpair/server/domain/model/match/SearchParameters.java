@@ -1,5 +1,6 @@
 package lt.dualpair.server.domain.model.match;
 
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import org.hibernate.annotations.Type;
 
@@ -79,10 +80,10 @@ public class SearchParameters implements Serializable {
         this.searchMale = searchMale;
     }
 
-    public Set<User.Gender> getSearchGenders() {
-        Set<User.Gender> genders = new HashSet<>();
-        if (getSearchFemale()) genders.add(User.Gender.FEMALE);
-        if (getSearchMale()) genders.add(User.Gender.MALE);
+    public Set<Gender> getSearchGenders() {
+        Set<Gender> genders = new HashSet<>();
+        if (getSearchFemale()) genders.add(Gender.FEMALE);
+        if (getSearchMale()) genders.add(Gender.MALE);
         return genders;
     }
 

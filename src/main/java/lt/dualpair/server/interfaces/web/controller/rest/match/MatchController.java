@@ -4,6 +4,7 @@ import lt.dualpair.server.domain.model.match.Match;
 import lt.dualpair.server.domain.model.match.MatchRequestBuilder;
 import lt.dualpair.server.domain.model.match.MatchRequestException;
 import lt.dualpair.server.domain.model.match.UserAwareMatch;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.infrastructure.authentication.ActiveUser;
 import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
@@ -140,13 +141,13 @@ public class MatchController {
             this.excludeOpponents = excludeOpponents;
         }
 
-        public Set<User.Gender> getGenders() {
-            Set<User.Gender> genders = new HashSet<>();
+        public Set<Gender> getGenders() {
+            Set<Gender> genders = new HashSet<>();
             if ("Y".equals(searchFemale)) {
-                genders.add(User.Gender.FEMALE);
+                genders.add(Gender.FEMALE);
             }
             if ("Y".equals(searchMale)) {
-                genders.add(User.Gender.MALE);
+                genders.add(Gender.MALE);
             }
             return genders;
         }

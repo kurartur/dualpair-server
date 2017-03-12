@@ -4,6 +4,7 @@ import lt.dualpair.server.domain.model.match.Match;
 import lt.dualpair.server.domain.model.match.MatchRequest;
 import lt.dualpair.server.domain.model.match.MatchRequestException;
 import lt.dualpair.server.domain.model.match.UserAwareMatch;
+import lt.dualpair.server.domain.model.user.Gender;
 import lt.dualpair.server.domain.model.user.User;
 import lt.dualpair.server.domain.model.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.match.MatchResource;
@@ -69,7 +70,7 @@ public class MatchControllerTest {
         MatchRequest matchRequest = matchRequestArgumentCaptor.getValue();
         assertEquals(25, matchRequest.getMinAge());
         assertEquals(30, matchRequest.getMaxAge());
-        assertEquals(new HashSet<>(Arrays.asList(User.Gender.MALE, User.Gender.FEMALE)), matchRequest.getGenders());
+        assertEquals(new HashSet<>(Arrays.asList(Gender.MALE, Gender.FEMALE)), matchRequest.getGenders());
         assertEquals(Arrays.asList(5L), matchRequest.getExcludedOpponentIds());
         assertEquals(matchRequest.getUser(), user);
         assertEquals(10.0, matchRequest.getLatitude(), 0);
