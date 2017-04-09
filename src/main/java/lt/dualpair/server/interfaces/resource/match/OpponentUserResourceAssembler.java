@@ -1,9 +1,7 @@
 package lt.dualpair.server.interfaces.resource.match;
 
 import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserAccount;
-import lt.dualpair.server.domain.model.user.UserLocation;
+import lt.dualpair.server.domain.model.user.*;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
 import lt.dualpair.server.interfaces.resource.user.PhotoResourceAssembler;
@@ -62,7 +60,17 @@ public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<Oppo
             resource.setAccounts(accountResources);
         }
 
-        resource.setRelationshipStatus(entity.getRelationshipStatus().getCode());
+        if (entity.getRelationshipStatus() == RelationshipStatus.NONE) {
+            resource.setRelationshipStatus("");
+        } else {
+            resource.setRelationshipStatus(entity.getRelationshipStatus().getCode());
+        }
+
+        Set<String> purposesOfBeing = new HashSet<>();
+        for (PurposeOfBeing purposeOfBeing : entity.getPurposesOfBeing()) {
+            purposesOfBeing.add(purposeOfBeing.getCode());
+        }
+        resource.setPurposesOfBeing(purposesOfBeing);
 
         return resource;
     }

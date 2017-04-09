@@ -3,10 +3,7 @@ package lt.dualpair.server.domain.model.match;
 import lt.dualpair.server.domain.model.photo.Photo;
 import lt.dualpair.server.domain.model.socionics.RelationType;
 import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.domain.model.user.Gender;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserAccount;
-import lt.dualpair.server.domain.model.user.UserLocation;
+import lt.dualpair.server.domain.model.user.*;
 import lt.dualpair.server.infrastructure.persistence.repository.RelationTypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
 import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
@@ -52,6 +49,9 @@ public class FakeMatchFinder implements MatchFinder {
                 matchRequest.getUser().getRandomSociotype().getCode1(),
                 matchRequest.getRelationType()));
         user.setSociotypes(sociotypes);
+
+        user.setRelationshipStatus(RelationshipStatus.values()[new Random().nextInt(3)]);
+        user.setPurposesOfBeing(getRandomPurposesOfBeing());
 
         // accounts
         Set<UserAccount> userAccounts = new HashSet<>();
@@ -100,6 +100,14 @@ public class FakeMatchFinder implements MatchFinder {
         userRepository.save(user);
 
         return createMatch(matchRequest.getUser(), user, matchRequest.getRelationType(), random.nextInt(300000));
+    }
+
+    private Set<PurposeOfBeing> getRandomPurposesOfBeing() {
+        Set<PurposeOfBeing> purposesOfBeing = new HashSet<>();
+        for (int i = 0 ; i < PurposeOfBeing.values().length; i++ ) {
+            purposesOfBeing.add(PurposeOfBeing.values()[new Random().nextInt(PurposeOfBeing.values().length)]);
+        }
+        return purposesOfBeing;
     }
 
     private String buildUrl(Gender gender) {
