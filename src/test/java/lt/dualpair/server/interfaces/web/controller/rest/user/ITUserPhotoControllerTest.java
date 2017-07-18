@@ -2,9 +2,9 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.photo.PhotoTestUtils;
-import lt.dualpair.server.domain.model.user.UserAccount;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.photo.PhotoTestUtils;
+import lt.dualpair.core.user.UserAccount;
 import lt.dualpair.server.interfaces.resource.user.PhotoResource;
 import lt.dualpair.server.interfaces.web.controller.rest.BaseRestControllerTest;
 import lt.dualpair.server.service.user.MockSocialDataProviderFactory;

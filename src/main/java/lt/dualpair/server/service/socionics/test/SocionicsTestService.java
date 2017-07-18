@@ -1,12 +1,12 @@
 package lt.dualpair.server.service.socionics.test;
 
-import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.domain.model.socionics.test.Choice;
-import lt.dualpair.server.domain.model.socionics.test.ChoicePair;
-import lt.dualpair.server.domain.model.socionics.test.Combination;
-import lt.dualpair.server.domain.model.socionics.test.CombinationChoice;
-import lt.dualpair.server.infrastructure.persistence.repository.ChoicePairRepository;
-import lt.dualpair.server.infrastructure.persistence.repository.CombinationRepository;
+import lt.dualpair.core.socionics.ChoicePairRepository;
+import lt.dualpair.core.socionics.CombinationRepository;
+import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.socionics.test.Choice;
+import lt.dualpair.core.socionics.test.ChoicePair;
+import lt.dualpair.core.socionics.test.Combination;
+import lt.dualpair.core.socionics.test.CombinationChoice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

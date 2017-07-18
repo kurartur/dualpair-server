@@ -1,7 +1,7 @@
 package lt.dualpair.server.interfaces.resource.match;
 
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.user.*;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.user.*;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
 import lt.dualpair.server.interfaces.resource.user.PhotoResourceAssembler;

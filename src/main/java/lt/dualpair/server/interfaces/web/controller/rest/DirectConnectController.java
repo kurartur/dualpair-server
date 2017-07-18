@@ -1,9 +1,9 @@
 package lt.dualpair.server.interfaces.web.controller.rest;
 
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserAccount;
-import lt.dualpair.server.infrastructure.authentication.ActiveUser;
-import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserAccount;
+import lt.dualpair.core.user.UserRepository;
+import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.social.connect.Connection;
@@ -63,7 +63,7 @@ public class DirectConnectController {
 
         // TODO validate connection
 
-        usersConnectionRepository.createConnectionRepository(user.getUsername()).addConnection(connection);
+        usersConnectionRepository.createConnectionRepository(user.getId().toString()).addConnection(connection);
 
         User freshUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found somehow"));
         UserAccount userAccount = new UserAccount(user);

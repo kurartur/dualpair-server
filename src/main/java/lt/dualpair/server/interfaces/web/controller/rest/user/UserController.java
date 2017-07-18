@@ -1,14 +1,15 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.server.domain.model.geo.Location;
-import lt.dualpair.server.domain.model.geo.LocationProvider;
-import lt.dualpair.server.domain.model.geo.LocationProviderException;
-import lt.dualpair.server.domain.model.user.PurposeOfBeing;
-import lt.dualpair.server.domain.model.user.RelationshipStatus;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.infrastructure.authentication.ActiveUser;
+import lt.dualpair.core.location.Location;
+import lt.dualpair.core.location.LocationProvider;
+import lt.dualpair.core.location.LocationProviderException;
+import lt.dualpair.core.user.PurposeOfBeing;
+import lt.dualpair.core.user.RelationshipStatus;
+import lt.dualpair.core.user.User;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
+import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
+import lt.dualpair.server.security.UserDetails;
 import lt.dualpair.server.service.user.SocialUserService;
 import lt.dualpair.server.service.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class UserController {
     private UserResourceAssembler userResourceAssembler;
 
     @RequestMapping(method = RequestMethod.GET, value = "/me")
-    public ResponseEntity me(@ActiveUser User principal) {
+    public ResponseEntity me(@ActiveUser UserDetails principal) {
         try {
             User user = socialUserService.loadUserById(principal.getId());
             return ResponseEntity.ok(userResourceAssembler.toResource(user));
@@ -46,7 +47,7 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.PATCH, value="/user/{userId:[0-9]}")
-    public ResponseEntity updateUser(@PathVariable Long userId, @RequestBody Map<String, Object> data, @ActiveUser User principal) throws URISyntaxException, ParseException {
+    public ResponseEntity updateUser(@PathVariable Long userId, @RequestBody Map<String, Object> data, @ActiveUser UserDetails principal) throws URISyntaxException, ParseException {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -76,7 +77,7 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/date-of-birth")
-    public ResponseEntity setDateOfBirth(@PathVariable Long userId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth, @ActiveUser User principal) throws URISyntaxException {
+    public ResponseEntity setDateOfBirth(@PathVariable Long userId, @RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dateOfBirth, @ActiveUser UserDetails principal) throws URISyntaxException {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -85,7 +86,7 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.PUT, value = "/user/{userId:[0-9]+}/locations")
-    public ResponseEntity setLocation(@RequestBody LocationResource locationResource, @PathVariable("userId") Long userId, @ActiveUser User principal) throws LocationProviderException, URISyntaxException {
+    public ResponseEntity setLocation(@RequestBody LocationResource locationResource, @PathVariable("userId") Long userId, @ActiveUser UserDetails principal) throws LocationProviderException, URISyntaxException {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

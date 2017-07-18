@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
 
-    <users id="1" username="1" gender="M" name="Artur"/>
+    <users id="1" gender="M" name="Artur"/>
     <search_parameters user_id="1" search_male="false" search_female="true" min_age="20" max_age="30"/>
 
 </dataset>

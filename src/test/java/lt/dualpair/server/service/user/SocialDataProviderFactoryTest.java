@@ -1,6 +1,6 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.user.UserAccount;
+import lt.dualpair.core.user.UserAccount;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.Connection;
@@ -26,7 +26,7 @@ public class SocialDataProviderFactoryTest {
     @Test
     public void testGetProvider_nullParameters() throws Exception {
         try {
-            socialDataProviderFactory.getProvider(null, "username");
+            socialDataProviderFactory.getProvider(null, 1L);
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("Account type required", iae.getMessage());
@@ -36,15 +36,15 @@ public class SocialDataProviderFactoryTest {
             socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, null);
             fail();
         } catch (IllegalArgumentException iae) {
-            assertEquals("Username required", iae.getMessage());
+            assertEquals("User id required", iae.getMessage());
         }
     }
 
     @Test
     public void testGetProvider_facebook() throws Exception {
         ConnectionRepository connectionRepository = mock(ConnectionRepository.class);
-        doReturn(connectionRepository).when(usersConnectionRepository).createConnectionRepository("username");
-        SocialDataProvider provider = socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, "username");
+        doReturn(connectionRepository).when(usersConnectionRepository).createConnectionRepository("1");
+        SocialDataProvider provider = socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, 1L);
         assertTrue(provider instanceof FacebookDataProvider);
         verify(connectionRepository, times(1)).findPrimaryConnection(Facebook.class);
     }
@@ -52,11 +52,11 @@ public class SocialDataProviderFactoryTest {
     @Test
     public void testGetProvider_vkontakte() throws Exception {
         ConnectionRepository connectionRepository = mock(ConnectionRepository.class);
-        doReturn(connectionRepository).when(usersConnectionRepository).createConnectionRepository("username");
+        doReturn(connectionRepository).when(usersConnectionRepository).createConnectionRepository("1");
         Connection connection = mock(Connection.class);
         doReturn(connection).when(connectionRepository).findPrimaryConnection(VKontakte.class);
         doReturn(new ConnectionData("vkontakte", "1", null, null, null, null, null, null, null)).when(connection).createData();
-        SocialDataProvider provider = socialDataProviderFactory.getProvider(UserAccount.Type.VKONTAKTE, "username");
+        SocialDataProvider provider = socialDataProviderFactory.getProvider(UserAccount.Type.VKONTAKTE, 1L);
         assertTrue(provider instanceof VKontakteDataProvider);
         verify(connectionRepository, times(1)).findPrimaryConnection(VKontakte.class);
     }

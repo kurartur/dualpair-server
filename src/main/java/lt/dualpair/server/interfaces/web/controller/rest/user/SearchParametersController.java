@@ -1,10 +1,11 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.server.domain.model.match.SearchParameters;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.infrastructure.authentication.ActiveUser;
+import lt.dualpair.core.match.SearchParameters;
+import lt.dualpair.core.user.User;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResource;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResourceAssembler;
+import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
+import lt.dualpair.server.security.UserDetails;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class SearchParametersController {
     private SearchParametersResourceAssembler searchParametersResourceAssembler;
 
     @RequestMapping(method = RequestMethod.PUT, value = "/search-parameters")
-    public ResponseEntity setSearchParameters(@PathVariable Long userId, @RequestBody SearchParametersResource resource, @ActiveUser User principal) throws URISyntaxException {
+    public ResponseEntity setSearchParameters(@PathVariable Long userId, @RequestBody SearchParametersResource resource, @ActiveUser UserDetails principal) throws URISyntaxException {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -36,7 +37,7 @@ public class SearchParametersController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/search-parameters")
-    public ResponseEntity getSearchParameters(@PathVariable Long userId, @ActiveUser User principal) {
+    public ResponseEntity getSearchParameters(@PathVariable Long userId, @ActiveUser UserDetails principal) {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

@@ -1,10 +1,10 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.geo.Location;
-import lt.dualpair.server.domain.model.match.SearchParameters;
-import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserLocation;
+import lt.dualpair.core.location.Location;
+import lt.dualpair.core.match.SearchParameters;
+import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserLocation;
 
 import java.util.Date;
 import java.util.Set;

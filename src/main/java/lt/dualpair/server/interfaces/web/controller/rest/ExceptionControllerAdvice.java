@@ -1,6 +1,6 @@
 package lt.dualpair.server.interfaces.web.controller.rest;
 
-import lt.dualpair.server.domain.model.match.MatchRequestException;
+import lt.dualpair.core.match.MatchRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

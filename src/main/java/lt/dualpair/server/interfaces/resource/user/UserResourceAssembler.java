@@ -1,9 +1,9 @@
 package lt.dualpair.server.interfaces.resource.user;
 
-import lt.dualpair.server.domain.model.user.PurposeOfBeing;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserAccount;
-import lt.dualpair.server.domain.model.user.UserLocation;
+import lt.dualpair.core.user.PurposeOfBeing;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserAccount;
+import lt.dualpair.core.user.UserLocation;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;
 import lt.dualpair.server.interfaces.web.controller.rest.user.SearchParametersController;
 import lt.dualpair.server.interfaces.web.controller.rest.user.UserController;
@@ -69,7 +69,8 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
         }
         resource.setPurposesOfBeing(purposesOfBeing);
 
-        resource.add(linkTo(methodOn(SearchParametersController.class).getSearchParameters(entity.getId(), entity)).withRel("search-parameters"));
+        // TODO null as param
+        resource.add(linkTo(methodOn(SearchParametersController.class).getSearchParameters(entity.getId(), null)).withRel("search-parameters"));
 
         return resource;
     }

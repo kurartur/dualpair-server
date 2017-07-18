@@ -1,10 +1,10 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.user.UserAccount;
-import lt.dualpair.server.domain.model.user.UserTestUtils;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.user.UserAccount;
 import lt.dualpair.server.interfaces.resource.user.PhotoResource;
 import lt.dualpair.server.interfaces.resource.user.PhotoResourceAssembler;
+import lt.dualpair.server.security.TestUserDetails;
 import lt.dualpair.server.service.user.SocialDataProvider;
 import lt.dualpair.server.service.user.SocialDataProviderFactory;
 import lt.dualpair.server.service.user.SocialUserService;
@@ -41,25 +41,25 @@ public class UserPhotoControllerTest {
         userPhotoController.setPhotoResourceAssembler(photoResourceAssembler);
         userPhotoController.setSocialDataProviderFactory(socialDataProviderFactory);
         userPhotoController.setSocialUserService(socialUserService);
-        when(socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, "username")).thenReturn(socialDataProvider);
+        when(socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, 1L)).thenReturn(socialDataProvider);
     }
 
     @Test
     public void testDeletePhoto_forbidden() throws Exception {
-        ResponseEntity responseEntity = userPhotoController.deletePhoto(2L, 1L, UserTestUtils.createUser());
+        ResponseEntity responseEntity = userPhotoController.deletePhoto(2L, 1L, new TestUserDetails(1L));
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
     }
 
     @Test
     public void testDeletePhoto() throws Exception {
-        ResponseEntity responseEntity = userPhotoController.deletePhoto(1L, 1L, UserTestUtils.createUser());
+        ResponseEntity responseEntity = userPhotoController.deletePhoto(1L, 1L, new TestUserDetails(1L));
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         verify(socialUserService, times(1)).deleteUserPhoto(1L, 1L);
     }
 
     @Test
     public void testGetAvailablePhotos_forbidden() throws Exception {
-        ResponseEntity responseEntity = userPhotoController.getAvailablePhotos(2L, null, UserTestUtils.createUser());
+        ResponseEntity responseEntity = userPhotoController.getAvailablePhotos(2L, null, new TestUserDetails(1L));
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
     }
 
@@ -71,15 +71,15 @@ public class UserPhotoControllerTest {
         PhotoResource photoResource = new PhotoResource();
         List<PhotoResource> photoResources = Arrays.asList(photoResource);
         when(photoResourceAssembler.toResources(photos)).thenReturn(photoResources);
-        when(socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, "username")).thenReturn(socialDataProvider);
-        ResponseEntity responseEntity = userPhotoController.getAvailablePhotos(1L, "FB", UserTestUtils.createUser());
+        when(socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, 1L)).thenReturn(socialDataProvider);
+        ResponseEntity responseEntity = userPhotoController.getAvailablePhotos(1L, "FB", new TestUserDetails(1L));
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(photoResources, responseEntity.getBody());
     }
 
     @Test
     public void testAddPhoto_forbidden() throws Exception {
-        ResponseEntity responseEntity = userPhotoController.addPhoto(2L, null, UserTestUtils.createUser());
+        ResponseEntity responseEntity = userPhotoController.addPhoto(2L, null, new TestUserDetails(1L));
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
     }
 
@@ -97,14 +97,14 @@ public class UserPhotoControllerTest {
         PhotoResource newPhotoResource = new PhotoResource();
         when(photoResourceAssembler.toResource(photo)).thenReturn(newPhotoResource);
 
-        ResponseEntity responseEntity = userPhotoController.addPhoto(1L, photoResource, UserTestUtils.createUser());
+        ResponseEntity responseEntity = userPhotoController.addPhoto(1L, photoResource, new TestUserDetails(1L));
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(newPhotoResource, responseEntity.getBody());
     }
 
     @Test
     public void testSetPhotos_forbidden() throws Exception {
-        ResponseEntity responseEntity = userPhotoController.setPhotos(2L, new ArrayList<>(), UserTestUtils.createUser());
+        ResponseEntity responseEntity = userPhotoController.setPhotos(2L, new ArrayList<>(), new TestUserDetails(1L));
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
     }
 
@@ -117,7 +117,7 @@ public class UserPhotoControllerTest {
         photoResource.setPosition(1);
         photoResourceList.add(photoResource);
 
-        ResponseEntity responseEntity = userPhotoController.setPhotos(1L, photoResourceList, UserTestUtils.createUser());
+        ResponseEntity responseEntity = userPhotoController.setPhotos(1L, photoResourceList, new TestUserDetails(1L));
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
         verify(socialUserService, times(1)).setUserPhotos(eq(1L), photoDataCaptor.capture());

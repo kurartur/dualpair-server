@@ -3,6 +3,7 @@ package lt.dualpair.server.interfaces.web.controller.rest;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import lt.dualpair.server.Application;
 import lt.dualpair.server.OAuthHelper;
+import lt.dualpair.server.security.UserDetailsImpl;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,7 @@ public abstract class BaseRestControllerTest {
     }
 
     protected RequestPostProcessor bearerToken(Long userId) {
-        return helper.bearerToken("dualpairandroid", OAuthHelper.buildUserPrincipal(userId));
+        return helper.bearerToken("dualpairandroid", new UserDetailsImpl(OAuthHelper.buildUserPrincipal(userId)));
     }
 
 }

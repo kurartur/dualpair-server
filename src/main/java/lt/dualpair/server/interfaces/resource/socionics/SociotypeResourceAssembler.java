@@ -1,6 +1,6 @@
 package lt.dualpair.server.interfaces.resource.socionics;
 
-import lt.dualpair.server.domain.model.socionics.Sociotype;
+import lt.dualpair.core.socionics.Sociotype;
 import lt.dualpair.server.interfaces.web.controller.rest.SocionicsController;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;

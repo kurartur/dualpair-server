@@ -1,9 +1,10 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserTestUtils;
-import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
+import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.socionics.SociotypeRepository;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserTestUtils;
+import lt.dualpair.server.security.TestUserDetails;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +42,7 @@ public class SociotypesControllerTest {
         String[] codes = {"EII"};
         Set<Sociotype.Code1> sociotypeCodes = new HashSet<>();
         sociotypeCodes.add(Sociotype.Code1.EII);
-        ResponseEntity response = sociotypesController.setSociotypes(1L, codes, principal);
+        ResponseEntity response = sociotypesController.setSociotypes(1L, codes, new TestUserDetails(1L));
         verify(socialUserService, times(1)).setUserSociotypes(principal, sociotypes);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("/api/user/1", response.getHeaders().getLocation().toString());
@@ -50,7 +51,7 @@ public class SociotypesControllerTest {
     @Test
     public void testSetSociotypes_invalidUser() throws Exception {
         String[] codes = {"EII"};
-        ResponseEntity response = sociotypesController.setSociotypes(2L, codes, principal);
+        ResponseEntity response = sociotypesController.setSociotypes(2L, codes, new TestUserDetails(1L));
         verify(socialUserService, never()).setUserSociotypes(any(User.class), any(Set.class));
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
@@ -62,7 +63,7 @@ public class SociotypesControllerTest {
         sociotypeCodes.add(Sociotype.Code1.EII);
         doThrow(new RuntimeException("Error")).when(socialUserService).setUserSociotypes(principal, sociotypes);
         try {
-            sociotypesController.setSociotypes(1L, codes, principal);
+            sociotypesController.setSociotypes(1L, codes, new TestUserDetails(1L));
             fail();
         } catch (RuntimeException re) {
             assertEquals("Error", re.getMessage());

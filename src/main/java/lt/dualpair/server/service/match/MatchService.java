@@ -1,8 +1,8 @@
 package lt.dualpair.server.service.match;
 
-import lt.dualpair.server.domain.model.match.Match;
-import lt.dualpair.server.domain.model.match.MatchRequest;
-import lt.dualpair.server.domain.model.match.MatchRequestException;
+import lt.dualpair.core.match.Match;
+import lt.dualpair.core.match.MatchRequest;
+import lt.dualpair.core.match.MatchRequestException;
 
 public interface MatchService {
 

@@ -1,6 +1,6 @@
 package lt.dualpair.server.infrastructure.persistence.repository.converter;
 
-import lt.dualpair.server.domain.model.user.PurposeOfBeing;
+import lt.dualpair.core.user.PurposeOfBeing;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

@@ -2,9 +2,9 @@ package lt.dualpair.server.infrastructure.notification.gcm;
 
 import com.google.android.gcm.server.Message;
 import com.google.android.gcm.server.Sender;
-import lt.dualpair.server.domain.model.user.Device;
-import lt.dualpair.server.domain.model.user.DeviceRepository;
-import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.core.user.Device;
+import lt.dualpair.core.user.DeviceRepository;
+import lt.dualpair.core.user.User;
 import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationType;
 import org.junit.Before;

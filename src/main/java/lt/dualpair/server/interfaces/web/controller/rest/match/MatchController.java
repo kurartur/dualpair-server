@@ -1,21 +1,22 @@
 package lt.dualpair.server.interfaces.web.controller.rest.match;
 
-import lt.dualpair.server.domain.model.match.Match;
-import lt.dualpair.server.domain.model.match.MatchRequestBuilder;
-import lt.dualpair.server.domain.model.match.MatchRequestException;
-import lt.dualpair.server.domain.model.match.UserAwareMatch;
-import lt.dualpair.server.domain.model.user.Gender;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.infrastructure.authentication.ActiveUser;
+import lt.dualpair.core.match.Match;
+import lt.dualpair.core.match.MatchRequestBuilder;
+import lt.dualpair.core.match.MatchRequestException;
+import lt.dualpair.core.match.UserAwareMatch;
+import lt.dualpair.core.user.Gender;
+import lt.dualpair.core.user.User;
 import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
+import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
 import lt.dualpair.server.service.match.MatchService;
 import lt.dualpair.server.service.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -30,10 +31,17 @@ public class MatchController {
     private MatchResourceAssembler matchResourceAssembler;
     private UserService userService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/match/next")
-    public ResponseEntity next(@Valid SearchQuery searchQuery, @ActiveUser User principal) throws MatchRequestException {
+    @Inject
+    public MatchController(MatchService matchService, MatchResourceAssembler matchResourceAssembler, UserService userService) {
+        this.matchService = matchService;
+        this.matchResourceAssembler = matchResourceAssembler;
+        this.userService = userService;
+    }
 
-        User freshUser = userService.loadUserById(principal.getId());
+    @RequestMapping(method = RequestMethod.GET, value = "/match/next")
+    public ResponseEntity next(@Valid SearchQuery searchQuery, @ActiveUser UserDetails principal) throws MatchRequestException {
+
+        User freshUser = userService.loadUserById(new Long(principal.getUsername()));
 
         MatchRequestBuilder builder = MatchRequestBuilder.findFor(freshUser)
                 .ageRange(searchQuery.getMinAge(), searchQuery.getMaxAge())
@@ -47,22 +55,7 @@ public class MatchController {
         if (match == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().body(matchResourceAssembler.toResource(new UserAwareMatch(principal, match)));
-    }
-
-    @Autowired
-    public void setMatchService(MatchService matchService) {
-        this.matchService = matchService;
-    }
-
-    @Autowired
-    public void setMatchResourceAssembler(MatchResourceAssembler matchResourceAssembler) {
-        this.matchResourceAssembler = matchResourceAssembler;
-    }
-
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
+        return ResponseEntity.ok().body(matchResourceAssembler.toResource(new UserAwareMatch(freshUser, match)));
     }
 
     public static class SearchQuery {

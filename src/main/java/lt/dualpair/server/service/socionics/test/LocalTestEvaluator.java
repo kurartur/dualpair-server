@@ -1,7 +1,7 @@
 package lt.dualpair.server.service.socionics.test;
 
-import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
+import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.socionics.SociotypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class LocalTestEvaluator implements TestEvaluator {
     public Sociotype evaluate(Map<String, String> choices) throws SocionicsTestException {
         try {
             Integer sociotypeId = getSociotypeId(choices);
-            return sociotypeRepository.findOne(sociotypeId).orElseGet(() -> null);
+            return sociotypeRepository.findOne(sociotypeId).orElse(null);
         } catch (EmptyResultDataAccessException e) {
             return null;
         } catch (DataAccessException e) {

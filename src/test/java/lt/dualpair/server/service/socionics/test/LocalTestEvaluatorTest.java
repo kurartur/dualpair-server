@@ -1,7 +1,7 @@
 package lt.dualpair.server.service.socionics.test;
 
-import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
+import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.socionics.SociotypeRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

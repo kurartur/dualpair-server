@@ -1,6 +1,6 @@
 package lt.dualpair.server.interfaces.web.controller;
 
-import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.core.user.User;
 import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import lt.dualpair.server.infrastructure.notification.NotificationType;

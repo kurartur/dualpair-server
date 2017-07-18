@@ -1,6 +1,6 @@
 package lt.dualpair.server.infrastructure.persistence.repository.converter;
 
-import lt.dualpair.server.domain.model.match.Response;
+import lt.dualpair.core.match.Response;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

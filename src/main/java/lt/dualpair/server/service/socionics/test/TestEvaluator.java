@@ -1,6 +1,6 @@
 package lt.dualpair.server.service.socionics.test;
 
-import lt.dualpair.server.domain.model.socionics.Sociotype;
+import lt.dualpair.core.socionics.Sociotype;
 
 import java.util.Map;
 
