@@ -1,9 +1,9 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.user.Gender;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserAccount;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.user.Gender;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserAccount;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.Connection;

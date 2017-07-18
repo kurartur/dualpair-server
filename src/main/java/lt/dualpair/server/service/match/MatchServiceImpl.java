@@ -1,11 +1,11 @@
 package lt.dualpair.server.service.match;
 
-import lt.dualpair.server.domain.model.match.*;
-import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.core.match.*;
+import lt.dualpair.core.user.MatchRepository;
+import lt.dualpair.core.user.User;
 import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import lt.dualpair.server.infrastructure.notification.NotificationType;
-import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,9 +1,9 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.infrastructure.authentication.ActiveUser;
-import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
+import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.socionics.SociotypeRepository;
+import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
+import lt.dualpair.server.security.UserDetails;
 import lt.dualpair.server.service.user.SocialUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +24,7 @@ public class SociotypesController {
     private SociotypeRepository sociotypeRepository;
 
     @RequestMapping(method = RequestMethod.PUT, value = "/sociotypes")
-    public ResponseEntity setSociotypes(@PathVariable Long userId, @RequestBody String[] codes, @ActiveUser User principal) throws URISyntaxException {
+    public ResponseEntity setSociotypes(@PathVariable Long userId, @RequestBody String[] codes, @ActiveUser UserDetails principal) throws URISyntaxException {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }

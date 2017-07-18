@@ -1,6 +1,6 @@
 package lt.dualpair.server.interfaces.web.controller.rest;
 
-import lt.dualpair.server.domain.model.socionics.Sociotype;
+import lt.dualpair.core.socionics.Sociotype;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResource;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;
 import lt.dualpair.server.service.socionics.test.SocionicsTestService;

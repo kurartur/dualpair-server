@@ -1,16 +1,15 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.server.domain.model.geo.Location;
-import lt.dualpair.server.domain.model.geo.LocationProvider;
-import lt.dualpair.server.domain.model.geo.LocationProviderException;
-import lt.dualpair.server.domain.model.user.PurposeOfBeing;
-import lt.dualpair.server.domain.model.user.RelationshipStatus;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserTestUtils;
+import lt.dualpair.core.location.Location;
+import lt.dualpair.core.location.LocationProvider;
+import lt.dualpair.core.location.LocationProviderException;
+import lt.dualpair.core.user.PurposeOfBeing;
+import lt.dualpair.core.user.RelationshipStatus;
+import lt.dualpair.core.user.User;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
-import lt.dualpair.server.interfaces.resource.user.SearchParametersResourceAssembler;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
+import lt.dualpair.server.security.TestUserDetails;
 import lt.dualpair.server.service.user.SocialUserServiceImpl;
 import lt.dualpair.server.service.user.UserNotFoundException;
 import org.junit.Before;
@@ -31,10 +30,8 @@ public class UserControllerTest {
 
     private UserController userController = new UserController();
     private SocialUserServiceImpl socialUserService = mock(SocialUserServiceImpl.class);
-    private SearchParametersResourceAssembler searchParametersResourceAssembler = mock(SearchParametersResourceAssembler.class);
     private LocationProvider locationProvider = mock(LocationProvider.class);
     private UserResourceAssembler userResourceAssembler = mock(UserResourceAssembler.class);
-    private User principal = UserTestUtils.createUser(1L);
 
     @Before
     public void setUp() throws Exception {
@@ -49,7 +46,7 @@ public class UserControllerTest {
         UserResource userResource = new UserResource();
         when(socialUserService.loadUserById(1L)).thenReturn(user);
         when(userResourceAssembler.toResource(user)).thenReturn(userResource);
-        ResponseEntity responseEntity = userController.me(UserTestUtils.createUser(1L));
+        ResponseEntity responseEntity = userController.me(new TestUserDetails(1L));
         assertEquals(userResource, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
@@ -57,13 +54,13 @@ public class UserControllerTest {
     @Test
     public void testGetUser_notFound() throws Exception {
         doThrow(new UserNotFoundException("User not found")).when(socialUserService).loadUserById(1L);
-        ResponseEntity responseEntity = userController.me(UserTestUtils.createUser(1L));
+        ResponseEntity responseEntity = userController.me(new TestUserDetails(1L));
         assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
     }
 
     @Test
     public void testUpdateUser_invalidUser() throws Exception {
-        ResponseEntity responseEntity = userController.updateUser(2L, new HashMap<>(), principal);
+        ResponseEntity responseEntity = userController.updateUser(2L, new HashMap<>(), new TestUserDetails(1L));
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
         verify(socialUserService, never()).loadUserById(any(Long.class));
         verify(socialUserService, never()).updateUser(any(User.class));
@@ -79,7 +76,7 @@ public class UserControllerTest {
         data.put("purposesOfBeing", Arrays.asList("FIFR", "FILO"));
         User user = new User();
         when(socialUserService.loadUserById(1L)).thenReturn(user);
-        ResponseEntity responseEntity = userController.updateUser(1L, data, principal);
+        ResponseEntity responseEntity = userController.updateUser(1L, data, new TestUserDetails(1L));
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
         assertEquals("/api/user/1", responseEntity.getHeaders().getLocation().toString());
         verify(socialUserService, times(1)).updateUser(user);
@@ -101,7 +98,7 @@ public class UserControllerTest {
         User user = new User();
         user.setRelationshipStatus(RelationshipStatus.SINGLE);
         when(socialUserService.loadUserById(1L)).thenReturn(user);
-        ResponseEntity responseEntity = userController.updateUser(1L, data, principal);
+        ResponseEntity responseEntity = userController.updateUser(1L, data, new TestUserDetails(1L));
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
         verify(socialUserService, times(1)).updateUser(user);
         assertEquals(RelationshipStatus.NONE, user.getRelationshipStatus());
@@ -110,7 +107,7 @@ public class UserControllerTest {
     @Test
     public void testSetDateOfBirth() throws Exception {
         Date dateOfBirth = new Date();
-        ResponseEntity responseEntity = userController.setDateOfBirth(1L, dateOfBirth, principal);
+        ResponseEntity responseEntity = userController.setDateOfBirth(1L, dateOfBirth, new TestUserDetails(1L));
         verify(socialUserService, times(1)).setUserDateOfBirth(1L, dateOfBirth);
         assertEquals(HttpStatus.SEE_OTHER, responseEntity.getStatusCode());
         assertEquals("/api/user", responseEntity.getHeaders().getLocation().toString());
@@ -121,7 +118,7 @@ public class UserControllerTest {
         Date dateOfBirth = new Date();
         doThrow(new RuntimeException("Error")).when(socialUserService).setUserDateOfBirth(1L, dateOfBirth);
         try {
-            userController.setDateOfBirth(1L, dateOfBirth, principal);
+            userController.setDateOfBirth(1L, dateOfBirth, new TestUserDetails(1L));
             fail();
         } catch (RuntimeException re) {
             assertEquals("Error", re.getMessage());
@@ -132,7 +129,7 @@ public class UserControllerTest {
     @Test
     public void testSetDateOfBirth_invalidUser() throws Exception {
         Date dateOfBirth = new Date();
-        ResponseEntity response = userController.setDateOfBirth(2L, dateOfBirth, principal);
+        ResponseEntity response = userController.setDateOfBirth(2L, dateOfBirth, new TestUserDetails(1L));
         verify(socialUserService, never()).setUserDateOfBirth(any(Long.class), any(Date.class));
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
@@ -141,7 +138,7 @@ public class UserControllerTest {
     public void testSetLocation_noLatLon() throws Exception {
         LocationResource locationResource = new LocationResource();
         try {
-            userController.setLocation(locationResource, 1L, principal);
+            userController.setLocation(locationResource, 1L, new TestUserDetails(1L));
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("\"latitude\" and \"longitude\" must be provided", iae.getMessage());
@@ -149,7 +146,7 @@ public class UserControllerTest {
 
         locationResource.setLatitude(1.0);
         try {
-            userController.setLocation(locationResource, 1L, principal);
+            userController.setLocation(locationResource, 1L, new TestUserDetails(1L));
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("\"latitude\" and \"longitude\" must be provided", iae.getMessage());
@@ -158,7 +155,7 @@ public class UserControllerTest {
         locationResource.setLatitude(null);
         locationResource.setLongitude(1.0);
         try {
-            userController.setLocation(locationResource, 1L, principal);
+            userController.setLocation(locationResource, 1L, new TestUserDetails(1L));
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("\"latitude\" and \"longitude\" must be provided", iae.getMessage());
@@ -172,7 +169,7 @@ public class UserControllerTest {
         locationResource.setLongitude(2.0);
         when(locationProvider.getLocation(1.0, 2.0)).thenThrow(new LocationProviderException("Error"));
         try {
-            userController.setLocation(locationResource, 1L, principal);
+            userController.setLocation(locationResource, 1L, new TestUserDetails(1L));
             fail();
         } catch (LocationProviderException lpe) {
             assertEquals("Error", lpe.getMessage());
@@ -182,7 +179,7 @@ public class UserControllerTest {
 
     @Test
     public void testSetLocation_invalidUser() throws Exception {
-        ResponseEntity response = userController.setLocation(null, 2L, principal);
+        ResponseEntity response = userController.setLocation(null, 2L, new TestUserDetails(1L));
         verify(locationProvider, never()).getLocation(any(Double.class), any(Double.class));
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
@@ -196,7 +193,7 @@ public class UserControllerTest {
         when(locationProvider.getLocation(1.0, 2.0)).thenReturn(location);
         doThrow(new RuntimeException("Error")).when(socialUserService).addLocation(1L, location);
         try {
-            userController.setLocation(locationResource, 1L, principal);
+            userController.setLocation(locationResource, 1L, new TestUserDetails(1L));
             fail();
         } catch (RuntimeException re) {
             assertEquals("Error", re.getMessage());
@@ -210,7 +207,7 @@ public class UserControllerTest {
         locationResource.setLongitude(2.0);
         Location location = new Location(1.0, 2.0, "LT", "Vilnius");
         when(locationProvider.getLocation(1.0, 2.0)).thenReturn(location);
-        userController.setLocation(locationResource, 1L, principal);
+        userController.setLocation(locationResource, 1L, new TestUserDetails(1L));
         verify(socialUserService, times(1)).addLocation(1L, location);
     }
 

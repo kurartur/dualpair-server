@@ -1,8 +1,8 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserAccount;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class SocialUserServiceImpl extends UserServiceImpl implements SocialUser
     @Transactional
     public Photo addUserPhoto(Long userId, UserAccount.Type accountType, String idOnAccount, int position) {
         User user = loadUserById(userId);
-        Photo photo = socialDataProviderFactory.getProvider(accountType, user.getUsername())
+        Photo photo = socialDataProviderFactory.getProvider(accountType, user.getId())
                 .getPhoto(idOnAccount).orElseThrow((Supplier<RuntimeException>) () -> new IllegalArgumentException("Photo doesn't exist on account or is not public"));
         photo.setUser(user);
         photo.setPosition(position);
@@ -51,7 +51,7 @@ public class SocialUserServiceImpl extends UserServiceImpl implements SocialUser
                             .distinct()
                             .collect(Collectors.toList());
 
-                    List<Photo> photosByAccount = socialDataProviderFactory.getProvider(accountType, user.getUsername())
+                    List<Photo> photosByAccount = socialDataProviderFactory.getProvider(accountType, user.getId())
                             .getPhotos(idsOnAccount);
 
                     if (idsOnAccount.size() != photosByAccount.size()) {

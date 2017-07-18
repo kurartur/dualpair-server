@@ -1,6 +1,6 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.user.UserAccount;
+import lt.dualpair.core.user.UserAccount;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +14,7 @@ public class MockSocialDataProviderFactory extends SocialDataProviderFactory {
     private static Map<UserAccount.Type, SocialDataProvider> socialDataProviders = new HashMap<>();
 
     @Override
-    public SocialDataProvider getProvider(UserAccount.Type accountType, String username) {
+    public SocialDataProvider getProvider(UserAccount.Type accountType, Long userId) {
         if (socialDataProviders.containsKey(accountType)) {
             return socialDataProviders.get(accountType);
         }

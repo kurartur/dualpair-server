@@ -1,6 +1,6 @@
 package lt.dualpair.server.infrastructure.persistence.repository.converter;
 
-import lt.dualpair.server.domain.model.user.UserAccount;
+import lt.dualpair.core.user.UserAccount;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

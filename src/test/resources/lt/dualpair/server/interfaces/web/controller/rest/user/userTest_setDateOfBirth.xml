@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
 
-    <users id="1" username="1" gender="M" name="Artur"/>
-    <users id="2" username="2" gender="F" name="Melanie"/>
+    <users id="1" gender="M" name="Artur"/>
+    <users id="2" gender="F" name="Melanie"/>
 
 </dataset>

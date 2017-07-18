@@ -1,11 +1,11 @@
 package lt.dualpair.server.interfaces.resource.user;
 
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.domain.model.user.RelationshipStatus;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserAccount;
-import lt.dualpair.server.domain.model.user.UserLocation;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.user.RelationshipStatus;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserAccount;
+import lt.dualpair.core.user.UserLocation;
 import lt.dualpair.server.interfaces.resource.BaseResourceAssemblerTest;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResource;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;

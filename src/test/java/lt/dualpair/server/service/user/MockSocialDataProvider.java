@@ -1,7 +1,7 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.user.User;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 

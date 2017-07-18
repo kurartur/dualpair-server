@@ -1,10 +1,7 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserReport;
-import lt.dualpair.server.domain.model.user.UserTestUtils;
-import lt.dualpair.server.infrastructure.persistence.repository.UserReportRepository;
-import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
+import lt.dualpair.core.user.*;
+import lt.dualpair.server.security.UserDetailsImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,11 +32,12 @@ public class ReportControllerTest {
         when(userRepository.findById(2L)).thenReturn(Optional.of(userBeingReported));
         when(userReportRepository.getReportCountByUser(eq(principal), any(Date.class))).thenReturn(0);
         when(userReportRepository.findUserReportByUser(userBeingReported, principal)).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(principal));
     }
 
     @Test
     public void report() throws Exception {
-        reportController.report(createData(2L), principal);
+        reportController.report(createData(2L), new UserDetailsImpl(principal));
         ArgumentCaptor<UserReport> userReportCaptor = ArgumentCaptor.forClass(UserReport.class);
         verify(userReportRepository, times(1)).save(userReportCaptor.capture());
         UserReport userReport = userReportCaptor.getValue();
@@ -51,7 +49,7 @@ public class ReportControllerTest {
     public void report_whenLimitReached_409response() throws Exception {
         when(userReportRepository.getReportCountByUser(eq(principal), any(Date.class))).thenReturn(5);
         try {
-            reportController.report(createData(2L), principal);
+            reportController.report(createData(2L), new UserDetailsImpl(principal));
             fail();
         } catch (IllegalStateException ise) {
             assertEquals("Report limit is reached", ise.getMessage());
@@ -63,7 +61,7 @@ public class ReportControllerTest {
     public void report_whenUserNotFound_400response() throws Exception {
         when(userRepository.findById(3L)).thenReturn(Optional.empty());
         try {
-            reportController.report(createData(3L), principal);
+            reportController.report(createData(3L), new UserDetailsImpl(principal));
             fail();
         } catch (IllegalArgumentException iae) {
             assertEquals("User not found", iae.getMessage());
@@ -75,7 +73,7 @@ public class ReportControllerTest {
     public void report_whenAlreadyReported_409response() throws Exception {
         when(userReportRepository.findUserReportByUser(userBeingReported, principal)).thenReturn(Optional.of(new UserReport(null, null)));
         try {
-            reportController.report(createData(2L), principal);
+            reportController.report(createData(2L), new UserDetailsImpl(principal));
             fail();
         } catch (IllegalStateException ise) {
             assertEquals("User already reported", ise.getMessage());

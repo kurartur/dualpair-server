@@ -1,8 +1,9 @@
 package lt.dualpair.server.infrastructure.persistence.repository;
 
-import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.domain.model.user.Gender;
-import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.user.Gender;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserRepositoryImpl;
 import org.junit.Before;
 import org.junit.Test;
 

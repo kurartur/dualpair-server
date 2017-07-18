@@ -1,15 +1,15 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.match.*;
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.socionics.RelationType;
-import lt.dualpair.server.domain.model.socionics.Sociotype;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserTestUtils;
-import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
-import lt.dualpair.server.infrastructure.persistence.repository.PhotoRepository;
-import lt.dualpair.server.infrastructure.persistence.repository.SociotypeRepository;
-import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
+import lt.dualpair.core.match.*;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.photo.PhotoRepository;
+import lt.dualpair.core.socionics.RelationType;
+import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.socionics.SociotypeRepository;
+import lt.dualpair.core.user.MatchRepository;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserRepository;
+import lt.dualpair.core.user.UserTestUtils;
 import org.junit.Before;
 import org.junit.Test;
 

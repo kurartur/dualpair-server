@@ -1,13 +1,15 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.server.domain.model.match.Match;
-import lt.dualpair.server.domain.model.match.MatchTestUtils;
-import lt.dualpair.server.domain.model.match.UserAwareMatch;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserTestUtils;
-import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
+import lt.dualpair.core.match.Match;
+import lt.dualpair.core.match.MatchTestUtils;
+import lt.dualpair.core.match.UserAwareMatch;
+import lt.dualpair.core.user.MatchRepository;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserRepository;
+import lt.dualpair.core.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.match.MatchResource;
 import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
+import lt.dualpair.server.security.TestUserDetails;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,26 +30,28 @@ import static org.mockito.Mockito.*;
 
 public class UserMatchControllerTest {
 
-    private UserMatchController userMatchController = new UserMatchController();
+    private UserMatchController userMatchController;
     private MatchRepository matchRepository = mock(MatchRepository.class);
     private MatchResourceAssembler matchResourceAssembler = mock(MatchResourceAssembler.class);
+    private UserRepository userRepository = mock(UserRepository.class);
+    private User user = UserTestUtils.createUser();
 
     @Before
     public void setUp() throws Exception {
-        userMatchController.setMatchRepository(matchRepository);
-        userMatchController.setMatchResourceAssembler(matchResourceAssembler);
+        userMatchController = new UserMatchController(matchRepository, matchResourceAssembler, userRepository);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     }
 
     @Test
     public void testGetMatch_invalidUser() throws Exception {
-        ResponseEntity response = userMatchController.getMatch(2L, 1L, UserTestUtils.createUser());
+        ResponseEntity response = userMatchController.getMatch(2L, 1L, new TestUserDetails(1L));
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
     public void testGetMatch_notFound() throws Exception {
         when(matchRepository.findOneByUser(1L, 1L)).thenReturn(Optional.empty());
-        ResponseEntity response = userMatchController.getMatch(1L, 1L, UserTestUtils.createUser());
+        ResponseEntity response = userMatchController.getMatch(1L, 1L, new TestUserDetails(1L));
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
@@ -57,7 +61,7 @@ public class UserMatchControllerTest {
         MatchResource matchResource = new MatchResource();
         when(matchRepository.findOneByUser(1L, 1L)).thenReturn(Optional.of(match));
         when(matchResourceAssembler.toResource(any(UserAwareMatch.class))).thenReturn(matchResource);
-        ResponseEntity response = userMatchController.getMatch(1L, 1L, UserTestUtils.createUser());
+        ResponseEntity response = userMatchController.getMatch(1L, 1L, new TestUserDetails(1L));
         assertEquals(HttpStatus.OK, response.getStatusCode());
         ArgumentCaptor<UserAwareMatch> captor = ArgumentCaptor.forClass(UserAwareMatch.class);
         verify(matchResourceAssembler, times(1)).toResource(captor.capture());
@@ -71,20 +75,19 @@ public class UserMatchControllerTest {
                 mock(Pageable.class),
                 mock(PagedResourcesAssembler.class),
                 1L,
-                UserTestUtils.createUser(1L),
+                new TestUserDetails(1L),
                 null);
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
     public void testGetMatches_mutual() throws Exception {
-        User user = UserTestUtils.createUser();
         PagedResourcesAssembler pagedResourcesAssembler = mock(PagedResourcesAssembler.class);
         Pageable pageable = mock(Pageable.class);
         Date date = Date.from(Instant.ofEpochSecond(1472087710L));
         Page<Match> page = new PageImpl<>(new ArrayList<Match>());
         when(matchRepository.findMutual(user, date, pageable)).thenReturn(page);
-        userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, user, UserMatchController.MatchType.mu);
+        userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, new TestUserDetails(1L), UserMatchController.MatchType.mu);
 
         verify(matchRepository, times(1)).findMutual(user, date, pageable);
         verify(pagedResourcesAssembler, times(1)).toResource(any(Page.class), eq(matchResourceAssembler));
@@ -92,13 +95,12 @@ public class UserMatchControllerTest {
 
     @Test
     public void testGetMatches_reviewed() throws Exception {
-        User user = UserTestUtils.createUser();
         PagedResourcesAssembler pagedResourcesAssembler = mock(PagedResourcesAssembler.class);
         Pageable pageable = mock(Pageable.class);
         Date date = Date.from(Instant.ofEpochSecond(1472087710L));
         Page<Match> page = new PageImpl<>(new ArrayList<Match>());
         when(matchRepository.findReviewed(user, date, pageable)).thenReturn(page);
-        userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, user, UserMatchController.MatchType.re);
+        userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, new TestUserDetails(1L), UserMatchController.MatchType.re);
 
         verify(matchRepository, times(1)).findReviewed(user, date, pageable);
         verify(pagedResourcesAssembler, times(1)).toResource(any(Page.class), eq(matchResourceAssembler));

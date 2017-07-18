@@ -1,15 +1,15 @@
 package lt.dualpair.server.service.match;
 
-import lt.dualpair.server.domain.model.match.*;
+import lt.dualpair.core.match.*;
+import lt.dualpair.core.user.MatchRepository;
 import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
-import lt.dualpair.server.infrastructure.persistence.repository.MatchRepository;
 import lt.dualpair.server.service.user.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 
-import static lt.dualpair.server.domain.model.match.MatchPartyTestUtils.createMatchParty;
-import static lt.dualpair.server.domain.model.user.UserTestUtils.createUser;
+import static lt.dualpair.core.match.MatchPartyTestUtils.createMatchParty;
+import static lt.dualpair.core.user.UserTestUtils.createUser;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 

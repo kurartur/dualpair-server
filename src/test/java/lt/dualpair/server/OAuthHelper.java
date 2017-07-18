@@ -1,6 +1,7 @@
 package lt.dualpair.server;
 
-import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.core.user.User;
+import lt.dualpair.server.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
@@ -26,7 +27,7 @@ import java.util.Set;
 public class OAuthHelper {
 
     // For use with MockMvc
-    public RequestPostProcessor bearerToken(final String clientid, final User userPrincipal) {
+    public RequestPostProcessor bearerToken(final String clientid, final UserDetailsImpl userPrincipal) {
         return mockRequest -> {
             OAuth2AccessToken token = createAccessToken(clientid, userPrincipal);
             mockRequest.addHeader("Authorization", "Bearer " + token.getValue());
@@ -41,7 +42,7 @@ public class OAuthHelper {
     @Qualifier("defaultTokenServices")
     AuthorizationServerTokenServices tokenservice;
 
-    OAuth2AccessToken createAccessToken(final String clientId, final User userPrincipal) {
+    OAuth2AccessToken createAccessToken(final String clientId, final UserDetailsImpl userPrincipal) {
         // Look up authorities, resourceIds and scopes based on clientId
         ClientDetails client = clientDetailsService.loadClientByClientId(clientId);
         Collection<GrantedAuthority> authorities = client.getAuthorities();
@@ -68,13 +69,7 @@ public class OAuthHelper {
     public static User buildUserPrincipal(Long id) {
         User user = new User();
         user.setId(id);
-        user.setUsername(id.toString());
         return user;
     }
 
-    public static User buildUserPrincipal(Long id, String username) {
-        User user = buildUserPrincipal(id);
-        user.setUsername(username);
-        return user;
-    }
 }

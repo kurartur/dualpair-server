@@ -1,10 +1,10 @@
 package lt.dualpair.server.interfaces.resource.match;
 
-import lt.dualpair.server.domain.model.match.MatchParty;
-import lt.dualpair.server.domain.model.match.MatchPartyTestUtils;
-import lt.dualpair.server.domain.model.match.MatchTestUtils;
-import lt.dualpair.server.domain.model.match.Response;
-import lt.dualpair.server.domain.model.user.User;
+import lt.dualpair.core.match.MatchParty;
+import lt.dualpair.core.match.MatchPartyTestUtils;
+import lt.dualpair.core.match.MatchTestUtils;
+import lt.dualpair.core.match.Response;
+import lt.dualpair.core.user.User;
 import lt.dualpair.server.interfaces.resource.BaseResourceAssemblerTest;
 import lt.dualpair.server.interfaces.resource.match.OpponentUserResourceAssembler.AssemblingContext;
 import lt.dualpair.server.interfaces.resource.user.UserResource;

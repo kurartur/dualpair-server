@@ -1,6 +1,6 @@
 package lt.dualpair.server.config;
 
-import lt.dualpair.server.infrastructure.authentication.CurrentUserWebArgumentResolver;
+import lt.dualpair.server.interfaces.web.authentication.CurrentUserWebArgumentResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;

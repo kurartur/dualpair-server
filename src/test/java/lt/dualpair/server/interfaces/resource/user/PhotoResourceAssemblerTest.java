@@ -1,7 +1,7 @@
 package lt.dualpair.server.interfaces.resource.user;
 
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.user.UserAccount;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.user.UserAccount;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

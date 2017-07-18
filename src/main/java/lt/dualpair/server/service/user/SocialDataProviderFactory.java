@@ -1,6 +1,6 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.user.UserAccount;
+import lt.dualpair.core.user.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.social.connect.ConnectionRepository;
@@ -16,11 +16,11 @@ public class SocialDataProviderFactory {
 
     private UsersConnectionRepository usersConnectionRepository;
 
-    public SocialDataProvider getProvider(UserAccount.Type accountType, String username) {
+    public SocialDataProvider getProvider(UserAccount.Type accountType, Long userId) {
         Validate.notNull(accountType, "Account type required");
-        Validate.notNull(username, "Username required");
+        Validate.notNull(userId, "User id required");
 
-        ConnectionRepository connectionRepository = usersConnectionRepository.createConnectionRepository(username);
+        ConnectionRepository connectionRepository = usersConnectionRepository.createConnectionRepository(userId.toString());
         if (accountType == UserAccount.Type.FACEBOOK) {
             return new FacebookDataProvider(connectionRepository.findPrimaryConnection(Facebook.class));
         } else if (accountType == UserAccount.Type.VKONTAKTE) {

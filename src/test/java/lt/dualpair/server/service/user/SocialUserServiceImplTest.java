@@ -1,11 +1,11 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.server.domain.model.photo.Photo;
-import lt.dualpair.server.domain.model.photo.PhotoTestUtils;
-import lt.dualpair.server.domain.model.user.User;
-import lt.dualpair.server.domain.model.user.UserAccount;
-import lt.dualpair.server.infrastructure.persistence.repository.PhotoRepository;
-import lt.dualpair.server.infrastructure.persistence.repository.UserRepository;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.photo.PhotoRepository;
+import lt.dualpair.core.photo.PhotoTestUtils;
+import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.UserAccount;
+import lt.dualpair.core.user.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -34,11 +34,11 @@ public class SocialUserServiceImplTest {
         socialUserService.setPhotoRepository(photoRepository);
 
         User user = new User();
-        user.setUsername("username");
+        user.setId(1L);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         SocialDataProvider socialDataProvider = mock(SocialDataProvider.class);
-        when(socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, "username")).thenReturn(socialDataProvider);
+        when(socialDataProviderFactory.getProvider(UserAccount.Type.FACEBOOK, 1L)).thenReturn(socialDataProvider);
         Photo photo1 = PhotoTestUtils.createPhoto(UserAccount.Type.FACEBOOK, "idOnAccount1", "url1");
         Photo photo2 = PhotoTestUtils.createPhoto(UserAccount.Type.FACEBOOK, "idOnAccount2", "url2");
         Photo photo3 = PhotoTestUtils.createPhoto(UserAccount.Type.FACEBOOK, "idOnAccount3", "url3");
@@ -72,7 +72,7 @@ public class SocialUserServiceImplTest {
     @Test
     public void testAddUserPhoto() throws Exception {
         Photo photo = socialUserService.addUserPhoto(1L, UserAccount.Type.FACEBOOK, "idOnAccount1", 5);
-        assertEquals("username", photo.getUser().getUsername());
+        assertEquals((Long)1L, photo.getUser().getId());
         assertEquals(5, photo.getPosition());
         assertEquals("idOnAccount1", photo.getIdOnAccount());
         assertEquals("url1", photo.getSourceLink());
