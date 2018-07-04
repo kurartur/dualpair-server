@@ -29,51 +29,40 @@ public class ITUserMatchControllerTest extends BaseRestControllerTest {
     }
 
     @Test
-    public void testGetMutualMatches() throws Exception {
+    public void testMatches() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087710&mt=mu").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         PagedResources<MatchResource> resources = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PagedResources.class);
-        assertEquals(5, resources.getContent().size());
+        assertEquals(6, resources.getContent().size());
         assertEquals(1, resources.getMetadata().getTotalPages());
-        assertEquals(5, resources.getMetadata().getTotalElements());
+        assertEquals(6, resources.getMetadata().getTotalElements());
         assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=mu"));
         assertNull(resources.getLink("next"));
     }
 
     @Test
-    public void testGetMutualMatches_paged() throws Exception {
+    public void testMatches_paged() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087710&mt=mu&size=2").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         PagedResources<MatchResource> resources = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PagedResources.class);
         assertEquals(2, resources.getContent().size());
         assertEquals(3, resources.getMetadata().getTotalPages());
-        assertEquals(5, resources.getMetadata().getTotalElements());
+        assertEquals(6, resources.getMetadata().getTotalElements());
         assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=mu&size=2"));
         assertTrue(resources.getLink("next").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=mu&page=1&size=2"));
-
-        result = mockMvc.perform(get(resources.getLink("next").getHref()).with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-        resources = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PagedResources.class);
-        assertEquals(2, resources.getContent().size());
-        assertEquals(3, resources.getMetadata().getTotalPages());
-        assertEquals(5, resources.getMetadata().getTotalElements());
-        assertTrue(resources.getLink("prev").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=mu&page=0&size=2"));
-        assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=mu&page=1&size=2"));
-        assertTrue(resources.getLink("next").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=mu&page=2&size=2"));
     }
 
     @Test
-    public void testGetMutualMatches_timestamp() throws Exception {
+    public void testMatches_timestamp() throws Exception {
         MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087705&mt=mu").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         PagedResources<MatchResource> resources = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PagedResources.class);
-        assertEquals(4, resources.getContent().size());
+        assertEquals(5, resources.getContent().size());
         assertEquals(1, resources.getMetadata().getTotalPages());
-        assertEquals(4, resources.getMetadata().getTotalElements());
+        assertEquals(5, resources.getMetadata().getTotalElements());
         assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087705&mt=mu"));
         assertNull(resources.getLink("next"));
     }
@@ -101,16 +90,4 @@ public class ITUserMatchControllerTest extends BaseRestControllerTest {
                 .andExpect(status().isForbidden()).andReturn();
     }
 
-    @Test
-    public void testGetReviewedMatches() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087710&mt=re").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-        PagedResources<MatchResource> resources = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PagedResources.class);
-        assertEquals(6, resources.getContent().size());
-        assertEquals(1, resources.getMetadata().getTotalPages());
-        assertEquals(6, resources.getMetadata().getTotalElements());
-        assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=re"));
-        assertNull(resources.getLink("next"));
-    }
 }

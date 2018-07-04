@@ -86,23 +86,11 @@ public class UserMatchControllerTest {
         Pageable pageable = mock(Pageable.class);
         Date date = Date.from(Instant.ofEpochSecond(1472087710L));
         Page<Match> page = new PageImpl<>(new ArrayList<Match>());
-        when(matchRepository.findMutual(user, date, pageable)).thenReturn(page);
+        when(matchRepository.fetchMatches(user, date, pageable)).thenReturn(page);
         userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, new TestUserDetails(1L), UserMatchController.MatchType.mu);
 
-        verify(matchRepository, times(1)).findMutual(user, date, pageable);
+        verify(matchRepository, times(1)).fetchMatches(user, date, pageable);
         verify(pagedResourcesAssembler, times(1)).toResource(any(Page.class), eq(matchResourceAssembler));
     }
 
-    @Test
-    public void testGetMatches_reviewed() throws Exception {
-        PagedResourcesAssembler pagedResourcesAssembler = mock(PagedResourcesAssembler.class);
-        Pageable pageable = mock(Pageable.class);
-        Date date = Date.from(Instant.ofEpochSecond(1472087710L));
-        Page<Match> page = new PageImpl<>(new ArrayList<Match>());
-        when(matchRepository.findReviewed(user, date, pageable)).thenReturn(page);
-        userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, new TestUserDetails(1L), UserMatchController.MatchType.re);
-
-        verify(matchRepository, times(1)).findReviewed(user, date, pageable);
-        verify(pagedResourcesAssembler, times(1)).toResource(any(Page.class), eq(matchResourceAssembler));
-    }
 }

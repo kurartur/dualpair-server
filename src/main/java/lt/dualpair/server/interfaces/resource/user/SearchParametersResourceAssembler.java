@@ -1,6 +1,6 @@
 package lt.dualpair.server.interfaces.resource.user;
 
-import lt.dualpair.core.match.SearchParameters;
+import lt.dualpair.core.user.SearchParameters;
 import lt.dualpair.server.interfaces.web.controller.rest.user.UserController;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;

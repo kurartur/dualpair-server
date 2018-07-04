@@ -31,24 +31,4 @@
     <search_parameters user_id="6" min_age="25" max_age="25" search_male="N" search_female="Y"/>
     <user_locations user_id="6" latitude="10" longitude="10.3" country_code="LT"/>
 
-    <matches id="1" distance="10" />
-    <match_parties id="1" match_id="1" user_id="1" response="U"/>
-    <match_parties id="2" match_id="1" user_id="2" response="U"/>
-
-    <matches id="2" distance="100" />
-    <match_parties id="3" match_id="2" user_id="1" response="U"/>
-    <match_parties id="4" match_id="2" user_id="3" response="U"/>
-
-    <matches id="3" distance="299"/>
-    <match_parties id="5" match_id="3" user_id="1" response="U"/>
-    <match_parties id="6" match_id="3" user_id="4" response="U"/>
-
-    <matches id="4" distance="300"/>
-    <match_parties id="7" match_id="4" user_id="1" response="U"/>
-    <match_parties id="8" match_id="4" user_id="5" response="U"/>
-
-    <matches id="5" distance="300"/>
-    <match_parties id="9" match_id="5" user_id="1" response="U"/>
-    <match_parties id="10" match_id="5" user_id="6" response="U"/>
-
 </dataset>

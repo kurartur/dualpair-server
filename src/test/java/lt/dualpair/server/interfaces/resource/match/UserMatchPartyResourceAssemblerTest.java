@@ -2,7 +2,6 @@ package lt.dualpair.server.interfaces.resource.match;
 
 import lt.dualpair.core.match.Match;
 import lt.dualpair.core.match.MatchParty;
-import lt.dualpair.core.match.Response;
 import lt.dualpair.core.user.User;
 import lt.dualpair.server.interfaces.resource.BaseResourceAssemblerTest;
 import org.junit.Test;
@@ -24,10 +23,8 @@ public class UserMatchPartyResourceAssemblerTest extends BaseResourceAssemblerTe
         matchParty.setId(100L);
         matchParty.setUser(user);
         matchParty.setMatch(match);
-        matchParty.setResponse(Response.YES);
         UserMatchPartyResource matchPartyResource = userMatchPartyResourceAssembler.toResource(matchParty);
         assertTrue(matchPartyResource.getLink("user").getHref().endsWith("api/me"));
-        assertEquals("YES", matchPartyResource.getResponse());
         assertEquals((Long)100L, matchPartyResource.getPartyId());
     }
 

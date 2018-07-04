@@ -45,7 +45,7 @@ public class UserRepositoryImplTest {
                 25,
                 genders,
                 "LT",
-                Arrays.asList(1L)
+                new HashSet<>(Arrays.asList(1L))
         );
         userRepository.findOpponents(params);
         verify(query, times(1)).setParameter("user", user);
@@ -56,7 +56,7 @@ public class UserRepositoryImplTest {
         verify(query, times(1)).setParameter("countryCode", "LT");
         verify(query, times(1)).setParameter("userAge", 0);
         verify(query, times(1)).setParameter("userGenderCode", "M");
-        verify(query, times(1)).setParameter("exclude", Arrays.asList(1L));
+        verify(query, times(1)).setParameter("exclude", new HashSet<>(Arrays.asList(1L)));
     }
 
 }

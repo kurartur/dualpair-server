@@ -12,8 +12,6 @@ public class MatchResource extends ResourceSupport {
 
     private OpponentMatchPartyResource opponent;
 
-    private Integer distance;
-
     public Long getMatchId() {
         return matchId;
     }
@@ -38,11 +36,4 @@ public class MatchResource extends ResourceSupport {
         this.opponent = opponent;
     }
 
-    public Integer getDistance() {
-        return distance;
-    }
-
-    public void setDistance(Integer distance) {
-        this.distance = distance;
-    }
 }

@@ -1,15 +1,11 @@
 package lt.dualpair.server.service.user;
 
 import lt.dualpair.core.location.Location;
-import lt.dualpair.core.match.SearchParameters;
 import lt.dualpair.core.photo.PhotoRepository;
 import lt.dualpair.core.socionics.RelationType;
 import lt.dualpair.core.socionics.Sociotype;
 import lt.dualpair.core.socionics.SociotypeRepository;
-import lt.dualpair.core.user.MatchRepository;
-import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserLocation;
-import lt.dualpair.core.user.UserRepository;
+import lt.dualpair.core.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

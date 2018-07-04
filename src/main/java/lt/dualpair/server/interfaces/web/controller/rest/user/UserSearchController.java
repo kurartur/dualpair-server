@@ -1,14 +1,11 @@
-package lt.dualpair.server.interfaces.web.controller.rest.match;
+package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.core.match.Match;
-import lt.dualpair.core.match.MatchRequestBuilder;
-import lt.dualpair.core.match.MatchRequestException;
-import lt.dualpair.core.match.UserAwareMatch;
 import lt.dualpair.core.user.Gender;
 import lt.dualpair.core.user.User;
-import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
+import lt.dualpair.core.user.UserRequestBuilder;
+import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
-import lt.dualpair.server.service.match.MatchService;
+import lt.dualpair.server.service.user.UserSearchService;
 import lt.dualpair.server.service.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,41 +18,43 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
-public class MatchController {
+public class UserSearchController {
 
-    private MatchService matchService;
-    private MatchResourceAssembler matchResourceAssembler;
+    private UserSearchService userSearchService;
+    private UserResourceAssembler userResourceAssembler;
     private UserService userService;
 
     @Inject
-    public MatchController(MatchService matchService, MatchResourceAssembler matchResourceAssembler, UserService userService) {
-        this.matchService = matchService;
-        this.matchResourceAssembler = matchResourceAssembler;
+    public UserSearchController(UserSearchService userSearchService, UserResourceAssembler userResourceAssembler, UserService userService) {
+        this.userSearchService = userSearchService;
+        this.userResourceAssembler = userResourceAssembler;
         this.userService = userService;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/match/next")
-    public ResponseEntity next(@Valid SearchQuery searchQuery, @ActiveUser UserDetails principal) throws MatchRequestException {
+    @RequestMapping(method = RequestMethod.GET, value = "/users")
+    public ResponseEntity find(@Valid SearchQuery searchQuery, @ActiveUser UserDetails principal) {
 
-        User freshUser = userService.loadUserById(new Long(principal.getUsername()));
+        User freshPrincipal = userService.loadUserById(new Long(principal.getUsername()));
 
-        MatchRequestBuilder builder = MatchRequestBuilder.findFor(freshUser)
+        UserRequestBuilder builder = UserRequestBuilder.findFor(freshPrincipal)
                 .ageRange(searchQuery.getMinAge(), searchQuery.getMaxAge())
                 .genders(searchQuery.getGenders());
 
         if (searchQuery.getExcludeOpponents() != null && !searchQuery.getExcludeOpponents().isEmpty()) {
-            builder.excludeOpponents(searchQuery.getExcludeOpponents());
+            builder.excludeOpponents(new HashSet<>(searchQuery.getExcludeOpponents()));
         }
 
-        Match match = matchService.nextFor(builder.build());
-        if (match == null) {
+        Optional<User> result = userSearchService.findOne(builder.build());
+        if (!result.isPresent()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().body(matchResourceAssembler.toResource(new UserAwareMatch(freshUser, match)));
+        return ResponseEntity.ok().body(userResourceAssembler.toResource(result.get()));
+
     }
 
     public static class SearchQuery {

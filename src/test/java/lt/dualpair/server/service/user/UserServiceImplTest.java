@@ -1,15 +1,14 @@
 package lt.dualpair.server.service.user;
 
-import lt.dualpair.core.match.*;
+import lt.dualpair.core.match.Match;
+import lt.dualpair.core.match.MatchPartyTestUtils;
+import lt.dualpair.core.match.MatchTestUtils;
 import lt.dualpair.core.photo.Photo;
 import lt.dualpair.core.photo.PhotoRepository;
 import lt.dualpair.core.socionics.RelationType;
 import lt.dualpair.core.socionics.Sociotype;
 import lt.dualpair.core.socionics.SociotypeRepository;
-import lt.dualpair.core.user.MatchRepository;
-import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserRepository;
-import lt.dualpair.core.user.UserTestUtils;
+import lt.dualpair.core.user.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -176,8 +175,8 @@ public class UserServiceImplTest {
         newSociotypes.add(newSociotype2);
 
         Match match = MatchTestUtils.createMatch(1L,
-                MatchPartyTestUtils.createMatchParty(1L, user, Response.UNDEFINED),
-                MatchPartyTestUtils.createMatchParty(2L, opponentUser, Response.UNDEFINED)
+                MatchPartyTestUtils.createMatchParty(1L, user),
+                MatchPartyTestUtils.createMatchParty(2L, opponentUser)
         );
         Set<Match> matches = new HashSet<>();
         matches.add(match);
@@ -225,8 +224,8 @@ public class UserServiceImplTest {
         newSociotypes.add(newSociotype2);
 
         Match match = MatchTestUtils.createMatch(1L,
-                MatchPartyTestUtils.createMatchParty(1L, user, Response.UNDEFINED),
-                MatchPartyTestUtils.createMatchParty(2L, opponentUser, Response.UNDEFINED)
+                MatchPartyTestUtils.createMatchParty(1L, user),
+                MatchPartyTestUtils.createMatchParty(2L, opponentUser)
         );
         Set<Match> matches = new HashSet<>();
         matches.add(match);

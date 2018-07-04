@@ -41,6 +41,8 @@ public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<Oppo
             LocationResource locationResource = new LocationResource();
             locationResource.setCountryCode(userLocation.getCountryCode());
             locationResource.setCity(userLocation.getCity());
+            locationResource.setLatitude(userLocation.getLatitude()); // TODO obscure, point to center of city or smth
+            locationResource.setLongitude(userLocation.getLongitude());
             locations.add(locationResource);
         }
         resource.setLocations(locations);

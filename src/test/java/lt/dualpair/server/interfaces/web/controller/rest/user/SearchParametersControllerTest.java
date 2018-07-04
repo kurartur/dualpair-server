@@ -1,6 +1,6 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
-import lt.dualpair.core.match.SearchParameters;
+import lt.dualpair.core.user.SearchParameters;
 import lt.dualpair.core.user.User;
 import lt.dualpair.core.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResource;

@@ -27,10 +27,9 @@ public class MatchResourceAssemblerTest extends BaseResourceAssemblerTest {
     @Test
     public void testToResource() throws Exception {
         User user = UserTestUtils.createUser(1L);
-        MatchParty matchParty1 = MatchPartyTestUtils.createMatchParty(10L, user, Response.NO);
-        MatchParty matchParty2 = MatchPartyTestUtils.createMatchParty(11L, UserTestUtils.createUser(2L), Response.NO);
+        MatchParty matchParty1 = MatchPartyTestUtils.createMatchParty(10L, user);
+        MatchParty matchParty2 = MatchPartyTestUtils.createMatchParty(11L, UserTestUtils.createUser(2L));
         Match match = MatchTestUtils.createMatch(100L, matchParty1, matchParty2);
-        match.setDistance(10);
 
         OpponentMatchPartyResource opponentMatchPartyResource = new OpponentMatchPartyResource();
         when(opponentMatchPartyResourceAssembler.toResource(matchParty2)).thenReturn(opponentMatchPartyResource);
@@ -41,6 +40,5 @@ public class MatchResourceAssemblerTest extends BaseResourceAssemblerTest {
         assertEquals((Long)100L, matchResource.getMatchId());
         assertEquals(opponentMatchPartyResource, matchResource.getOpponent());
         assertEquals(userMatchPartyResource, matchResource.getUser());
-        assertEquals((Integer)10, matchResource.getDistance());
     }
 }

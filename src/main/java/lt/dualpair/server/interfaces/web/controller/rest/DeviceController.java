@@ -29,7 +29,7 @@ public class DeviceController {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/device")
-    public ResponseEntity registerDevice(@RequestParam(name="id", required = true) String deviceId, @ActiveUser UserDetails principal) {
+    public ResponseEntity registerDevice(@RequestParam(name="id") String deviceId, @ActiveUser UserDetails principal) {
         Optional<Device> device = deviceRepository.findOne(deviceId);
         if (device.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();

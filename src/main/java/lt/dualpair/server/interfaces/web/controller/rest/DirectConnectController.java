@@ -4,6 +4,7 @@ import lt.dualpair.core.user.User;
 import lt.dualpair.core.user.UserAccount;
 import lt.dualpair.core.user.UserRepository;
 import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
+import lt.dualpair.server.security.UserDetails;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.social.connect.Connection;
@@ -40,7 +41,7 @@ public class DirectConnectController {
 
     @PostMapping("/connect")
     @Transactional
-    public ResponseEntity connect(@ActiveUser User user,
+    public ResponseEntity connect(@ActiveUser UserDetails principal,
                                   @RequestParam("provider") String authProviderId,
                                   @RequestParam("accessToken") String accessToken,
                                   @RequestParam(value = "expiresIn", required = false) Long expiresIn,
@@ -63,10 +64,10 @@ public class DirectConnectController {
 
         // TODO validate connection
 
-        usersConnectionRepository.createConnectionRepository(user.getId().toString()).addConnection(connection);
+        usersConnectionRepository.createConnectionRepository(principal.getId().toString()).addConnection(connection);
 
-        User freshUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found somehow"));
-        UserAccount userAccount = new UserAccount(user);
+        User freshUser = userRepository.findById(principal.getId()).orElseThrow(() -> new RuntimeException("User not found somehow"));
+        UserAccount userAccount = new UserAccount(freshUser);
         userAccount.setAccountType(UserAccount.Type.valueOf(authProviderId.toUpperCase()));
         userAccount.setAccountId(connection.createData().getProviderUserId());
         freshUser.addUserAccount(userAccount);

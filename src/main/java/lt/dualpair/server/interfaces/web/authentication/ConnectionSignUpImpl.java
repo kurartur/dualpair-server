@@ -1,10 +1,6 @@
 package lt.dualpair.server.interfaces.web.authentication;
 
-import lt.dualpair.core.match.SearchParameters;
-import lt.dualpair.core.user.Gender;
-import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserAccount;
-import lt.dualpair.core.user.UserRepository;
+import lt.dualpair.core.user.*;
 import lt.dualpair.server.service.user.FacebookDataProvider;
 import lt.dualpair.server.service.user.SocialDataException;
 import lt.dualpair.server.service.user.SocialDataProvider;
@@ -61,6 +57,8 @@ public class ConnectionSignUpImpl implements ConnectionSignUp {
 
     private void setDefaultSearchParameters(User user) {
         SearchParameters searchParameters = user.getSearchParameters();
+
+        // TODO set min max age if users age not present
         if (user.getAge() != null) {
             searchParameters.setMinAge(user.getAge() - DEFAULT_SEARCH_AGE_GAP);
             searchParameters.setMaxAge(user.getAge() + DEFAULT_SEARCH_AGE_GAP);

@@ -1,10 +1,6 @@
 package lt.dualpair.server.interfaces.web.authentication;
 
-import lt.dualpair.core.match.SearchParameters;
-import lt.dualpair.core.user.Gender;
-import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserAccount;
-import lt.dualpair.core.user.UserRepository;
+import lt.dualpair.core.user.*;
 import lt.dualpair.server.service.user.FacebookDataProvider;
 import lt.dualpair.server.service.user.SocialDataProvider;
 import org.junit.Before;

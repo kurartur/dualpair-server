@@ -1,8 +1,8 @@
 package lt.dualpair.server.service.user;
 
 import lt.dualpair.core.location.Location;
-import lt.dualpair.core.match.SearchParameters;
 import lt.dualpair.core.socionics.Sociotype;
+import lt.dualpair.core.user.SearchParameters;
 import lt.dualpair.core.user.User;
 import lt.dualpair.core.user.UserLocation;
 

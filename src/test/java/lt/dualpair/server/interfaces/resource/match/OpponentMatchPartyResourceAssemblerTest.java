@@ -3,7 +3,6 @@ package lt.dualpair.server.interfaces.resource.match;
 import lt.dualpair.core.match.MatchParty;
 import lt.dualpair.core.match.MatchPartyTestUtils;
 import lt.dualpair.core.match.MatchTestUtils;
-import lt.dualpair.core.match.Response;
 import lt.dualpair.core.user.User;
 import lt.dualpair.server.interfaces.resource.BaseResourceAssemblerTest;
 import lt.dualpair.server.interfaces.resource.match.OpponentUserResourceAssembler.AssemblingContext;
@@ -30,8 +29,8 @@ public class OpponentMatchPartyResourceAssemblerTest extends BaseResourceAssembl
     @Test
     public void testToResource() throws Exception {
         User user = new User();
-        MatchParty matchParty1 = MatchPartyTestUtils.createMatchParty(10L, user, Response.NO);
-        MatchParty matchParty2 = MatchPartyTestUtils.createMatchParty(11L, user, Response.NO);
+        MatchParty matchParty1 = MatchPartyTestUtils.createMatchParty(10L, user);
+        MatchParty matchParty2 = MatchPartyTestUtils.createMatchParty(11L, user);
         MatchTestUtils.createMatch(1L, matchParty1, matchParty2);
         UserResource userResource = new UserResource();
         doReturn(userResource).when(userResourceAssembler).toResource(any(AssemblingContext.class));
@@ -43,15 +42,14 @@ public class OpponentMatchPartyResourceAssemblerTest extends BaseResourceAssembl
         verify(userResourceAssembler, times(1)).toResource(assemblingContextArgumentCaptor.capture());
         AssemblingContext context = assemblingContextArgumentCaptor.getValue();
         assertEquals(user, context.getUser());
-        assertEquals(false, context.isMutualMatch());
-        assertEquals(null, matchPartyResource.getResponse());
+        assertEquals(true, context.isMutualMatch());
     }
 
     @Test
     public void testToResource_mutual() throws Exception {
         User user = new User();
-        MatchParty matchParty1 = MatchPartyTestUtils.createMatchParty(10L, user, Response.YES);
-        MatchParty matchParty2 = MatchPartyTestUtils.createMatchParty(11L, user, Response.YES);
+        MatchParty matchParty1 = MatchPartyTestUtils.createMatchParty(10L, user);
+        MatchParty matchParty2 = MatchPartyTestUtils.createMatchParty(11L, user);
         MatchTestUtils.createMatch(1L, matchParty1, matchParty2);
         OpponentMatchPartyResource matchPartyResource = opponentMatchPartyResourceAssembler.toResource(matchParty1);
 
@@ -60,6 +58,5 @@ public class OpponentMatchPartyResourceAssemblerTest extends BaseResourceAssembl
         AssemblingContext context = assemblingContextArgumentCaptor.getValue();
         assertEquals(user, context.getUser());
         assertEquals(true, context.isMutualMatch());
-        assertEquals(Response.YES.name(), matchPartyResource.getResponse());
     }
 }

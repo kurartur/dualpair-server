@@ -12,28 +12,28 @@
     <user_accounts user_id="2" account_type="FB" account_id="100"/>
     <user_accounts user_id="7" account_type="FB" account_id="200"/>
 
-    <matches id="1" create_time="2016-08-25 01:15:10"/>
-    <match_parties id="1" match_id="1" user_id="1" response="Y"/>
-    <match_parties id="2" match_id="1" user_id="2" response="Y"/>
+    <matches id="1" time="2016-08-25 01:15:10"/>
+    <match_parties id="1" match_id="1" user_id="1"/>
+    <match_parties id="2" match_id="1" user_id="2"/>
 
-    <matches id="2" create_time="2016-08-25 01:15:05"/>
-    <match_parties id="3" match_id="2" user_id="1" response="Y"/>
-    <match_parties id="4" match_id="2" user_id="3" response="Y"/>
+    <matches id="2" time="2016-08-25 01:15:05"/>
+    <match_parties id="3" match_id="2" user_id="1"/>
+    <match_parties id="4" match_id="2" user_id="3"/>
 
-    <matches id="3" create_time="2016-08-25 01:15:00"/>
-    <match_parties id="5" match_id="3" user_id="1" response="Y"/>
-    <match_parties id="6" match_id="3" user_id="4" response="Y"/>
+    <matches id="3" time="2016-08-25 01:15:00"/>
+    <match_parties id="5" match_id="3" user_id="1"/>
+    <match_parties id="6" match_id="3" user_id="4"/>
 
-    <matches id="4" create_time="2016-08-25 01:14:55"/>
-    <match_parties id="7" match_id="4" user_id="1" response="Y"/>
-    <match_parties id="8" match_id="4" user_id="5" response="Y"/>
+    <matches id="4" time="2016-08-25 01:14:55"/>
+    <match_parties id="7" match_id="4" user_id="1"/>
+    <match_parties id="8" match_id="4" user_id="5"/>
 
-    <matches id="5" create_time="2016-08-25 01:14:50"/>
-    <match_parties id="9" match_id="5" user_id="1" response="Y"/>
-    <match_parties id="10" match_id="5" user_id="6" response="Y"/>
+    <matches id="5" time="2016-08-25 01:14:50"/>
+    <match_parties id="9" match_id="5" user_id="1"/>
+    <match_parties id="10" match_id="5" user_id="6"/>
 
-    <matches id="6" create_time="2016-08-25 01:14:50"/>
-    <match_parties id="11" match_id="6" user_id="1" response="Y"/>
-    <match_parties id="12" match_id="6" user_id="7" response="N"/>
+    <matches id="6" time="2016-08-25 01:14:50"/>
+    <match_parties id="11" match_id="6" user_id="1"/>
+    <match_parties id="12" match_id="6" user_id="7"/>
 
 </dataset>

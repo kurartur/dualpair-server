@@ -66,9 +66,9 @@ public class UserMatchController {
     private Page<Match> getMatchesByType(User user, MatchType matchType, Long timestamp, Pageable pageable) {
         Date date = Date.from(Instant.ofEpochSecond(timestamp));
         if (matchType == MatchType.mu) {
-            return matchRepository.findMutual(user, date, pageable);
+            return matchRepository.fetchMatches(user, date, pageable);
         } else {
-            return matchRepository.findReviewed(user, date, pageable);
+            return null; //matchRepository.findReviewed(user, date, pageable);
         }
     }
 

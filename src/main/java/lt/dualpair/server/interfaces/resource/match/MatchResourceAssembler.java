@@ -1,7 +1,7 @@
 package lt.dualpair.server.interfaces.resource.match;
 
 import lt.dualpair.core.match.UserAwareMatch;
-import lt.dualpair.server.interfaces.web.controller.rest.match.MatchController;
+import lt.dualpair.server.interfaces.web.controller.rest.user.UserSearchController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ public class MatchResourceAssembler extends ResourceAssemblerSupport<UserAwareMa
     private OpponentMatchPartyResourceAssembler opponentMatchPartyResourceAssembler;
 
     public MatchResourceAssembler() {
-        super(MatchController.class, MatchResource.class);
+        super(UserSearchController.class, MatchResource.class);
     }
 
     @Override
@@ -22,7 +22,6 @@ public class MatchResourceAssembler extends ResourceAssemblerSupport<UserAwareMa
         resource.setMatchId(entity.getId());
         resource.setUser(userMatchPartyResourceAssembler.toResource(entity.getUserMatchParty()));
         resource.setOpponent(opponentMatchPartyResourceAssembler.toResource(entity.getOpponentMatchParty()));
-        resource.setDistance(entity.getDistance());
         return resource;
     }
 

@@ -1,8 +1,8 @@
 package lt.dualpair.server.interfaces.resource.match;
 
 import lt.dualpair.core.match.MatchParty;
-import lt.dualpair.server.interfaces.web.controller.rest.match.MatchController;
 import lt.dualpair.server.interfaces.web.controller.rest.user.UserController;
+import lt.dualpair.server.interfaces.web.controller.rest.user.UserSearchController;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class UserMatchPartyResourceAssembler extends ResourceAssemblerSupport<MatchParty, UserMatchPartyResource> {
 
     public UserMatchPartyResourceAssembler() {
-        super(MatchController.class, UserMatchPartyResource.class);
+        super(UserSearchController.class, UserMatchPartyResource.class);
     }
 
     @Override
@@ -21,7 +21,6 @@ public class UserMatchPartyResourceAssembler extends ResourceAssemblerSupport<Ma
         UserMatchPartyResource resource = new UserMatchPartyResource();
         resource.setPartyId(entity.getId());
         resource.add(linkTo(methodOn(UserController.class).me(null)).withRel("user"));
-        resource.setResponse(entity.getResponse().name());
         return resource;
     }
 }
