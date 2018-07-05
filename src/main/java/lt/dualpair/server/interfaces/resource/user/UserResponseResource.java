@@ -6,6 +6,7 @@ public class UserResponseResource extends ResourceSupport {
 
     private UserResource user;
     private String response;
+    private boolean match;
 
     public UserResource getUser() {
         return user;
@@ -21,5 +22,13 @@ public class UserResponseResource extends ResourceSupport {
 
     public void setResponse(String response) {
         this.response = response;
+    }
+
+    public boolean isMatch() {
+        return match;
+    }
+
+    public void setMatch(boolean match) {
+        this.match = match;
     }
 }

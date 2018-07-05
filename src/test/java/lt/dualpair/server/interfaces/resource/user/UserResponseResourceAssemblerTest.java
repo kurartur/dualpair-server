@@ -9,7 +9,7 @@ import lt.dualpair.server.interfaces.resource.match.OpponentUserResourceAssemble
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -27,6 +27,7 @@ public class UserResponseResourceAssemblerTest {
     public void toResource() {
         UserResponse entity = new UserResponse();
         User user = UserTestUtils.createUser(1L);
+        entity.setUser(UserTestUtils.createUser(2L));
         entity.setToUser(user);
         entity.setResponse(Response.YES);
         entity.setMatch(new Match());
@@ -35,5 +36,22 @@ public class UserResponseResourceAssemblerTest {
         UserResponseResource result = userResponseResourceAssembler.toResource(entity);
         assertEquals("Y", result.getResponse());
         assertEquals(userResource, result.getUser());
+        assertTrue(result.isMatch());
+        assertNotNull(result.getLink("match"));
+    }
+
+    @Test
+    public void toResource_whenNoMatch_matchIsFalse() {
+        UserResponse entity = new UserResponse();
+        User user = UserTestUtils.createUser(1L);
+        entity.setToUser(user);
+        entity.setResponse(Response.YES);
+        UserResource userResource = new UserResource();
+        when(opponentUserResourceAssembler.toResource(new OpponentUserResourceAssembler.AssemblingContext(user, false))).thenReturn(userResource);
+        UserResponseResource result = userResponseResourceAssembler.toResource(entity);
+        assertEquals("Y", result.getResponse());
+        assertEquals(userResource, result.getUser());
+        assertFalse(result.isMatch());
+        assertNull(result.getLink("match"));
     }
 }
