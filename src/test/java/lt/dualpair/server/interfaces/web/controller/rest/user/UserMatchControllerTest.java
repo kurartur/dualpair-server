@@ -75,8 +75,7 @@ public class UserMatchControllerTest {
                 mock(Pageable.class),
                 mock(PagedResourcesAssembler.class),
                 1L,
-                new TestUserDetails(1L),
-                null);
+                new TestUserDetails(1L));
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
@@ -86,10 +85,10 @@ public class UserMatchControllerTest {
         Pageable pageable = mock(Pageable.class);
         Date date = Date.from(Instant.ofEpochSecond(1472087710L));
         Page<Match> page = new PageImpl<>(new ArrayList<Match>());
-        when(matchRepository.fetchMatches(user, date, pageable)).thenReturn(page);
-        userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, new TestUserDetails(1L), UserMatchController.MatchType.mu);
+        when(matchRepository.fetchMatches(1L, date, pageable)).thenReturn(page);
+        userMatchController.getMatches(1L, pageable, pagedResourcesAssembler, 1472087710L, new TestUserDetails(1L));
 
-        verify(matchRepository, times(1)).fetchMatches(user, date, pageable);
+        verify(matchRepository, times(1)).fetchMatches(1L, date, pageable);
         verify(pagedResourcesAssembler, times(1)).toResource(any(Page.class), eq(matchResourceAssembler));
     }
 

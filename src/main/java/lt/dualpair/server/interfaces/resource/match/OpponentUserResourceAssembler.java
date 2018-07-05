@@ -104,5 +104,19 @@ public class OpponentUserResourceAssembler extends ResourceAssemblerSupport<Oppo
         public boolean isMutualMatch() {
             return isMutualMatch;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            AssemblingContext that = (AssemblingContext) o;
+            return isMutualMatch == that.isMutualMatch &&
+                    Objects.equals(user, that.user);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(user, isMutualMatch);
+        }
     }
 }

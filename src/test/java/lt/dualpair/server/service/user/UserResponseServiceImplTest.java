@@ -7,7 +7,12 @@ import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -79,7 +84,7 @@ public class UserResponseServiceImplTest {
 
         ArgumentCaptor<UserResponse> userResponseCaptor = ArgumentCaptor.forClass(UserResponse.class);
         verify(userResponseRepository, times(2)).save(userResponseCaptor.capture());
-        UserResponse fakeResponse = userResponseCaptor.getAllValues().get(1);
+        UserResponse fakeResponse = userResponseCaptor.getAllValues().get(0);
         assertEquals(new Long(2), fakeResponse.getUser().getId());
         assertEquals(new Long(1), fakeResponse.getToUser().getId());
     }
@@ -108,6 +113,12 @@ public class UserResponseServiceImplTest {
         assertEquals(new Long(1L), match.getMatchParty(1L).getUser().getId());
         assertEquals(new Long(2L), match.getMatchParty(2L).getUser().getId());
         assertNotNull(match.getDate());
+
+        ArgumentCaptor<UserResponse> responseArgumentCaptor = ArgumentCaptor.forClass(UserResponse.class);
+        verify(userResponseRepository, times(2)).save(responseArgumentCaptor.capture());
+        List<UserResponse> userResponses = responseArgumentCaptor.getAllValues();
+        assertEquals(match, userResponses.get(0).getMatch());
+        assertEquals(match, userResponses.get(1).getMatch());
     }
 
     @Test
@@ -119,5 +130,16 @@ public class UserResponseServiceImplTest {
         service.respond(1L, 2L, Response.YES);
 
         verify(notificationSender, times(2)).sendNotification(any(Notification.class));
+    }
+
+    @Test
+    public void getResponsesPage() {
+        Pageable pageable = mock(Pageable.class);
+        UserResponse userResponse = new UserResponse();
+        Page<UserResponse> page = new PageImpl<>(Arrays.asList(userResponse));
+        when(userResponseRepository.fetchPageByUser(1L, pageable)).thenReturn(page);
+        Page<UserResponse> result = service.getResponsesPage(1L, pageable);
+        assertEquals(1, result.getTotalElements());
+        assertEquals(userResponse, result.getContent().get(0));
     }
 }

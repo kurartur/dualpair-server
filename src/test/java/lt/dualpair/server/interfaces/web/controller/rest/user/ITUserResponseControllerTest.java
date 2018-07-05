@@ -1,14 +1,20 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import lt.dualpair.server.interfaces.resource.user.UserResponseResource;
 import lt.dualpair.server.interfaces.web.controller.rest.BaseRestControllerTest;
 import org.junit.Test;
+import org.springframework.hateoas.PagedResources;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,7 +41,7 @@ public class ITUserResponseControllerTest extends BaseRestControllerTest {
     @DatabaseSetup(value = "userResponseTest.xml")
     public void testRespond_userDoesntExist() throws Exception {
         mockMvc.perform(put("/api/user/1/responses").with(bearerToken(1L))
-                .param("toUserId", "4")
+                .param("toUserId", "100")
                 .param("response", "YES"))
                 .andExpect(status().isBadRequest());
     }
@@ -101,6 +107,17 @@ public class ITUserResponseControllerTest extends BaseRestControllerTest {
                 .param("toUserId", "2")
                 .param("response", "YES"))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    @DatabaseSetup(value = "userResponseTest.xml")
+    public void testRespond_getResponses() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/user/4/responses?size=2").with(bearerToken(4L)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+        PagedResources<UserResponseResource> resources = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PagedResources.class);
+        assertEquals(2, resources.getContent().size());
+        assertEquals(2, resources.getMetadata().getTotalPages());
+        assertEquals(3, resources.getMetadata().getTotalElements());
     }
 
 }

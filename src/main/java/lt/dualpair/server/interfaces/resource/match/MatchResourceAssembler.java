@@ -9,8 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MatchResourceAssembler extends ResourceAssemblerSupport<UserAwareMatch, MatchResource> {
 
-    private UserMatchPartyResourceAssembler userMatchPartyResourceAssembler;
-    private OpponentMatchPartyResourceAssembler opponentMatchPartyResourceAssembler;
+    private OpponentUserResourceAssembler opponentUserResourceAssembler;
 
     public MatchResourceAssembler() {
         super(UserSearchController.class, MatchResource.class);
@@ -20,18 +19,13 @@ public class MatchResourceAssembler extends ResourceAssemblerSupport<UserAwareMa
     public MatchResource toResource(UserAwareMatch entity) {
         MatchResource resource = new MatchResource();
         resource.setMatchId(entity.getId());
-        resource.setUser(userMatchPartyResourceAssembler.toResource(entity.getUserMatchParty()));
-        resource.setOpponent(opponentMatchPartyResourceAssembler.toResource(entity.getOpponentMatchParty()));
+        resource.setUser(opponentUserResourceAssembler.toResource(new OpponentUserResourceAssembler.AssemblingContext(entity.getOpponentMatchParty().getUser(), true)));
+        resource.setDate(entity.getDate());
         return resource;
     }
 
     @Autowired
-    public void setUserMatchPartyResourceAssembler(UserMatchPartyResourceAssembler userMatchPartyResourceAssembler) {
-        this.userMatchPartyResourceAssembler = userMatchPartyResourceAssembler;
-    }
-
-    @Autowired
-    public void setOpponentMatchPartyResourceAssembler(OpponentMatchPartyResourceAssembler opponentMatchPartyResourceAssembler) {
-        this.opponentMatchPartyResourceAssembler = opponentMatchPartyResourceAssembler;
+    public void setOpponentUserResourceAssembler(OpponentUserResourceAssembler opponentUserResourceAssembler) {
+        this.opponentUserResourceAssembler = opponentUserResourceAssembler;
     }
 }

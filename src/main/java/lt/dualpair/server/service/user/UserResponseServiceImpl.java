@@ -7,6 +7,8 @@ import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import lt.dualpair.server.infrastructure.notification.NotificationType;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -55,7 +57,6 @@ public class UserResponseServiceImpl implements UserResponseService {
         userResponse.setToUser(toUser);
         userResponse.setDate(new Date());
         userResponse.setResponse(response);
-        userResponseRepository.save(userResponse);
 
         if (fakeMatches) {
             String description = toUser.getDescription();
@@ -78,9 +79,18 @@ public class UserResponseServiceImpl implements UserResponseService {
                 match.setDate(new Date());
                 matchRepository.save(match);
                 sendMutualMatchNotifications(match);
+                userResponse.setMatch(match);
+                opponentResponse.setMatch(match);
+                userResponseRepository.save(opponentResponse);
             }
         }
 
+        userResponseRepository.save(userResponse);
+    }
+
+    @Override
+    public Page<UserResponse> getResponsesPage(Long userId, Pageable pageable) {
+        return userResponseRepository.fetchPageByUser(userId, pageable);
     }
 
     private void sendMutualMatchNotifications(Match match) {

@@ -3,7 +3,6 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 import lt.dualpair.core.match.Match;
 import lt.dualpair.core.match.UserAwareMatch;
 import lt.dualpair.core.user.MatchRepository;
-import lt.dualpair.core.user.User;
 import lt.dualpair.core.user.UserRepository;
 import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
 import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
@@ -54,25 +53,13 @@ public class UserMatchController {
                                      Pageable pageable,
                                      PagedResourcesAssembler pagedResourcesAssembler,
                                      @RequestParam Long timestamp,
-                                     @ActiveUser UserDetails principal,
-                                     @RequestParam("mt") MatchType matchType) {
+                                     @ActiveUser UserDetails principal) {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Page<Match> matches = getMatchesByType(userRepository.findById(userId).get(), matchType, timestamp, pageable);
+        Date date = Date.from(Instant.ofEpochSecond(timestamp));
+        Page<Match> matches = matchRepository.fetchMatches(userId, date, pageable);
         return ResponseEntity.ok(pagedResourcesAssembler.toResource(matches.map(source -> new UserAwareMatch(userId, source)), matchResourceAssembler));
     }
 
-    private Page<Match> getMatchesByType(User user, MatchType matchType, Long timestamp, Pageable pageable) {
-        Date date = Date.from(Instant.ofEpochSecond(timestamp));
-        if (matchType == MatchType.mu) {
-            return matchRepository.fetchMatches(user, date, pageable);
-        } else {
-            return null; //matchRepository.findReviewed(user, date, pageable);
-        }
-    }
-
-    enum MatchType {
-        mu, re;
-    }
 }

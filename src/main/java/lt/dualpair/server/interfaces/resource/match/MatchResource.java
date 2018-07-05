@@ -1,16 +1,17 @@
 package lt.dualpair.server.interfaces.resource.match;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lt.dualpair.server.interfaces.resource.user.UserResource;
 import org.springframework.hateoas.ResourceSupport;
+
+import java.util.Date;
 
 public class MatchResource extends ResourceSupport {
 
     @JsonProperty("id")
     private Long matchId;
-
-    private UserMatchPartyResource user;
-
-    private OpponentMatchPartyResource opponent;
+    private UserResource user;
+    private Date date;
 
     public Long getMatchId() {
         return matchId;
@@ -20,20 +21,19 @@ public class MatchResource extends ResourceSupport {
         this.matchId = matchId;
     }
 
-    public UserMatchPartyResource getUser() {
+    public UserResource getUser() {
         return user;
     }
 
-    public void setUser(UserMatchPartyResource user) {
+    public void setUser(UserResource user) {
         this.user = user;
     }
 
-    public OpponentMatchPartyResource getOpponent() {
-        return opponent;
+    public Date getDate() {
+        return date;
     }
 
-    public void setOpponent(OpponentMatchPartyResource opponent) {
-        this.opponent = opponent;
+    public void setDate(Date date) {
+        this.date = date;
     }
-
 }

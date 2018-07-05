@@ -30,40 +30,40 @@ public class ITUserMatchControllerTest extends BaseRestControllerTest {
 
     @Test
     public void testMatches() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087710&mt=mu").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087710").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         PagedResources<MatchResource> resources = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PagedResources.class);
         assertEquals(6, resources.getContent().size());
         assertEquals(1, resources.getMetadata().getTotalPages());
         assertEquals(6, resources.getMetadata().getTotalElements());
-        assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=mu"));
+        assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087710"));
         assertNull(resources.getLink("next"));
     }
 
     @Test
     public void testMatches_paged() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087710&mt=mu&size=2").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087710&size=2").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         PagedResources<MatchResource> resources = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PagedResources.class);
         assertEquals(2, resources.getContent().size());
         assertEquals(3, resources.getMetadata().getTotalPages());
         assertEquals(6, resources.getMetadata().getTotalElements());
-        assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=mu&size=2"));
-        assertTrue(resources.getLink("next").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&mt=mu&page=1&size=2"));
+        assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&size=2"));
+        assertTrue(resources.getLink("next").getHref().endsWith("/api/user/1/matches?timestamp=1472087710&page=1&size=2"));
     }
 
     @Test
     public void testMatches_timestamp() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087705&mt=mu").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
+        MvcResult result = mockMvc.perform(get("/api/user/1/matches?timestamp=1472087705").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
         PagedResources<MatchResource> resources = new ObjectMapper().readValue(result.getResponse().getContentAsString(), PagedResources.class);
         assertEquals(5, resources.getContent().size());
         assertEquals(1, resources.getMetadata().getTotalPages());
         assertEquals(5, resources.getMetadata().getTotalElements());
-        assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087705&mt=mu"));
+        assertTrue(resources.getLink("self").getHref().endsWith("/api/user/1/matches?timestamp=1472087705"));
         assertNull(resources.getLink("next"));
     }
 
@@ -72,7 +72,7 @@ public class ITUserMatchControllerTest extends BaseRestControllerTest {
         MvcResult result = mockMvc.perform(get("/api/user/1/matches/1").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
         MatchResource resource = new ObjectMapper().readValue(result.getResponse().getContentAsString(), MatchResource.class);
-        List<UserAccountResource> accounts = resource.getOpponent().getUser().getAccounts();
+        List<UserAccountResource> accounts = resource.getUser().getAccounts();
         UserAccountResource userAccountResource = accounts.iterator().next();
         assertEquals("FB", userAccountResource.getAccountType());
         assertEquals("100", userAccountResource.getAccountId());
