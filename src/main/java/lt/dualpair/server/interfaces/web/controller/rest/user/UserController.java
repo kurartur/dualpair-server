@@ -3,10 +3,9 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 import lt.dualpair.core.location.Location;
 import lt.dualpair.core.location.LocationProvider;
 import lt.dualpair.core.location.LocationProviderException;
-import lt.dualpair.core.user.PurposeOfBeing;
-import lt.dualpair.core.user.RelationshipStatus;
-import lt.dualpair.core.user.User;
+import lt.dualpair.core.user.*;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
+import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
 import lt.dualpair.server.security.UserDetails;
@@ -34,19 +33,32 @@ public class UserController {
     private SocialUserService socialUserService;
     private LocationProvider locationProvider;
     private UserResourceAssembler userResourceAssembler;
+    private UserResponseRepository userResponseRepository;
 
     @RequestMapping(method = RequestMethod.GET, value = "/me")
     public ResponseEntity me(@ActiveUser UserDetails principal) {
         try {
             User user = socialUserService.loadUserById(principal.getId());
-            return ResponseEntity.ok(userResourceAssembler.toResource(user));
+            return ResponseEntity.ok(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, true, true)));
         } catch (UserNotFoundException unfe) { // in case user was deleted
             SecurityContextHolder.clearContext();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, value="/user/{userId:[0-9]}")
+    @RequestMapping(method = RequestMethod.GET, value="/user/{userId:[0-9]+}")
+    public ResponseEntity getUser(@PathVariable Long userId, @ActiveUser UserDetails principal) {
+        Optional<UserResponse> response = userResponseRepository.findByParties(principal.getId(), userId);
+        if (!response.isPresent()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        boolean isMatch = response.get().getMatch() != null;
+        User user = socialUserService.loadUserById(userId);
+        UserResource userResource = userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, isMatch, false));
+        return ResponseEntity.ok(userResource);
+    }
+
+    @RequestMapping(method = RequestMethod.PATCH, value="/user/{userId:[0-9]+}")
     public ResponseEntity updateUser(@PathVariable Long userId, @RequestBody Map<String, Object> data, @ActiveUser UserDetails principal) throws URISyntaxException, ParseException {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -119,4 +131,8 @@ public class UserController {
         this.userResourceAssembler = userResourceAssembler;
     }
 
+    @Autowired
+    public void setUserResponseRepository(UserResponseRepository userResponseRepository) {
+        this.userResponseRepository = userResponseRepository;
+    }
 }

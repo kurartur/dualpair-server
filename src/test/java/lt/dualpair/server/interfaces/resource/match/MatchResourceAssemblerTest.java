@@ -5,6 +5,7 @@ import lt.dualpair.core.user.User;
 import lt.dualpair.core.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.BaseResourceAssemblerTest;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
+import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,12 +18,12 @@ import static org.mockito.Mockito.when;
 public class MatchResourceAssemblerTest extends BaseResourceAssemblerTest {
 
     private MatchResourceAssembler matchResourceAssembler = new MatchResourceAssembler();
-    private OpponentUserResourceAssembler opponentUserResourceAssembler = mock(OpponentUserResourceAssembler.class);
+    private UserResourceAssembler userResourceAssembler = mock(UserResourceAssembler.class);
 
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        matchResourceAssembler.setOpponentUserResourceAssembler(opponentUserResourceAssembler);
+        matchResourceAssembler.setUserResourceAssembler(userResourceAssembler);
     }
 
     @Test
@@ -36,7 +37,7 @@ public class MatchResourceAssemblerTest extends BaseResourceAssemblerTest {
         match.setDate(date);
 
         UserResource opponentResource = new UserResource();
-        when(opponentUserResourceAssembler.toResource(new OpponentUserResourceAssembler.AssemblingContext(opponent, true))).thenReturn(opponentResource);
+        when(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(opponent, true, false))).thenReturn(opponentResource);
 
         MatchResource matchResource = matchResourceAssembler.toResource(new UserAwareMatch(user, match));
         assertEquals((Long)100L, matchResource.getMatchId());

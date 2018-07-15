@@ -51,7 +51,7 @@ public class UserSearchControllerTest {
         UserResource userResource = new UserResource();
         User found = new User();
         doReturn(Optional.of(found)).when(userSearchService).findOne(any(UserRequest.class));
-        doReturn(userResource).when(userResourceAssembler).toResource(found);
+        doReturn(userResource).when(userResourceAssembler).toResource(new UserResourceAssembler.AssemblingContext(found, false, false));
         ResponseEntity<UserResource> responseEntity = userSearchController.find(crateSearchQuery(), new UserDetailsImpl(userPrincipal));
         assertEquals(userResource, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());

@@ -1,26 +1,17 @@
 package lt.dualpair.server.interfaces.resource.user;
 
-import lt.dualpair.core.user.PurposeOfBeing;
-import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserAccount;
-import lt.dualpair.core.user.UserLocation;
+import lt.dualpair.core.photo.Photo;
+import lt.dualpair.core.user.*;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;
-import lt.dualpair.server.interfaces.web.controller.rest.user.SearchParametersController;
 import lt.dualpair.server.interfaces.web.controller.rest.user.UserController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import java.util.*;
 
 @Component
-public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserResource> {
+public class UserResourceAssembler extends ResourceAssemblerSupport<UserResourceAssembler.AssemblingContext, UserResource> {
 
     private SociotypeResourceAssembler sociotypeResourceAssembler;
     private PhotoResourceAssembler photoResourceAssembler;
@@ -30,11 +21,16 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
     }
 
     @Override
-    public UserResource toResource(User entity) {
+    public UserResource toResource(AssemblingContext context) {
+        User entity = context.getUser();
+
         UserResource resource = new UserResource();
+
         resource.setUserId(entity.getId());
         resource.setName(entity.getName());
-        resource.setDateOfBirth(entity.getDateOfBirth());
+        if (context.isPrincipal) {
+            resource.setDateOfBirth(entity.getDateOfBirth());
+        }
         resource.setAge(entity.getAge());
         resource.setDescription(entity.getDescription());
         resource.setSociotypes(new HashSet<>(sociotypeResourceAssembler.toResources(entity.getSociotypes())));
@@ -44,33 +40,38 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
             LocationResource locationResource = new LocationResource();
             locationResource.setCountryCode(userLocation.getCountryCode());
             locationResource.setCity(userLocation.getCity());
-            locationResource.setLatitude(userLocation.getLatitude());
+            locationResource.setLatitude(userLocation.getLatitude()); // TODO obscure, point to center of city or smth
             locationResource.setLongitude(userLocation.getLongitude());
             locations.add(locationResource);
         }
         resource.setLocations(locations);
 
-        resource.setPhotos(photoResourceAssembler.toResources(entity.getPhotos()));
+        List<Photo> sortedPhotos = new ArrayList<>(entity.getPhotos());
+        Collections.sort(sortedPhotos, (o1, o2) -> o2.getPosition() - o1.getPosition());
+        resource.setPhotos(photoResourceAssembler.toResources(sortedPhotos));
 
-        List<UserAccountResource> userAccounts = new ArrayList<>();
-        for (UserAccount userAccount : entity.getUserAccounts()) {
-            UserAccountResource accountResource = new UserAccountResource();
-            accountResource.setAccountType(userAccount.getAccountType().getCode());
-            accountResource.setAccountId(userAccount.getAccountId());
-            userAccounts.add(accountResource);
+        if (context.isMutualMatch()) {
+            List<UserAccountResource> accountResources = new ArrayList<>();
+            for (UserAccount userAccount : entity.getUserAccounts()) {
+                UserAccountResource userAccountResource = new UserAccountResource();
+                userAccountResource.setAccountType(userAccount.getAccountType().getCode());
+                userAccountResource.setAccountId(userAccount.getAccountId());
+                accountResources.add(userAccountResource);
+            }
+            resource.setAccounts(accountResources);
         }
-        resource.setAccounts(userAccounts);
 
-        resource.setRelationshipStatus(entity.getRelationshipStatus().getCode());
+        if (entity.getRelationshipStatus() == RelationshipStatus.NONE) {
+            resource.setRelationshipStatus("");
+        } else {
+            resource.setRelationshipStatus(entity.getRelationshipStatus().getCode());
+        }
 
         Set<String> purposesOfBeing = new HashSet<>();
         for (PurposeOfBeing purposeOfBeing : entity.getPurposesOfBeing()) {
             purposesOfBeing.add(purposeOfBeing.getCode());
         }
         resource.setPurposesOfBeing(purposesOfBeing);
-
-        // TODO null as param
-        resource.add(linkTo(methodOn(SearchParametersController.class).getSearchParameters(entity.getId(), null)).withRel("search-parameters"));
 
         return resource;
     }
@@ -83,5 +84,41 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<User, UserRe
     @Autowired
     public void setPhotoResourceAssembler(PhotoResourceAssembler photoResourceAssembler) {
         this.photoResourceAssembler = photoResourceAssembler;
+    }
+
+    public static class AssemblingContext {
+
+        private User user;
+        private boolean isMutualMatch;
+        private boolean isPrincipal;
+
+        public AssemblingContext(User user, boolean isMutualMatch, boolean isPrincipal) {
+            this.user = user;
+            this.isMutualMatch = isMutualMatch;
+            this.isPrincipal = isPrincipal;
+        }
+
+        public User getUser() {
+            return user;
+        }
+
+        public boolean isMutualMatch() {
+            return isMutualMatch;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            AssemblingContext that = (AssemblingContext) o;
+            return isMutualMatch == that.isMutualMatch &&
+                    isPrincipal == that.isPrincipal &&
+                    Objects.equals(user, that.user);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(user, isMutualMatch, isPrincipal);
+        }
     }
 }

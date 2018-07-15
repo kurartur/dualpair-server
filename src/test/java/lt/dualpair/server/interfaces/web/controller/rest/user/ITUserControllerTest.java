@@ -270,4 +270,41 @@ public class ITUserControllerTest extends BaseRestControllerTest {
         assertTrue(c.equals(0));
     }
 
+    @Test
+    @DatabaseSetup("userTest_getUser.xml")
+    public void testGetUser_forbidden() throws Exception {
+        mockMvc.perform(get("/api/user/11")
+                .with(bearerToken(10L))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DatabaseSetup("userTest_getUser.xml")
+    public void testGetUser_whenMatch_hasAccounts() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/user/13")
+                .with(bearerToken(10L))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentString = result.getResponse().getContentAsString();
+        UserResource userResource = new ObjectMapper().readValue(contentString, UserResource.class);
+        assertEquals(new Long(13), userResource.getUserId());
+        assertEquals(2, userResource.getAccounts().size());
+    }
+
+    @Test
+    @DatabaseSetup("userTest_getUser.xml")
+    public void testGetUser_whenNoMatch_doesntHaveAccounts() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/user/12")
+                .with(bearerToken(10L))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentString = result.getResponse().getContentAsString();
+        UserResource userResource = new ObjectMapper().readValue(contentString, UserResource.class);
+        assertEquals(new Long(12), userResource.getUserId());
+        assertNull(userResource.getAccounts());
+    }
+
 }

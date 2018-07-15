@@ -6,15 +6,16 @@ import lt.dualpair.core.user.*;
 import lt.dualpair.server.infrastructure.notification.Notification;
 import lt.dualpair.server.infrastructure.notification.NotificationSender;
 import lt.dualpair.server.infrastructure.notification.NotificationType;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserResponseServiceImpl implements UserResponseService {
@@ -23,18 +24,15 @@ public class UserResponseServiceImpl implements UserResponseService {
     private UserResponseRepository userResponseRepository;
     private MatchRepository matchRepository;
     private NotificationSender notificationSender;
-    boolean fakeMatches;
 
     public UserResponseServiceImpl(UserRepository userRepository,
                                    UserResponseRepository userResponseRepository,
                                    MatchRepository matchRepository,
-                                   NotificationSender notificationSender,
-                                   @Value("${fakeMatches}") boolean fakeMatches) {
+                                   NotificationSender notificationSender) {
         this.userRepository = userRepository;
         this.userResponseRepository = userResponseRepository;
         this.matchRepository = matchRepository;
         this.notificationSender = notificationSender;
-        this.fakeMatches = fakeMatches;
     }
 
     @Override
@@ -46,6 +44,7 @@ public class UserResponseServiceImpl implements UserResponseService {
 
         Optional<UserResponse> existingResponse = userResponseRepository.findByParties(userId, toUserId);
         if (existingResponse.isPresent()) {
+            // TODO unmatch, update should be possible, or separate service for unmatching
             throw new IllegalStateException("Response from user " + userId + " to user " + toUserId + " already exists");
         }
 
@@ -57,18 +56,6 @@ public class UserResponseServiceImpl implements UserResponseService {
         userResponse.setToUser(toUser);
         userResponse.setDate(new Date());
         userResponse.setResponse(response);
-
-        if (fakeMatches) {
-            String description = toUser.getDescription();
-            if (!StringUtils.isEmpty(description) && description.startsWith("Lorem ipsum") && description.endsWith("FAKE")) {
-                UserResponse fakeResponse = new UserResponse();
-                fakeResponse.setUser(toUser);
-                fakeResponse.setToUser(user);
-                fakeResponse.setDate(new Date());
-                fakeResponse.setResponse(new Random().nextInt(2) == 1 ? Response.YES : Response.NO);
-                userResponseRepository.save(fakeResponse);
-            }
-        }
 
         Optional<UserResponse> opponentResponseOpt = userResponseRepository.findByParties(toUserId, userId);
         if (opponentResponseOpt.isPresent()) {
@@ -100,14 +87,15 @@ public class UserResponseServiceImpl implements UserResponseService {
             User opponent = match.getOppositeMatchParty(userId).getUser();
             Notification<Map> notification = new Notification<>(userId,
                     NotificationType.NEW_MATCH,
-                    createPayload(matchId, opponent.getName()));
+                    createPayload(matchId, opponent.getId(), opponent.getName()));
             notificationSender.sendNotification(notification);
         }
     }
 
-    private Map createPayload(Long id, String name) {
+    private Map createPayload(Long id, Long userId, String name) {
         Map<String, Object> map = new HashMap<>();
         map.put("matchId", id);
+        map.put("userId", userId);
         map.put("opponentName", name);
         return map;
     }

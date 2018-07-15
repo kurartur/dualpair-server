@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+
+    <users id="10" gender="M" age="25" name="Artur"/>
+    <users id="11" gender="M" age="25" name="Dave"/>
+    <users id="12" gender="F" age="25" name="Diana"/>
+    <users id="13" gender="F" age="25" name="Kelly"/>
+
+    <matches id="1"/>
+
+    <user_responses user_id="10" to_user_id="13" match_id="1"/>
+    <user_responses user_id="10" to_user_id="12"/>
+
+    <user_accounts user_id="13" account_type="FB" account_id="100"/>
+    <user_accounts user_id="13" account_type="FB" account_id="200"/>
+
+</dataset>

@@ -3,9 +3,8 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 import lt.dualpair.core.location.Location;
 import lt.dualpair.core.location.LocationProvider;
 import lt.dualpair.core.location.LocationProviderException;
-import lt.dualpair.core.user.PurposeOfBeing;
-import lt.dualpair.core.user.RelationshipStatus;
-import lt.dualpair.core.user.User;
+import lt.dualpair.core.match.Match;
+import lt.dualpair.core.user.*;
 import lt.dualpair.server.interfaces.resource.user.LocationResource;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
@@ -18,10 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -32,30 +28,68 @@ public class UserControllerTest {
     private SocialUserServiceImpl socialUserService = mock(SocialUserServiceImpl.class);
     private LocationProvider locationProvider = mock(LocationProvider.class);
     private UserResourceAssembler userResourceAssembler = mock(UserResourceAssembler.class);
+    private UserResponseRepository userResponseRepository = mock(UserResponseRepository.class);
 
     @Before
     public void setUp() throws Exception {
         userController.setSocialUserService(socialUserService);
         userController.setLocationProvider(locationProvider);
         userController.setUserResourceAssembler(userResourceAssembler);
+        userController.setUserResponseRepository(userResponseRepository);
     }
 
     @Test
-    public void testGetUser() throws Exception {
+    public void testMe() throws Exception {
         User user = new User();
         UserResource userResource = new UserResource();
         when(socialUserService.loadUserById(1L)).thenReturn(user);
-        when(userResourceAssembler.toResource(user)).thenReturn(userResource);
+        when(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, true, true))).thenReturn(userResource);
         ResponseEntity responseEntity = userController.me(new TestUserDetails(1L));
         assertEquals(userResource, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }
 
     @Test
-    public void testGetUser_notFound() throws Exception {
+    public void testMe_notFound() throws Exception {
         doThrow(new UserNotFoundException("User not found")).when(socialUserService).loadUserById(1L);
         ResponseEntity responseEntity = userController.me(new TestUserDetails(1L));
         assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+    }
+
+    @Test
+    public void testGetUser() throws Exception {
+        User user = UserTestUtils.createUser(2L);
+        UserResource userResource = new UserResource();
+        when(socialUserService.loadUserById(2L)).thenReturn(user);
+        when(userResponseRepository.findByParties(1L, 2L)).thenReturn(Optional.of(new UserResponse()));
+        when(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, false, false))).thenReturn(userResource);
+        ResponseEntity responseEntity = userController.getUser(2L, new TestUserDetails(1L));
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(userResource, responseEntity.getBody());
+    }
+
+    @Test
+    public void testGetUser_whenDidntRespond_forbidden() {
+        User user = UserTestUtils.createUser(2L);
+        UserResource userResource = new UserResource();
+        when(socialUserService.loadUserById(2L)).thenReturn(user);
+        when(userResponseRepository.findByParties(1L, 2L)).thenReturn(Optional.empty());
+        ResponseEntity responseEntity = userController.getUser(2L, new TestUserDetails(1L));
+        assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
+    }
+
+    @Test
+    public void testGetUser_whenIsMatch_passMatchToContext() {
+        User user = UserTestUtils.createUser(2L);
+        UserResource userResource = new UserResource();
+        when(socialUserService.loadUserById(2L)).thenReturn(user);
+        UserResponse userResponse = new UserResponse();
+        userResponse.setMatch(new Match());
+        when(userResponseRepository.findByParties(1L, 2L)).thenReturn(Optional.of(userResponse));
+        when(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, true, false))).thenReturn(userResource);
+        ResponseEntity responseEntity = userController.getUser(2L, new TestUserDetails(1L));
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(userResource, responseEntity.getBody());
     }
 
     @Test

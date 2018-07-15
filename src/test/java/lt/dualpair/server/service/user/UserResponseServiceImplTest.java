@@ -28,7 +28,7 @@ public class UserResponseServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new UserResponseServiceImpl(userRepository, userResponseRepository, matchRepository, notificationSender, false);
+        service = new UserResponseServiceImpl(userRepository, userResponseRepository, matchRepository, notificationSender);
         when(userRepository.findById(1L)).thenReturn(Optional.of(UserTestUtils.createUser(1L)));
         when(userRepository.findById(2L)).thenReturn(Optional.of(UserTestUtils.createUser(2L)));
         when(userResponseRepository.findByParties(any(Long.class), any(Long.class))).thenReturn(Optional.empty());
@@ -71,32 +71,6 @@ public class UserResponseServiceImplTest {
         } catch (IllegalStateException ise) {
             assertEquals("Response from user 1 to user 2 already exists", ise.getMessage());
         }
-    }
-
-    @Test
-    public void respond_whenFakeMatchesEnabled_createResponseFromFake() {
-        service = new UserResponseServiceImpl(userRepository, userResponseRepository, matchRepository, notificationSender, true);
-        User toUser = UserTestUtils.createUser(2L);
-        toUser.setDescription("Lorem ipsum FAKE");
-        when(userRepository.findById(2L)).thenReturn(Optional.of(toUser));
-
-        service.respond(1L, 2L, Response.YES);
-
-        ArgumentCaptor<UserResponse> userResponseCaptor = ArgumentCaptor.forClass(UserResponse.class);
-        verify(userResponseRepository, times(2)).save(userResponseCaptor.capture());
-        UserResponse fakeResponse = userResponseCaptor.getAllValues().get(0);
-        assertEquals(new Long(2), fakeResponse.getUser().getId());
-        assertEquals(new Long(1), fakeResponse.getToUser().getId());
-    }
-
-    @Test
-    public void respond_whenFakeMatchesEnabledAndUserIsNotFake_responseFromFakeIsNotCreated() {
-        service = new UserResponseServiceImpl(userRepository, userResponseRepository, matchRepository, notificationSender, true);
-
-        service.respond(1L, 2L, Response.YES);
-
-        ArgumentCaptor<UserResponse> userResponseCaptor = ArgumentCaptor.forClass(UserResponse.class);
-        verify(userResponseRepository, times(1)).save(userResponseCaptor.capture());
     }
 
     @Test

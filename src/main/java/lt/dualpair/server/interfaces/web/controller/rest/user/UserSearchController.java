@@ -53,7 +53,7 @@ public class UserSearchController {
         if (!result.isPresent()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok().body(userResourceAssembler.toResource(result.get()));
+        return ResponseEntity.ok().body(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(result.get(), false, false)));
 
     }
 

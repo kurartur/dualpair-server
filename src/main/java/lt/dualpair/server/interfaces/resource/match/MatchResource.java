@@ -1,5 +1,6 @@
 package lt.dualpair.server.interfaces.resource.match;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import org.springframework.hateoas.ResourceSupport;
@@ -11,6 +12,7 @@ public class MatchResource extends ResourceSupport {
     @JsonProperty("id")
     private Long matchId;
     private UserResource user;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private Date date;
 
     public Long getMatchId() {

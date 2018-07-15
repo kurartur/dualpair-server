@@ -15,7 +15,6 @@ import org.junit.Test;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
@@ -60,13 +59,12 @@ public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
         userAccount.setAccountType(UserAccount.Type.FACEBOOK);
         user.setUserAccounts(new HashSet<>(Arrays.asList(userAccount)));
 
-        UserResource userResource = userResourceAssembler.toResource(user);
+        UserResource userResource = userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, true, true));
 
         assertEquals("name", userResource.getName());
         assertEquals((Integer)0, userResource.getAge());
         assertEquals(birthday, userResource.getDateOfBirth());
         assertEquals("description", userResource.getDescription());
-        assertTrue(userResource.getLink("search-parameters").getHref().endsWith("user/1/search-parameters"));
         assertEquals(sociotypeResources, userResource.getSociotypes());
         assertEquals(1, userResource.getLocations().size());
         assertEquals(photoResources, userResource.getPhotos());
