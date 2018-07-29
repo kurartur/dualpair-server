@@ -2,12 +2,20 @@ package lt.dualpair.server.interfaces.web.controller.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice("lt.dualpair.server.interfaces.web.controller.rest")
 public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> accessDeniedExceptionHandler(AccessDeniedException ade) {
+        logger.error(ade.getMessage(), ade);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.from(ade, HttpStatus.FORBIDDEN));
+    }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponse> illegalStateExceptionHandler(IllegalStateException ise) {

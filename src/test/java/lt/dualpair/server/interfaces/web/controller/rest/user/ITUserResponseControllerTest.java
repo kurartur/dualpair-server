@@ -105,6 +105,29 @@ public class ITUserResponseControllerTest extends BaseRestControllerTest {
         flushPersistenceContext();
         mockMvc.perform(put("/api/user/1/responses").with(bearerToken(1L))
                 .param("toUserId", "2")
+                .param("response", "NO"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DatabaseSetup(value = "userResponseTest.xml")
+    public void testRespond_responseAlreadyExistsAndIsMatch() throws Exception {
+        mockMvc.perform(put("/api/user/1/responses").with(bearerToken(1L))
+                .param("toUserId", "2")
+                .param("response", "YES"))
+                .andExpect(status().isOk());
+        flushPersistenceContext();
+        mockMvc.perform(put("/api/user/2/responses").with(bearerToken(2L))
+                .param("toUserId", "1")
+                .param("response", "YES"))
+                .andExpect(status().isOk());
+        flushPersistenceContext();
+        mockMvc.perform(put("/api/user/1/responses").with(bearerToken(1L))
+                .param("toUserId", "2")
+                .param("response", "NO"))
+                .andExpect(status().isConflict());
+        mockMvc.perform(put("/api/user/1/responses").with(bearerToken(1L))
+                .param("toUserId", "2")
                 .param("response", "YES"))
                 .andExpect(status().isConflict());
     }

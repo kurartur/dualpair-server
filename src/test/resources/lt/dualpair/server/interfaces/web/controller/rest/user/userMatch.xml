@@ -35,5 +35,7 @@
     <matches id="6" time="2016-08-25 01:14:50"/>
     <match_parties id="11" match_id="6" user_id="1"/>
     <match_parties id="12" match_id="6" user_id="7"/>
+    <user_responses id="1" user_id="1" to_user_id="7" response="Y" match_id="6"/>
+    <user_responses id="2" user_id="7" to_user_id="1" response="Y" match_id="6"/>
 
 </dataset>

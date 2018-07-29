@@ -63,14 +63,25 @@ public class UserResponseServiceImplTest {
     }
 
     @Test
-    public void respond_whenRespondToThisUserExists_exceptionThrown() {
-        when(userResponseRepository.findByParties(1L, 2L)).thenReturn(Optional.of(new UserResponse()));
+    public void respond_ifResponseExistsAndIsMatch_exceptionThrown() {
+        UserResponse userResponse = new UserResponse();
+        userResponse.setMatch(new Match());
+        when(userResponseRepository.findByParties(1L, 2L)).thenReturn(Optional.of(userResponse));
         try {
-            service.respond(1L, 2L, Response.YES);
+            service.respond(1L, 2L, Response.NO);
             fail();
         } catch (IllegalStateException ise) {
-            assertEquals("Response from user 1 to user 2 already exists", ise.getMessage());
+            assertEquals("Response from user 1 to user 2 already exists and is match", ise.getMessage());
         }
+    }
+
+    @Test
+    public void respond_ifResponseExistsAndIsNotMatch_isSaved() {
+        UserResponse userResponse = new UserResponse();
+        userResponse.setResponse(Response.NO);
+        when(userResponseRepository.findByParties(1L, 2L)).thenReturn(Optional.of(userResponse));
+        service.respond(1L, 2L, Response.NO);
+        verify(userResponseRepository, times(1)).save(userResponse);
     }
 
     @Test

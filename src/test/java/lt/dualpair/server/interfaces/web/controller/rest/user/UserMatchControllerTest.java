@@ -5,11 +5,11 @@ import lt.dualpair.core.match.MatchTestUtils;
 import lt.dualpair.core.match.UserAwareMatch;
 import lt.dualpair.core.user.MatchRepository;
 import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserRepository;
 import lt.dualpair.core.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.match.MatchResource;
 import lt.dualpair.server.interfaces.resource.match.MatchResourceAssembler;
 import lt.dualpair.server.security.TestUserDetails;
+import lt.dualpair.server.service.user.UserMatchService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -33,19 +33,12 @@ public class UserMatchControllerTest {
     private UserMatchController userMatchController;
     private MatchRepository matchRepository = mock(MatchRepository.class);
     private MatchResourceAssembler matchResourceAssembler = mock(MatchResourceAssembler.class);
-    private UserRepository userRepository = mock(UserRepository.class);
+    private UserMatchService userMatchService = mock(UserMatchService.class);
     private User user = UserTestUtils.createUser();
 
     @Before
     public void setUp() throws Exception {
-        userMatchController = new UserMatchController(matchRepository, matchResourceAssembler, userRepository);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-    }
-
-    @Test
-    public void testGetMatch_invalidUser() throws Exception {
-        ResponseEntity response = userMatchController.getMatch(2L, 1L, new TestUserDetails(1L));
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        userMatchController = new UserMatchController(matchRepository, matchResourceAssembler, userMatchService);
     }
 
     @Test
@@ -92,4 +85,10 @@ public class UserMatchControllerTest {
         verify(pagedResourcesAssembler, times(1)).toResource(any(Page.class), eq(matchResourceAssembler));
     }
 
+    @Test
+    public void testUnmatch() {
+        ResponseEntity responseEntity = userMatchController.unmatch(1L, 10L, new TestUserDetails(1L));
+        verify(userMatchService, times(1)).unmatch(10L, 1L);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+    }
 }

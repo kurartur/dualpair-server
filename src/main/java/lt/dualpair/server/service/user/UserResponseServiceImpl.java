@@ -42,18 +42,22 @@ public class UserResponseServiceImpl implements UserResponseService {
         Assert.notNull(toUserId);
         Assert.notNull(response);
 
-        Optional<UserResponse> existingResponse = userResponseRepository.findByParties(userId, toUserId);
-        if (existingResponse.isPresent()) {
-            // TODO unmatch, update should be possible, or separate service for unmatching
-            throw new IllegalStateException("Response from user " + userId + " to user " + toUserId + " already exists");
-        }
-
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User " + userId + " not found"));
         User toUser = userRepository.findById(toUserId).orElseThrow(() -> new IllegalArgumentException("User " + toUserId + " not found"));
 
-        UserResponse userResponse = new UserResponse();
-        userResponse.setUser(user);
-        userResponse.setToUser(toUser);
+        UserResponse userResponse;
+        Optional<UserResponse> existingResponse = userResponseRepository.findByParties(userId, toUserId);
+        if (existingResponse.isPresent()) {
+            userResponse = existingResponse.get();
+            if (userResponse.getMatch() != null) {
+                throw new IllegalStateException("Response from user " + userId + " to user " + toUserId + " already exists and is match");
+            }
+        } else {
+            userResponse = new UserResponse();
+            userResponse.setUser(user);
+            userResponse.setToUser(toUser);
+        }
+
         userResponse.setDate(new Date());
         userResponse.setResponse(response);
 

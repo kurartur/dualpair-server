@@ -12,9 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -90,4 +92,24 @@ public class ITUserMatchControllerTest extends BaseRestControllerTest {
                 .andExpect(status().isForbidden()).andReturn();
     }
 
+    @Test
+    public void testUnmatch_forbidden() throws Exception {
+        mockMvc.perform(delete("/api/user/1/matches/6").with(bearerToken(2L)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden()).andReturn();
+    }
+
+    @Test
+    public void testUnmatch() throws Exception {
+        mockMvc.perform(delete("/api/user/1/matches/6").with(bearerToken(1L)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        flushPersistenceContext();
+        Map<String, Object> userResponse = jdbcTemplate.queryForMap("select * from user_responses where user_id=1 and to_user_id=7");
+        assertEquals("N", userResponse.get("response"));
+        assertNull(userResponse.get("match_id"));
+        Map<String, Object> opponentResponse = jdbcTemplate.queryForMap("select * from user_responses where user_id=7 and to_user_id=1");
+        assertEquals("Y", opponentResponse.get("response"));
+        assertNull(opponentResponse.get("match_id"));
+        List<Long> matches = jdbcTemplate.queryForList("select * from matches where id=6", Long.class);
+        assertTrue(matches.isEmpty());
+    }
 }
