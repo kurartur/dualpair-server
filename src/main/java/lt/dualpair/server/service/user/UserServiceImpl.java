@@ -33,6 +33,7 @@ public class UserServiceImpl implements UserService {
     protected UserDetailsService userDetailsService;
     private MatchRepository matchRepository;
     protected PhotoRepository photoRepository;
+    private UserMatchService userMatchService;
 
     @Override
     public User loadUserById(Long userId) throws UserNotFoundException {
@@ -70,7 +71,7 @@ public class UserServiceImpl implements UserService {
     private void removeInvalidMatches(final User user, final Set<Sociotype> validSociotypes) {
         matchRepository.findForPossibleRemoval(user).forEach(match -> {
             if (Collections.disjoint(match.getOppositeMatchParty(user.getId()).getUser().getSociotypes(), validSociotypes)) {
-                matchRepository.delete(match);
+                userMatchService.remove(match.getId(), user.getId());
             }
         });
     }
@@ -141,5 +142,10 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setPhotoRepository(PhotoRepository photoRepository) {
         this.photoRepository = photoRepository;
+    }
+
+    @Autowired
+    public void setUserMatchService(UserMatchService userMatchService) {
+        this.userMatchService = userMatchService;
     }
 }

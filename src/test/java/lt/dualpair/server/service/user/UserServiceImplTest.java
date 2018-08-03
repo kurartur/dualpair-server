@@ -24,6 +24,7 @@ public class UserServiceImplTest {
     private SociotypeRepository sociotypeRepository = mock(SociotypeRepository.class);
     private MatchRepository matchRepository = mock(MatchRepository.class);
     private PhotoRepository photoRepository = mock(PhotoRepository.class);
+    private UserMatchService userMatchService = mock(UserMatchService.class);
 
     @Before
     public void setUp() throws Exception {
@@ -31,6 +32,7 @@ public class UserServiceImplTest {
         userService.setSociotypeRepository(sociotypeRepository);
         userService.setMatchRepository(matchRepository);
         userService.setPhotoRepository(photoRepository);
+        userService.setUserMatchService(userMatchService);
     }
 
     @Test
@@ -139,7 +141,7 @@ public class UserServiceImplTest {
         when(sociotypeRepository.findOppositeByRelationType(oldSociotype.getCode1(), RelationType.Code.DUAL)).thenReturn(opposite);
         userService.setUserSociotypes(user, newSociotypes);
         verify(matchRepository, times(1)).findForPossibleRemoval(user);
-        verify(matchRepository, times(1)).delete(match);
+        verify(userMatchService, times(1)).remove(1L, 1L);
         verify(userRepository, times(1)).save(user);
     }
 
@@ -188,7 +190,7 @@ public class UserServiceImplTest {
 
         userService.setUserSociotypes(user, newSociotypes);
         verify(matchRepository, times(1)).findForPossibleRemoval(user);
-        verify(matchRepository, times(1)).delete(match);
+        verify(userMatchService, times(1)).remove(1L, 1L);
         verify(userRepository, times(1)).save(user);
     }
 

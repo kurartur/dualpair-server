@@ -26,6 +26,25 @@ public class UserMatchServiceImpl implements UserMatchService {
 
     @Override
     @Transactional
+    public void remove(Long matchId, Long userId) {
+        Assert.notNull(matchId);
+        Assert.notNull(userId);
+
+        Match match = matchRepository.findOneByUser(userId, matchId)
+                .orElseThrow(() -> new IllegalArgumentException("Match with id " + matchId + " and user id " + userId + " not found"));
+        Long opponentUserId = match.getOppositeMatchParty(userId).getUser().getId();
+        UserResponse userResponse = userResponseRepository.findByParties(userId, opponentUserId)
+                .get();
+        UserResponse opponentResponse = userResponseRepository.findByParties(opponentUserId, userId)
+                .get();
+
+        userResponseRepository.delete(userResponse);
+        userResponseRepository.delete(opponentResponse);
+        matchRepository.delete(match);
+    }
+
+    @Override
+    @Transactional
     public void unmatch(Long matchId, Long userId) {
         Assert.notNull(matchId);
         Assert.notNull(userId);

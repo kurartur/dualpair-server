@@ -123,6 +123,8 @@ public class ITUserControllerTest extends BaseRestControllerTest {
         assertEquals((Integer)0, c);
         c = jdbcTemplate.queryForObject("select count(*) from matches where id in (3, 4)", Integer.class);
         assertEquals((Integer)2, c);
+        c = jdbcTemplate.queryForObject("select count(*) from user_responses where id in (1, 2, 3, 4)", Integer.class);
+        assertEquals((Integer)0, c);
     }
 
     @Test

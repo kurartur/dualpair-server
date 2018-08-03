@@ -91,4 +91,49 @@ public class UserMatchServiceImplTest {
         assertEquals(responseDate, savedOpponentResponse.getDate());
         assertNull(savedUserResponse.getMatch());
     }
+
+    @Test
+    public void remove_whenNullArgs_exceptionThrown() {
+        try {
+            service.remove(null, null);
+            fail();
+        } catch (IllegalArgumentException iae) {}
+        try {
+            service.remove(1L, null);
+            fail();
+        } catch (IllegalArgumentException iae) {}
+        try {
+            service.remove(null, 1L);
+            fail();
+        } catch (IllegalArgumentException iae) {}
+    }
+
+    @Test
+    public void remove_whenMatchNotFound_exceptionThrown() {
+        when(matchRepository.findOneByUser(1L, 2L)).thenReturn(Optional.empty());
+        try {
+            service.remove(2L, 1L);
+            fail();
+        } catch (IllegalArgumentException iae) {
+            assertEquals("Match with id 2 and user id 1 not found", iae.getMessage());
+        }
+    }
+
+    @Test
+    public void remove() {
+        User user1 = UserTestUtils.createUser(1L);
+        User user2 = UserTestUtils.createUser(2L);
+        MatchParty mp1 = MatchPartyTestUtils.createMatchParty(1L, user1);
+        MatchParty mp2 = MatchPartyTestUtils.createMatchParty(2L, user2);
+        Match match = MatchTestUtils.createMatch(1L, mp1, mp2);
+        UserResponse response1 = new UserResponse();
+        UserResponse response2 = new UserResponse();
+        when(matchRepository.findOneByUser(1L, 3L)).thenReturn(Optional.of(match));
+        when(userResponseRepository.findByParties(1L,2L)).thenReturn(Optional.of(response1));
+        when(userResponseRepository.findByParties(2L,1L)).thenReturn(Optional.of(response2));
+        service.remove(3L, 1L);
+        verify(matchRepository, times(1)).delete(match);
+        verify(userResponseRepository, times(1)).delete(response1);
+        verify(userResponseRepository, times(1)).delete(response2);
+    }
 }
