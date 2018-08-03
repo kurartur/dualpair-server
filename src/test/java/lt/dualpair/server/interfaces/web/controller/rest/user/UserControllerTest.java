@@ -10,7 +10,6 @@ import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.security.TestUserDetails;
 import lt.dualpair.server.service.user.SocialUserServiceImpl;
-import lt.dualpair.server.service.user.UserNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -50,13 +49,6 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testMe_notFound() throws Exception {
-        doThrow(new UserNotFoundException("User not found")).when(socialUserService).loadUserById(1L);
-        ResponseEntity responseEntity = userController.me(new TestUserDetails(1L));
-        assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
-    }
-
-    @Test
     public void testGetUser() throws Exception {
         User user = UserTestUtils.createUser(2L);
         UserResource userResource = new UserResource();
@@ -88,6 +80,18 @@ public class UserControllerTest {
         when(userResponseRepository.findByParties(1L, 2L)).thenReturn(Optional.of(userResponse));
         when(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, true, false))).thenReturn(userResource);
         ResponseEntity responseEntity = userController.getUser(2L, new TestUserDetails(1L));
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(userResource, responseEntity.getBody());
+    }
+
+    @Test
+    public void testGetUser_whenPrincipal_trueIsPassedToAssemblingContext() throws Exception {
+        User user = UserTestUtils.createUser(2L);
+        UserResource userResource = new UserResource();
+        when(socialUserService.loadUserById(2L)).thenReturn(user);
+        when(userResponseRepository.findByParties(2L, 2L)).thenReturn(Optional.empty());
+        when(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, false, true))).thenReturn(userResource);
+        ResponseEntity responseEntity = userController.getUser(2L, new TestUserDetails(2L));
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(userResource, responseEntity.getBody());
     }

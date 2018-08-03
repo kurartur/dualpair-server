@@ -11,6 +11,9 @@
     <user_responses user_id="10" to_user_id="13" match_id="1"/>
     <user_responses user_id="10" to_user_id="12"/>
 
+    <user_accounts user_id="10" account_type="FB" account_id="5"/>
+    <user_accounts user_id="10" account_type="VK" account_id="10"/>
+
     <user_accounts user_id="13" account_type="FB" account_id="100"/>
     <user_accounts user_id="13" account_type="FB" account_id="200"/>
 

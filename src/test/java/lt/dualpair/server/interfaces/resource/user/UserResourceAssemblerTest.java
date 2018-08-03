@@ -2,10 +2,7 @@ package lt.dualpair.server.interfaces.resource.user;
 
 import lt.dualpair.core.photo.Photo;
 import lt.dualpair.core.socionics.Sociotype;
-import lt.dualpair.core.user.RelationshipStatus;
-import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserAccount;
-import lt.dualpair.core.user.UserLocation;
+import lt.dualpair.core.user.*;
 import lt.dualpair.server.interfaces.resource.BaseResourceAssemblerTest;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResource;
 import lt.dualpair.server.interfaces.resource.socionics.SociotypeResourceAssembler;
@@ -40,6 +37,7 @@ public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
         user.setDateOfBirth(birthday);
         user.setDescription("description");
         user.setRelationshipStatus(RelationshipStatus.IN_RELATIONSHIP);
+        user.setGender(Gender.FEMALE);
 
         Set<Sociotype> sociotypes = new HashSet<>(Arrays.asList(new Sociotype.Builder().build()));
         user.setSociotypes(sociotypes);
@@ -70,6 +68,7 @@ public class UserResourceAssemblerTest extends BaseResourceAssemblerTest {
         assertEquals(photoResources, userResource.getPhotos());
         assertEquals(1, userResource.getAccounts().size());
         assertEquals("IR", userResource.getRelationshipStatus());
+        assertEquals("F", userResource.getGender());
     }
 
 }

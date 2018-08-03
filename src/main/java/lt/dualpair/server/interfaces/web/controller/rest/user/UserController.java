@@ -10,13 +10,11 @@ import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
 import lt.dualpair.server.security.UserDetails;
 import lt.dualpair.server.service.user.SocialUserService;
-import lt.dualpair.server.service.user.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,24 +35,23 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/me")
     public ResponseEntity me(@ActiveUser UserDetails principal) {
-        try {
-            User user = socialUserService.loadUserById(principal.getId());
-            return ResponseEntity.ok(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, true, true)));
-        } catch (UserNotFoundException unfe) { // in case user was deleted
-            SecurityContextHolder.clearContext();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        User user = socialUserService.loadUserById(principal.getId());
+        return ResponseEntity.ok(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, true, true)));
     }
 
     @RequestMapping(method = RequestMethod.GET, value="/user/{userId:[0-9]+}")
     public ResponseEntity getUser(@PathVariable Long userId, @ActiveUser UserDetails principal) {
-        Optional<UserResponse> response = userResponseRepository.findByParties(principal.getId(), userId);
-        if (!response.isPresent()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        boolean isMatch = false;
+        boolean isPrincipal = userId.equals(principal.getId());
+        if (!isPrincipal) {
+            Optional<UserResponse> response = userResponseRepository.findByParties(principal.getId(), userId);
+            if (!response.isPresent()) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            isMatch = response.get().getMatch() != null;
         }
-        boolean isMatch = response.get().getMatch() != null;
         User user = socialUserService.loadUserById(userId);
-        UserResource userResource = userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, isMatch, false));
+        UserResource userResource = userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, isMatch, isPrincipal));
         return ResponseEntity.ok(userResource);
     }
 

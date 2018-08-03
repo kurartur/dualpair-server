@@ -307,4 +307,18 @@ public class ITUserControllerTest extends BaseRestControllerTest {
         assertNull(userResource.getAccounts());
     }
 
+    @Test
+    @DatabaseSetup("userTest_getUser.xml")
+    public void testGetUser_whenPrincipal_hasAccounts() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/user/10")
+                .with(bearerToken(10L))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentString = result.getResponse().getContentAsString();
+        UserResource userResource = new ObjectMapper().readValue(contentString, UserResource.class);
+        assertEquals(new Long(10), userResource.getUserId());
+        assertEquals(2, userResource.getAccounts().size());
+    }
+
 }

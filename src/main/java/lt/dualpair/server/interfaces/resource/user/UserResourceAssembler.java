@@ -28,10 +28,11 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserResource
 
         resource.setUserId(entity.getId());
         resource.setName(entity.getName());
-        if (context.isPrincipal) {
+        if (context.isPrincipal()) {
             resource.setDateOfBirth(entity.getDateOfBirth());
         }
         resource.setAge(entity.getAge());
+        resource.setGender(entity.getGender().getCode());
         resource.setDescription(entity.getDescription());
         resource.setSociotypes(new HashSet<>(sociotypeResourceAssembler.toResources(entity.getSociotypes())));
 
@@ -50,7 +51,7 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserResource
         Collections.sort(sortedPhotos, (o1, o2) -> o2.getPosition() - o1.getPosition());
         resource.setPhotos(photoResourceAssembler.toResources(sortedPhotos));
 
-        if (context.isMutualMatch()) {
+        if (context.isMutualMatch() || context.isPrincipal()) {
             List<UserAccountResource> accountResources = new ArrayList<>();
             for (UserAccount userAccount : entity.getUserAccounts()) {
                 UserAccountResource userAccountResource = new UserAccountResource();
@@ -104,6 +105,10 @@ public class UserResourceAssembler extends ResourceAssemblerSupport<UserResource
 
         public boolean isMutualMatch() {
             return isMutualMatch;
+        }
+
+        public boolean isPrincipal() {
+            return isPrincipal;
         }
 
         @Override
