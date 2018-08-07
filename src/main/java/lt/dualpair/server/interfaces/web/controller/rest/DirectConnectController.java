@@ -14,10 +14,7 @@ import org.springframework.social.connect.support.OAuth2ConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.social.security.SocialAuthenticationServiceLocator;
 import org.springframework.social.security.provider.SocialAuthenticationService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.Set;
@@ -73,6 +70,20 @@ public class DirectConnectController {
         freshUser.addUserAccount(userAccount);
         userRepository.save(freshUser);
 
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/connect/{providerId:[a-zA-Z]+}")
+    public ResponseEntity disconnect(@ActiveUser UserDetails principal,
+                                     @PathVariable("providerId") String authProviderId) {
+        User user = userRepository.findById(principal.getId()).orElseThrow(() -> new RuntimeException("User not found somehow"));
+        if (user.getUserAccounts().size() < 2) {
+            throw new IllegalArgumentException("Can't disconnect from last account");
+        }
+        UserAccount.Type accountType = UserAccount.Type.valueOf(authProviderId.toUpperCase());
+        usersConnectionRepository.createConnectionRepository(principal.getId().toString()).removeConnections(accountType.name().toLowerCase());
+        user.removeAccount(accountType);
+        userRepository.save(user);
         return ResponseEntity.ok().build();
     }
 

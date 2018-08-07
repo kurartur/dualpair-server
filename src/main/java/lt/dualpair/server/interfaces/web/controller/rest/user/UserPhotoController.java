@@ -38,7 +38,7 @@ public class UserPhotoController {
     @PostMapping("/photos")
     public ResponseEntity setPhotos(
             @PathVariable Long userId,
-            @RequestPart(value = "photoFiles") MultipartFile[] photoFiles,
+            @RequestPart(value = "photoFiles") List<MultipartFile> photoFiles,
             @RequestPart(value = "data") String dataJson) throws Exception {
         PhotoResourceCollection data = new ObjectMapper().readValue(dataJson, PhotoResourceCollection.class);
         List<Photo> photos = userPhotoService.setUserPhotos(userId, createModels(photoFiles, data.getPhotoResources()));
@@ -50,7 +50,7 @@ public class UserPhotoController {
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.IMAGE_JPEG).body(photoFileHelper.read(userId, name));
     }
 
-    private List<PhotoModel> createModels(MultipartFile[] photoFiles, List<PhotoResource> photoResources) throws IOException {
+    private List<PhotoModel> createModels(List<MultipartFile> photoFiles, List<PhotoResource> photoResources) throws IOException {
         List<PhotoModel> models = new ArrayList<>();
         for (PhotoResource photoResource : photoResources) {
             if (photoResource.getPhotoId() == null) {
@@ -64,7 +64,7 @@ public class UserPhotoController {
             }
         }
         if (models.size() != photoResources.size()) {
-            throw new IllegalArgumentException("Something wrong");
+            throw new IllegalArgumentException("Model count is not equal to photo count in received data");
         }
         return models;
     }
