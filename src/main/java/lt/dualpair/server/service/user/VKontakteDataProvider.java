@@ -19,10 +19,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class VKontakteDataProvider implements SocialDataProvider {
@@ -107,61 +104,6 @@ public class VKontakteDataProvider implements SocialDataProvider {
             return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         }
         return null;
-    }
-
-    @Override
-    public List<Photo> getPhotos() {
-        try {
-            return vkApiClient.photos().getAll(userActor).count(20).execute()
-                    .getItems()
-                    .stream()
-                    .map(vkPhoto -> {
-                        Photo photo = new Photo();
-                        photo.setSourceLink(vkPhoto.getPhoto604());
-                        return photo;
-                    }).collect(Collectors.toList());
-        } catch (ApiException | ClientException e) {
-            logger.error(e.getMessage(), e);
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public Optional<Photo> getPhoto(String idOnAccount) {
-        try {
-            List<com.vk.api.sdk.objects.photos.Photo> vkPhotos = vkApiClient
-                    .photos()
-                    .getById(getAccountId() + "_" + idOnAccount)
-                    .execute();
-            if (vkPhotos == null || vkPhotos.isEmpty()) {
-                return Optional.empty();
-            }
-            com.vk.api.sdk.objects.photos.Photo vkPhoto = vkPhotos.get(0);
-            Photo photo = new Photo();
-            photo.setSourceLink(vkPhoto.getPhoto604());
-            return Optional.of(photo);
-        } catch (ApiException | ClientException e) {
-            logger.error(e.getMessage(), e);
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public List<Photo> getPhotos(List<String> ids) {
-        ConnectionData connectionData = vkontakteConnection.createData();
-        List<Photo> photos = new ArrayList<>();
-        try {
-            List<String> userAndPhotoIds = ids.stream().map(photoId -> connectionData.getProviderUserId() + "_" + photoId).collect(Collectors.toList());
-            List<com.vk.api.sdk.objects.photos.Photo> vkPhotos = vkApiClient.photos().getById(userActor, userAndPhotoIds).execute();
-            for (com.vk.api.sdk.objects.photos.Photo vkPhoto : vkPhotos) {
-                Photo photo = new Photo();
-                photo.setSourceLink(vkPhoto.getPhoto604());
-                photos.add(photo);
-            }
-        } catch (ApiException | ClientException e) {
-            logger.error(e.getMessage(), e);
-        }
-        return photos;
     }
 
 }

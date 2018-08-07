@@ -3,10 +3,7 @@ package lt.dualpair.server.service.user;
 import com.vk.api.sdk.actions.Photos;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
-import com.vk.api.sdk.objects.photos.responses.GetAllResponse;
 import com.vk.api.sdk.objects.photos.responses.GetResponse;
-import com.vk.api.sdk.queries.photos.PhotosGetAllQuery;
-import com.vk.api.sdk.queries.photos.PhotosGetByIdQuery;
 import com.vk.api.sdk.queries.photos.PhotosGetQuery;
 import lt.dualpair.core.photo.Photo;
 import lt.dualpair.core.user.Gender;
@@ -22,10 +19,8 @@ import org.springframework.social.vkontakte.api.VKontakteDate;
 import org.springframework.social.vkontakte.api.VKontakteProfile;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -147,49 +142,6 @@ public class VKontakteDataProviderTest {
         vKontakteProfile.setBirthDate(new VKontakteDate(1, 2, 0));
         user = vKontakteDataProvider.enhanceUser(new User());
         assertNull(user.getDateOfBirth());
-    }
-
-    @Test
-    public void getPhotos() throws Exception {
-        PhotosGetAllQuery query = mock(PhotosGetAllQuery.class);
-        GetAllResponse response = mock(GetAllResponse.class);
-        when(query.execute()).thenReturn(response);
-        when(query.count(20)).thenReturn(query);
-        when(photos.getAll(any(UserActor.class))).thenReturn(query);
-
-        List<com.vk.api.sdk.objects.photos.PhotoXtrRealOffset> vkPhotos = Arrays.asList(
-                mockVkPhotoXtrRealOffset(1, "src1"),
-                mockVkPhotoXtrRealOffset(2, "src2")
-        );
-        when(response.getItems()).thenReturn(vkPhotos);
-        List<Photo> photos = vKontakteDataProvider.getPhotos();
-        int i = 1;
-        for(Photo photo : photos) {
-            assertEquals("src" + i, photo.getSourceLink());
-            i++;
-        }
-    }
-
-    @Test
-    public void getPhoto() throws Exception {
-        List<com.vk.api.sdk.objects.photos.Photo> vkPhotos = new ArrayList<>();
-        vkPhotos.add(mockVkPhoto(1, "src1"));
-        PhotosGetByIdQuery query = mock(PhotosGetByIdQuery.class);
-        when(query.execute()).thenReturn(vkPhotos);
-        when(photos.getById("1_1")).thenReturn(query);
-        Optional<Photo> photoOptional = vKontakteDataProvider.getPhoto("1");
-        assertTrue(photoOptional.isPresent());
-        Photo photo = photoOptional.get();
-        assertEquals("src1", photo.getSourceLink());
-    }
-
-    @Test
-    public void getPhoto_whenNotFound_emptyOptional() throws Exception {
-        PhotosGetByIdQuery query = mock(PhotosGetByIdQuery.class);
-        when(query.execute()).thenReturn(new ArrayList<>());
-        when(photos.getById("1_1")).thenReturn(query);
-        Optional<Photo> photoOptional = vKontakteDataProvider.getPhoto("1");
-        assertFalse(photoOptional.isPresent());
     }
 
     private com.vk.api.sdk.objects.photos.Photo mockVkPhoto(Integer id, String src) {

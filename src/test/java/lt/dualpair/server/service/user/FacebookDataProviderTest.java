@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.facebook.api.*;
-import org.springframework.social.support.URIBuilder;
 import org.springframework.web.client.RestOperations;
 
 import java.time.LocalDate;
@@ -17,7 +16,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 public class FacebookDataProviderTest {
@@ -119,38 +119,6 @@ public class FacebookDataProviderTest {
         user = facebookDataProvider.enhanceUser(user);
 
         assertEquals(User.MAX_NUMBER_OF_PHOTOS, user.getPhotos().size());
-    }
-
-    @Test
-    public void testGetPhotos() throws Exception {
-        doReturn(new PagedList<>(Arrays.asList(createAlbum("1", "Profile pictures"), createAlbum("2", "Cool pics")), null, null)).when(mediaOperations).getAlbums();
-        doReturn(new PagedList<>(Arrays.asList(createPhoto("1"), createPhoto("2")), null, null)).when(mediaOperations).getPhotos("1");
-        doReturn(new PagedList<>(Arrays.asList(createPhoto("3"), createPhoto("4")), null, null)).when(mediaOperations).getPhotos("2");
-        List<Photo> photos = facebookDataProvider.getPhotos();
-        assertEquals(4, photos.size());
-    }
-
-    @Test
-    public void testGetPhoto_nullPhoto() throws Exception {
-        assertFalse(facebookDataProvider.getPhoto("1").isPresent());
-    }
-
-    @Test
-    public void testGetPhoto_exception() throws Exception {
-        doThrow(new RuntimeException("Exception")).when(restOperations).getForObject(URIBuilder.fromUri("https://graph.facebook.com/v2.5/1?fields=source").build(), org.springframework.social.facebook.api.Photo.class);
-        assertFalse(facebookDataProvider.getPhoto("1").isPresent());
-    }
-
-    @Test
-    public void testGetPhoto() throws Exception {
-        org.springframework.social.facebook.api.Photo fbPhoto = mock(org.springframework.social.facebook.api.Photo.class);
-        when(fbPhoto.getSource()).thenReturn("url");
-        when(fbPhoto.getId()).thenReturn("id");
-        doReturn(fbPhoto).when(restOperations).getForObject(URIBuilder.fromUri("https://graph.facebook.com/v2.5/1?fields=source").build(), org.springframework.social.facebook.api.Photo.class);
-        Optional<Photo> optionalPhoto = facebookDataProvider.getPhoto("1");
-        assertTrue(optionalPhoto.isPresent());
-        Photo photo = optionalPhoto.get();
-        assertEquals("url", photo.getSourceLink());
     }
 
     private void assertUserPhoto(String expectedId, User expectedUser, Photo actualPhoto) throws Exception {

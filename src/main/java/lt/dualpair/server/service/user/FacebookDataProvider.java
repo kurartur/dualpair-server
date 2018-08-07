@@ -7,16 +7,14 @@ import org.jboss.logging.Logger;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.facebook.api.Album;
 import org.springframework.social.facebook.api.Facebook;
-import org.springframework.social.facebook.api.MediaOperations;
 import org.springframework.social.facebook.api.PagedList;
-import org.springframework.social.support.URIBuilder;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestOperations;
 
-import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class FacebookDataProvider implements SocialDataProvider {
 
@@ -54,46 +52,6 @@ public class FacebookDataProvider implements SocialDataProvider {
         addPhotos(user, facebook);
 
         return user;
-    }
-
-    @Override
-    public List<Photo> getPhotos() {
-        Facebook facebook = facebookConnection.getApi();
-        MediaOperations mediaOperations = facebook.mediaOperations();
-        List<Photo> photos = new ArrayList<>();
-        mediaOperations.getAlbums().forEach(album -> mediaOperations.getPhotos(album.getId()).forEach(fbPhoto -> {
-            Photo photo = new Photo();
-            photo.setSourceLink(fbPhoto.getSource());
-            photos.add(photo);
-        }));
-        return photos;
-    }
-
-    @Override
-    public Optional<Photo> getPhoto(String photoId) {
-        try {
-            RestOperations restOperations = facebookConnection.getApi().restOperations();
-            URI uri = URIBuilder.fromUri("https://graph.facebook.com/v2.5/" + photoId + "?fields=source").build();
-            org.springframework.social.facebook.api.Photo fbPhoto = restOperations.getForObject(uri, org.springframework.social.facebook.api.Photo.class);
-            if (fbPhoto != null) {
-                Photo photo = new Photo();
-                photo.setSourceLink(fbPhoto.getSource());
-                return Optional.of(photo);
-            }
-            return Optional.empty();
-        } catch (Exception e) {
-            logger.warn(e);
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public List<Photo> getPhotos(List<String> ids) {
-        List<Photo> photos = new ArrayList<>();
-        for (String idOnAccount : ids) {
-            getPhoto(idOnAccount).ifPresent(photo -> photos.add(photo));
-        }
-        return photos;
     }
 
     private Gender resolveGender(String gender) throws SocialDataException {
