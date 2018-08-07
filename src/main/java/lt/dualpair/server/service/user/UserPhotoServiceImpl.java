@@ -33,10 +33,11 @@ public class UserPhotoServiceImpl implements UserPhotoService {
 
         userPhotos.removeIf(photo -> !photoList.stream().map(PhotoModel::getId).collect(Collectors.toList()).contains(photo.getId()));
 
-        userPhotos.forEach(photo -> photoList.stream()
-                .filter(pm -> pm.getId().equals(photo.getId()))
-                .findFirst()
-                .ifPresent(photoModel -> photo.setPosition(photoModel.getPosition())));
+        userPhotos.forEach(photo ->
+                photoList.stream()
+                    .filter(pm -> photo.getId().equals(pm.getId()))
+                    .findFirst()
+                    .ifPresent(photoModel -> photo.setPosition(photoModel.getPosition())));
 
         photoList.stream()
                 .filter(pm -> pm.getId() == null)
@@ -52,7 +53,7 @@ public class UserPhotoServiceImpl implements UserPhotoService {
         user.setPhotos(userPhotos);
         userRepository.save(user);
 
-        return userPhotos;
+        return user.getPhotos();
     }
 
 }

@@ -91,7 +91,7 @@ public class UserPhotoServiceImplTest {
         byte[] photoBytes2 = new byte[10];
         when(photoStore.save(photoBytes1, 1L, 2)).thenReturn("path1");
         when(photoStore.save(photoBytes2, 1L, 3)).thenReturn("path2");
-        List<PhotoModel> photoList = Arrays.asList(new PhotoModel(1L, null, 1), new PhotoModel(null, photoBytes1, 2), new PhotoModel(null, photoBytes2, 3));
+        List<PhotoModel> photoList = Arrays.asList(new PhotoModel(null, photoBytes1, 2), new PhotoModel(1L, null, 1) , new PhotoModel(null, photoBytes2, 3));
         List<Photo> result = service.setUserPhotos(1L, photoList);
         verify(userRepository, times(1)).save(userCaptor.capture());
         List<Photo> savedPhotos = userCaptor.getValue().getPhotos();
