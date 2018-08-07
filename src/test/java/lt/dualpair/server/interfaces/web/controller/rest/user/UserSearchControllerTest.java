@@ -40,7 +40,7 @@ public class UserSearchControllerTest {
     public void testFind_notFound() throws Exception {
         doReturn(UserTestUtils.createUser()).when(userService).loadUserById(1L);
         doReturn(Optional.empty()).when(userSearchService).findOne(any(UserRequest.class));
-        ResponseEntity responseEntity = userSearchController.find(crateSearchQuery(), new UserDetailsImpl(userPrincipal));
+        ResponseEntity responseEntity = userSearchController.find(crateSearchQuery(), new UserDetailsImpl(1L));
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
 
@@ -52,7 +52,7 @@ public class UserSearchControllerTest {
         User found = new User();
         doReturn(Optional.of(found)).when(userSearchService).findOne(any(UserRequest.class));
         doReturn(userResource).when(userResourceAssembler).toResource(new UserResourceAssembler.AssemblingContext(found, false, false));
-        ResponseEntity<UserResource> responseEntity = userSearchController.find(crateSearchQuery(), new UserDetailsImpl(userPrincipal));
+        ResponseEntity<UserResource> responseEntity = userSearchController.find(crateSearchQuery(), new UserDetailsImpl(1L));
         assertEquals(userResource, responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 

@@ -58,7 +58,6 @@ public class ConnectionSignUpImpl implements ConnectionSignUp {
     private void setDefaultSearchParameters(User user) {
         SearchParameters searchParameters = user.getSearchParameters();
 
-        // TODO set min max age if users age not present
         if (user.getAge() != null) {
             searchParameters.setMinAge(user.getAge() - DEFAULT_SEARCH_AGE_GAP);
             searchParameters.setMaxAge(user.getAge() + DEFAULT_SEARCH_AGE_GAP);

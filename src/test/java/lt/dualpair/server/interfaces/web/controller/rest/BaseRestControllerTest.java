@@ -66,7 +66,7 @@ public abstract class BaseRestControllerTest {
     }
 
     protected RequestPostProcessor bearerToken(Long userId) {
-        return helper.bearerToken("dualpairandroid", new UserDetailsImpl(OAuthHelper.buildUserPrincipal(userId)));
+        return helper.bearerToken("dualpairandroid", new UserDetailsImpl(userId));
     }
 
 }

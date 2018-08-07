@@ -1,27 +1,25 @@
 package lt.dualpair.server.security;
 
-import lt.dualpair.core.user.User;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-// TODO remove User from this implementation to avoid authentication serialization/deserialization issues
 public class UserDetailsImpl implements UserDetails {
 
-    private User user;
+    private Long userId;
 
-    public UserDetailsImpl(User user) {
-        this.user = user;
+    public UserDetailsImpl(Long userId) {
+        this.userId = userId;
     }
 
     @Override
     public Long getId() {
-        return user.getId();
+        return userId;
     }
 
     @Override
     public String getUserId() {
-        return user.getId().toString();
+        return userId.toString();
     }
 
     @Override
@@ -36,7 +34,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getId().toString();
+        return userId.toString();
     }
 
     @Override

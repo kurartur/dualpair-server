@@ -23,13 +23,13 @@ public class UserDetailsService implements org.springframework.security.core.use
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findById(new Long(username));
-        return new UserDetailsImpl(user.orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found.")));
+        return new UserDetailsImpl(user.orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found.")).getId());
     }
 
     @Override
     public SocialUserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findById(new Long(userId));
-        return new UserDetailsImpl(user.orElseThrow(() -> new UsernameNotFoundException("User with user id " + userId + " not found.")));
+        return new UserDetailsImpl(user.orElseThrow(() -> new UsernameNotFoundException("User with user id " + userId + " not found.")).getId());
 
     }
 }

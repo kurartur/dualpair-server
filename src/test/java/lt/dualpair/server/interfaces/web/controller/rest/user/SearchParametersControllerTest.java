@@ -2,7 +2,6 @@ package lt.dualpair.server.interfaces.web.controller.rest.user;
 
 import lt.dualpair.core.user.SearchParameters;
 import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserTestUtils;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResource;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResourceAssembler;
 import lt.dualpair.server.security.TestUserDetails;
@@ -24,7 +23,6 @@ public class SearchParametersControllerTest {
     private SearchParametersController searchParametersController = new SearchParametersController();
     private UserService socialUserService = mock(UserService.class);
     private SearchParametersResourceAssembler searchParametersResourceAssembler = mock(SearchParametersResourceAssembler.class);
-    private User principal = UserTestUtils.createUser(1L);
 
     @Before
     public void setUp() throws Exception {
@@ -39,7 +37,7 @@ public class SearchParametersControllerTest {
         searchParametersResource.setSearchFemale(false);
         doThrow(new RuntimeException("Error")).when(socialUserService).setUserSearchParameters(eq(1L), any(SearchParameters.class));
         try {
-            searchParametersController.setSearchParameters(1L, searchParametersResource, new UserDetailsImpl(principal));
+            searchParametersController.setSearchParameters(1L, searchParametersResource, new UserDetailsImpl(1L));
             fail();
         } catch (Exception re) {
             assertEquals("Error", re.getMessage());
@@ -48,7 +46,7 @@ public class SearchParametersControllerTest {
 
     @Test
     public void testSetSearchParamters_invalidUser() throws Exception {
-        ResponseEntity responseEntity = searchParametersController.setSearchParameters(2L, null, new UserDetailsImpl(principal));
+        ResponseEntity responseEntity = searchParametersController.setSearchParameters(2L, null, new UserDetailsImpl(1L));
         verify(socialUserService, never()).setUserSearchParameters(any(Long.class), any(SearchParameters.class));
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
     }
@@ -60,7 +58,7 @@ public class SearchParametersControllerTest {
         searchParametersResource.setMaxAge(25);
         searchParametersResource.setSearchFemale(true);
         searchParametersResource.setSearchMale(true);
-        searchParametersController.setSearchParameters(1L, searchParametersResource, new UserDetailsImpl(principal));
+        searchParametersController.setSearchParameters(1L, searchParametersResource, new UserDetailsImpl(1L));
         ArgumentCaptor<SearchParameters> captor = ArgumentCaptor.forClass(SearchParameters.class);
         verify(socialUserService, times(1)).setUserSearchParameters(eq(1L), captor.capture());
         SearchParameters searchParameters = captor.getValue();

@@ -29,7 +29,7 @@ public class DeviceControllerTest {
     @Test
     public void testRegisterDevice() throws Exception {
         doReturn(Optional.empty()).when(deviceRepository).findOne("123");
-        ResponseEntity responseEntity = deviceController.registerDevice("123", new UserDetailsImpl(principal));
+        ResponseEntity responseEntity = deviceController.registerDevice("123", new UserDetailsImpl(1L));
         ArgumentCaptor<Device> deviceCaptor = ArgumentCaptor.forClass(Device.class);
         verify(deviceRepository, times(1)).save(deviceCaptor.capture());
         assertEquals("123", deviceCaptor.getValue().getId());
@@ -40,7 +40,7 @@ public class DeviceControllerTest {
     @Test
     public void testRegisterDevice_alreadyExists() throws Exception {
         doReturn(Optional.of(new Device("123", new User()))).when(deviceRepository).findOne("123");
-        ResponseEntity responseEntity = deviceController.registerDevice("123", new UserDetailsImpl(principal));
+        ResponseEntity responseEntity = deviceController.registerDevice("123", new UserDetailsImpl(1L));
         verify(deviceRepository, never()).save(any(Device.class));
         assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
     }
