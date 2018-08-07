@@ -6,7 +6,7 @@ import lt.dualpair.server.interfaces.resource.user.SearchParametersResource;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResourceAssembler;
 import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
 import lt.dualpair.server.security.UserDetails;
-import lt.dualpair.server.service.user.SocialUserService;
+import lt.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import java.net.URISyntaxException;
 @RequestMapping(value = "/api/user/{userId:[0-9]+}")
 public class SearchParametersController {
 
-    private SocialUserService socialUserService;
+    private UserService userService;
     private SearchParametersResourceAssembler searchParametersResourceAssembler;
 
     @RequestMapping(method = RequestMethod.PUT, value = "/search-parameters")
@@ -32,7 +32,7 @@ public class SearchParametersController {
         searchParameters.setMaxAge(resource.getMaxAge());
         searchParameters.setSearchFemale(resource.getSearchFemale());
         searchParameters.setSearchMale(resource.getSearchMale());
-        socialUserService.setUserSearchParameters(userId, searchParameters);
+        userService.setUserSearchParameters(userId, searchParameters);
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
@@ -41,13 +41,13 @@ public class SearchParametersController {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        User user = socialUserService.loadUserById(userId);
+        User user = userService.loadUserById(userId);
         return ResponseEntity.ok(searchParametersResourceAssembler.toResource(user.getSearchParameters()));
     }
 
     @Autowired
-    public void setSocialUserService(SocialUserService socialUserService) {
-        this.socialUserService = socialUserService;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     @Autowired

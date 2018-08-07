@@ -11,7 +11,6 @@ import com.vk.api.sdk.queries.photos.PhotosGetQuery;
 import lt.dualpair.core.photo.Photo;
 import lt.dualpair.core.user.Gender;
 import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserAccount;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.Connection;
@@ -87,9 +86,7 @@ public class VKontakteDataProviderTest {
         assertEquals(Gender.FEMALE, user.getGender());
         assertEquals("mail@mail.com", user.getEmail());
         Photo photo = user.getPhotos().get(0);
-        assertEquals("10", photo.getIdOnAccount());
         assertEquals("src", photo.getSourceLink());
-        assertEquals(UserAccount.Type.VKONTAKTE, photo.getAccountType());
         assertEquals(user, photo.getUser());
     }
 
@@ -168,9 +165,7 @@ public class VKontakteDataProviderTest {
         List<Photo> photos = vKontakteDataProvider.getPhotos();
         int i = 1;
         for(Photo photo : photos) {
-            assertEquals(i + "", photo.getIdOnAccount());
             assertEquals("src" + i, photo.getSourceLink());
-            assertEquals(UserAccount.Type.VKONTAKTE, photo.getAccountType());
             i++;
         }
     }
@@ -185,9 +180,7 @@ public class VKontakteDataProviderTest {
         Optional<Photo> photoOptional = vKontakteDataProvider.getPhoto("1");
         assertTrue(photoOptional.isPresent());
         Photo photo = photoOptional.get();
-        assertEquals("1", photo.getIdOnAccount());
         assertEquals("src1", photo.getSourceLink());
-        assertEquals(UserAccount.Type.VKONTAKTE, photo.getAccountType());
     }
 
     @Test

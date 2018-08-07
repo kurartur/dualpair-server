@@ -7,7 +7,7 @@ import lt.dualpair.server.interfaces.resource.user.SearchParametersResource;
 import lt.dualpair.server.interfaces.resource.user.SearchParametersResourceAssembler;
 import lt.dualpair.server.security.TestUserDetails;
 import lt.dualpair.server.security.UserDetailsImpl;
-import lt.dualpair.server.service.user.SocialUserService;
+import lt.dualpair.server.service.user.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,13 +22,13 @@ import static org.mockito.Mockito.*;
 public class SearchParametersControllerTest {
 
     private SearchParametersController searchParametersController = new SearchParametersController();
-    private SocialUserService socialUserService = mock(SocialUserService.class);
+    private UserService socialUserService = mock(UserService.class);
     private SearchParametersResourceAssembler searchParametersResourceAssembler = mock(SearchParametersResourceAssembler.class);
     private User principal = UserTestUtils.createUser(1L);
 
     @Before
     public void setUp() throws Exception {
-        searchParametersController.setSocialUserService(socialUserService);
+        searchParametersController.setUserService(socialUserService);
         searchParametersController.setSearchParametersResourceAssembler(searchParametersResourceAssembler);
     }
 

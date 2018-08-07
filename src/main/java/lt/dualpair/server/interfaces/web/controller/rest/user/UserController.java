@@ -9,7 +9,7 @@ import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
 import lt.dualpair.server.security.UserDetails;
-import lt.dualpair.server.service.user.SocialUserService;
+import lt.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,14 +28,14 @@ import java.util.*;
 @RequestMapping("/api")
 public class UserController {
 
-    private SocialUserService socialUserService;
+    private UserService userService;
     private LocationProvider locationProvider;
     private UserResourceAssembler userResourceAssembler;
     private UserResponseRepository userResponseRepository;
 
     @RequestMapping(method = RequestMethod.GET, value = "/me")
     public ResponseEntity me(@ActiveUser UserDetails principal) {
-        User user = socialUserService.loadUserById(principal.getId());
+        User user = userService.loadUserById(principal.getId());
         return ResponseEntity.ok(userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, true, true)));
     }
 
@@ -50,7 +50,7 @@ public class UserController {
             }
             isMatch = response.get().getMatch() != null;
         }
-        User user = socialUserService.loadUserById(userId);
+        User user = userService.loadUserById(userId);
         UserResource userResource = userResourceAssembler.toResource(new UserResourceAssembler.AssemblingContext(user, isMatch, isPrincipal));
         return ResponseEntity.ok(userResource);
     }
@@ -60,7 +60,7 @@ public class UserController {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        User user = socialUserService.loadUserById(userId);
+        User user = userService.loadUserById(userId);
         if (data.containsKey("description"))
             user.setDescription((String)data.get("description"));
         if (data.containsKey("name"))
@@ -81,7 +81,7 @@ public class UserController {
             }
             user.setPurposesOfBeing(purposesOfBeing);
         }
-        socialUserService.updateUser(user);
+        userService.updateUser(user);
         return ResponseEntity.noContent().location(new URI("/api/user/" + userId)).build();
     }
 
@@ -90,7 +90,7 @@ public class UserController {
         if (!principal.getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        socialUserService.setUserDateOfBirth(userId, dateOfBirth);
+        userService.setUserDateOfBirth(userId, dateOfBirth);
         return ResponseEntity.status(HttpStatus.SEE_OTHER).location(new URI("/api/user")).build();
     }
 
@@ -107,14 +107,14 @@ public class UserController {
             throw new IllegalArgumentException("\"latitude\" and \"longitude\" must be provided");
         }
 
-        socialUserService.addLocation(userId, location);
+        userService.addLocation(userId, location);
 
         return ResponseEntity.created(new URI("/api/user")).build();
     }
 
     @Autowired
-    public void setSocialUserService(SocialUserService socialUserService) {
-        this.socialUserService = socialUserService;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     @Autowired

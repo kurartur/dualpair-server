@@ -9,7 +9,6 @@ import com.vk.api.sdk.httpclient.HttpTransportClient;
 import lt.dualpair.core.photo.Photo;
 import lt.dualpair.core.user.Gender;
 import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserAccount;
 import org.jboss.logging.Logger;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.ConnectionData;
@@ -81,8 +80,6 @@ public class VKontakteDataProvider implements SocialDataProvider {
                         Photo photo = new Photo();
                         photo.setUser(user);
                         photo.setSourceLink(vkPhoto.getPhoto604());
-                        photo.setIdOnAccount(Long.toString(vkPhoto.getId()));
-                        photo.setAccountType(UserAccount.Type.VKONTAKTE);
                         return photo;
                     }).collect(Collectors.toList()));
         } catch (ApiException | ClientException e) {
@@ -120,8 +117,6 @@ public class VKontakteDataProvider implements SocialDataProvider {
                     .stream()
                     .map(vkPhoto -> {
                         Photo photo = new Photo();
-                        photo.setAccountType(UserAccount.Type.VKONTAKTE);
-                        photo.setIdOnAccount(Long.toString(vkPhoto.getId()));
                         photo.setSourceLink(vkPhoto.getPhoto604());
                         return photo;
                     }).collect(Collectors.toList());
@@ -143,8 +138,6 @@ public class VKontakteDataProvider implements SocialDataProvider {
             }
             com.vk.api.sdk.objects.photos.Photo vkPhoto = vkPhotos.get(0);
             Photo photo = new Photo();
-            photo.setIdOnAccount(idOnAccount);
-            photo.setAccountType(UserAccount.Type.VKONTAKTE);
             photo.setSourceLink(vkPhoto.getPhoto604());
             return Optional.of(photo);
         } catch (ApiException | ClientException e) {
@@ -162,8 +155,6 @@ public class VKontakteDataProvider implements SocialDataProvider {
             List<com.vk.api.sdk.objects.photos.Photo> vkPhotos = vkApiClient.photos().getById(userActor, userAndPhotoIds).execute();
             for (com.vk.api.sdk.objects.photos.Photo vkPhoto : vkPhotos) {
                 Photo photo = new Photo();
-                photo.setIdOnAccount(Integer.toString(vkPhoto.getId()));
-                photo.setAccountType(UserAccount.Type.VKONTAKTE);
                 photo.setSourceLink(vkPhoto.getPhoto604());
                 photos.add(photo);
             }

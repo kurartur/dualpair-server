@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
+// TODO remove User from this implementation to avoid authentication serialization/deserialization issues
 public class UserDetailsImpl implements UserDetails {
 
     private User user;

@@ -1,10 +1,11 @@
 package lt.dualpair.server.interfaces.resource.user;
 
 import lt.dualpair.core.photo.Photo;
-import lt.dualpair.core.user.UserAccount;
+import lt.dualpair.core.user.User;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class PhotoResourceAssemblerTest {
 
@@ -13,17 +14,21 @@ public class PhotoResourceAssemblerTest {
     @Test
     public void toResource() throws Exception {
         Photo photo = new Photo();
-        photo.setAccountType(UserAccount.Type.FACEBOOK);
-        photo.setIdOnAccount("idOnAccount");
         photo.setId(1L);
+        photo.setUser(new User());
         photo.setSourceLink("url");
         photo.setPosition(5);
         PhotoResource photoResource = photoResourceAssembler.toResource(photo);
-        assertEquals("FB", photoResource.getAccountType());
-        assertEquals("idOnAccount", photoResource.getIdOnAccount());
         assertEquals((Long)1L, photoResource.getPhotoId());
-        assertEquals("url", photoResource.getSourceUrl());
+        assertTrue(photoResource.getSource().endsWith("/photo?name=url"));
         assertEquals((Integer)5, photoResource.getPosition());
     }
 
+    @Test
+    public void toResource_whenSourceIsAbsoluteLink_itIsNotConverted() {
+        Photo photo = new Photo();
+        photo.setSourceLink("httpsomelink");
+        PhotoResource photoResource = photoResourceAssembler.toResource(photo);
+        assertEquals("httpsomelink", photoResource.getSource());
+    }
 }

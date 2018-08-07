@@ -5,7 +5,7 @@ import lt.dualpair.core.socionics.SociotypeRepository;
 import lt.dualpair.core.user.User;
 import lt.dualpair.core.user.UserTestUtils;
 import lt.dualpair.server.security.TestUserDetails;
-import lt.dualpair.server.service.user.SocialUserService;
+import lt.dualpair.server.service.user.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -23,14 +23,14 @@ import static org.mockito.Mockito.*;
 public class SociotypesControllerTest {
 
     private SociotypesController sociotypesController = new SociotypesController();
-    private SocialUserService socialUserService = mock(SocialUserService.class);
+    private UserService socialUserService = mock(UserService.class);
     private SociotypeRepository sociotypeRepository = mock(SociotypeRepository.class);
     private User principal = UserTestUtils.createUser(1L);
     private Set<Sociotype> sociotypes = new HashSet<>();
 
     @Before
     public void setUp() throws Exception {
-        sociotypesController.setSocialUserService(socialUserService);
+        sociotypesController.setUserService(socialUserService);
         sociotypesController.setSociotypeRepository(sociotypeRepository);
         sociotypes.add(new Sociotype.Builder().code1(Sociotype.Code1.EII).build());
         when(sociotypeRepository.findByCode1List(Arrays.asList(Sociotype.Code1.EII))).thenReturn(sociotypes);

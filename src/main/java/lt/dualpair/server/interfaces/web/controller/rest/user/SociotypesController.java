@@ -4,7 +4,7 @@ import lt.dualpair.core.socionics.Sociotype;
 import lt.dualpair.core.socionics.SociotypeRepository;
 import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
 import lt.dualpair.server.security.UserDetails;
-import lt.dualpair.server.service.user.SocialUserService;
+import lt.dualpair.server.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.Set;
 @RequestMapping("/api/user/{userId:[0-9]+}")
 public class SociotypesController {
 
-    private SocialUserService socialUserService;
+    private UserService userService;
     private SociotypeRepository sociotypeRepository;
 
     @RequestMapping(method = RequestMethod.PUT, value = "/sociotypes")
@@ -31,7 +31,7 @@ public class SociotypesController {
         if (codes.length == 0) {
             throw new IllegalArgumentException("Invalid sociotype code count. Must be 1 or 2");
         }
-        socialUserService.setUserSociotypes(socialUserService.loadUserById(userId), getSociotypesFromCodes(convertToEnumCodes(codes)));
+        userService.setUserSociotypes(userService.loadUserById(userId), getSociotypesFromCodes(convertToEnumCodes(codes)));
         return ResponseEntity.created(new URI("/api/user/" + userId)).build();
     }
 
@@ -49,8 +49,8 @@ public class SociotypesController {
     }
 
     @Autowired
-    public void setSocialUserService(SocialUserService socialUserService) {
-        this.socialUserService = socialUserService;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     @Autowired

@@ -9,7 +9,7 @@ import lt.dualpair.server.interfaces.resource.user.LocationResource;
 import lt.dualpair.server.interfaces.resource.user.UserResource;
 import lt.dualpair.server.interfaces.resource.user.UserResourceAssembler;
 import lt.dualpair.server.security.TestUserDetails;
-import lt.dualpair.server.service.user.SocialUserServiceImpl;
+import lt.dualpair.server.service.user.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -24,14 +24,14 @@ import static org.mockito.Mockito.*;
 public class UserControllerTest {
 
     private UserController userController = new UserController();
-    private SocialUserServiceImpl socialUserService = mock(SocialUserServiceImpl.class);
+    private UserService socialUserService = mock(UserService.class);
     private LocationProvider locationProvider = mock(LocationProvider.class);
     private UserResourceAssembler userResourceAssembler = mock(UserResourceAssembler.class);
     private UserResponseRepository userResponseRepository = mock(UserResponseRepository.class);
 
     @Before
     public void setUp() throws Exception {
-        userController.setSocialUserService(socialUserService);
+        userController.setUserService(socialUserService);
         userController.setLocationProvider(locationProvider);
         userController.setUserResourceAssembler(userResourceAssembler);
         userController.setUserResponseRepository(userResponseRepository);

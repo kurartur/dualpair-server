@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -65,6 +66,7 @@ public class OAuthServerConfiguration {
         public void configure(HttpSecurity http) throws Exception {
             http
                     .requestMatchers().antMatchers("/api/**").antMatchers("/connect/**").and()
+                    .authorizeRequests().antMatchers(HttpMethod.GET, "/api/user/**/photo").permitAll().and() // TODO photos shouldn't be publicly accessible
                     .authorizeRequests().antMatchers("/**").authenticated();
         }
     }

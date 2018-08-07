@@ -1,19 +1,21 @@
 package lt.dualpair.server.interfaces.web.controller.rest.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lt.dualpair.core.photo.Photo;
-import lt.dualpair.core.user.UserAccount;
 import lt.dualpair.server.interfaces.resource.user.PhotoResource;
 import lt.dualpair.server.interfaces.resource.user.PhotoResourceAssembler;
-import lt.dualpair.server.interfaces.web.authentication.ActiveUser;
-import lt.dualpair.server.security.UserDetails;
-import lt.dualpair.server.service.user.SocialDataProvider;
-import lt.dualpair.server.service.user.SocialDataProviderFactory;
-import lt.dualpair.server.service.user.SocialUserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lt.dualpair.server.service.user.PhotoFileHelper;
+import lt.dualpair.server.service.user.PhotoModel;
+import lt.dualpair.server.service.user.UserPhotoService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.inject.Inject;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,69 +23,63 @@ import java.util.List;
 @RequestMapping("/api/user/{userId:[0-9]+}")
 public class UserPhotoController {
 
-    private SocialDataProviderFactory socialDataProviderFactory;
     private PhotoResourceAssembler photoResourceAssembler;
-    private SocialUserService socialUserService;
+    private UserPhotoService userPhotoService;
+    private PhotoFileHelper photoFileHelper;
 
-    @RequestMapping(method = RequestMethod.DELETE, path = "/photos/{photoId:[0-9]+}")
-    public ResponseEntity deletePhoto(@PathVariable Long userId, @PathVariable Long photoId, @ActiveUser UserDetails principal) {
-        if (!userId.equals(principal.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        socialUserService.deleteUserPhoto(userId, photoId);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(method = RequestMethod.GET, path = "/available-photos")
-    public ResponseEntity getAvailablePhotos(@PathVariable Long userId, @RequestParam("at") String accountType, @ActiveUser UserDetails principal) {
-        if (!userId.equals(principal.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        SocialDataProvider socialDataProvider = socialDataProviderFactory.getProvider(UserAccount.Type.fromCode(accountType), principal.getId());
-        return ResponseEntity.ok(photoResourceAssembler.toResources(socialDataProvider.getPhotos()));
-    }
-
-    @RequestMapping(method = RequestMethod.PUT, path = "/photos")
-    public ResponseEntity addPhoto(@PathVariable Long userId, @RequestBody PhotoResource photoResource, @ActiveUser UserDetails principal) {
-        if (!userId.equals(principal.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        Photo photo = socialUserService.addUserPhoto(userId,
-                UserAccount.Type.fromCode(photoResource.getAccountType()),
-                photoResource.getIdOnAccount(),
-                photoResource.getPosition());
-        return ResponseEntity.status(HttpStatus.CREATED).body(photoResourceAssembler.toResource(photo));
-    }
-
-    @PostMapping("/photos")
-    public ResponseEntity setPhotos(@PathVariable Long userId, @RequestBody List<PhotoResource> photoResourceList, @ActiveUser UserDetails principal) {
-        if (!userId.equals(principal.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        List<SocialUserService.PhotoData> photoDataList = new ArrayList<>();
-        for (PhotoResource photoResource : photoResourceList) {
-            SocialUserService.PhotoData photoData = new SocialUserService.PhotoData();
-            photoData.accountType = UserAccount.Type.fromCode(photoResource.getAccountType());
-            photoData.idOnAccount = photoResource.getIdOnAccount();
-            photoData.position = photoResource.getPosition();
-            photoDataList.add(photoData);
-        }
-        socialUserService.setUserPhotos(userId, photoDataList);
-        return ResponseEntity.ok().build();
-    }
-
-    @Autowired
-    public void setSocialDataProviderFactory(SocialDataProviderFactory socialDataProviderFactory) {
-        this.socialDataProviderFactory = socialDataProviderFactory;
-    }
-
-    @Autowired
-    public void setPhotoResourceAssembler(PhotoResourceAssembler photoResourceAssembler) {
+    @Inject
+    public UserPhotoController(PhotoResourceAssembler photoResourceAssembler, UserPhotoService userPhotoService, PhotoFileHelper photoFileHelper) {
         this.photoResourceAssembler = photoResourceAssembler;
+        this.userPhotoService = userPhotoService;
+        this.photoFileHelper = photoFileHelper;
     }
 
-    @Autowired
-    public void setSocialUserService(SocialUserService socialUserService) {
-        this.socialUserService = socialUserService;
+    @PreAuthorize("@authorizer.hasPermission(authentication, #userId)")
+    @PostMapping("/photos")
+    public ResponseEntity setPhotos(
+            @PathVariable Long userId,
+            @RequestPart(value = "photoFiles") MultipartFile[] photoFiles,
+            @RequestPart(value = "data") String dataJson) throws Exception {
+        PhotoResourceCollection data = new ObjectMapper().readValue(dataJson, PhotoResourceCollection.class);
+        List<Photo> photos = userPhotoService.setUserPhotos(userId, createModels(photoFiles, data.getPhotoResources()));
+        return ResponseEntity.ok(photoResourceAssembler.toResources(photos));
+    }
+
+    @GetMapping("/photo")
+    public ResponseEntity readPhoto(@PathVariable Long userId, @RequestParam String name) {
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.IMAGE_JPEG).body(photoFileHelper.read(userId, name));
+    }
+
+    private List<PhotoModel> createModels(MultipartFile[] photoFiles, List<PhotoResource> photoResources) throws IOException {
+        List<PhotoModel> models = new ArrayList<>();
+        for (PhotoResource photoResource : photoResources) {
+            if (photoResource.getPhotoId() == null) {
+                for (MultipartFile photoFile : photoFiles) {
+                    if (photoFile.getOriginalFilename().equals(photoResource.getSource())) {
+                        models.add(new PhotoModel(null, photoFile.getBytes(), photoResource.getPosition()));
+                    }
+                }
+            } else {
+                models.add(new PhotoModel(photoResource.getPhotoId(), null, photoResource.getPosition()));
+            }
+        }
+        if (models.size() != photoResources.size()) {
+            throw new IllegalArgumentException("Something wrong");
+        }
+        return models;
+    }
+
+    public static final class PhotoResourceCollection {
+
+        List<PhotoResource> photoResources;
+
+        public List<PhotoResource> getPhotoResources() {
+            return photoResources;
+        }
+
+        public void setPhotoResources(List<PhotoResource> photoResources) {
+            this.photoResources = photoResources;
+        }
+
     }
 }

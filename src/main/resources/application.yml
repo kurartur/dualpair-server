@@ -31,3 +31,4 @@ spring:
 
 googleApiKey: fakeKey
 fakeMatches: false
+photoDir: /home/artur/Desktop/photos

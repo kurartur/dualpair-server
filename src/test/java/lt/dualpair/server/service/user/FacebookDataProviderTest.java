@@ -3,7 +3,6 @@ package lt.dualpair.server.service.user;
 import lt.dualpair.core.photo.Photo;
 import lt.dualpair.core.user.Gender;
 import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserAccount;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.social.connect.Connection;
@@ -151,15 +150,11 @@ public class FacebookDataProviderTest {
         Optional<Photo> optionalPhoto = facebookDataProvider.getPhoto("1");
         assertTrue(optionalPhoto.isPresent());
         Photo photo = optionalPhoto.get();
-        assertEquals("id", photo.getIdOnAccount());
         assertEquals("url", photo.getSourceLink());
-        assertEquals(UserAccount.Type.FACEBOOK, photo.getAccountType());
     }
 
     private void assertUserPhoto(String expectedId, User expectedUser, Photo actualPhoto) throws Exception {
-        assertEquals(expectedId, actualPhoto.getIdOnAccount());
         assertEquals("http://photo" + expectedId, actualPhoto.getSourceLink());
-        assertEquals(UserAccount.Type.FACEBOOK, actualPhoto.getAccountType());
         assertEquals(expectedUser, actualPhoto.getUser());
     }
 

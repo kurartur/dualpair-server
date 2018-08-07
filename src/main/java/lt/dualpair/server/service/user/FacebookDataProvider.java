@@ -3,7 +3,6 @@ package lt.dualpair.server.service.user;
 import lt.dualpair.core.photo.Photo;
 import lt.dualpair.core.user.Gender;
 import lt.dualpair.core.user.User;
-import lt.dualpair.core.user.UserAccount;
 import org.jboss.logging.Logger;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.facebook.api.Album;
@@ -42,7 +41,6 @@ public class FacebookDataProvider implements SocialDataProvider {
             user.setName(facebookUser.getFirstName());
         }
         user.setEmail(facebookConnection.fetchUserProfile().getEmail());
-        //user.setLocation(facebookUser.getLocation().getName());
         user.setGender(resolveGender(facebookUser.getGender()));
 
         String birthday = facebookUser.getBirthday();
@@ -66,8 +64,6 @@ public class FacebookDataProvider implements SocialDataProvider {
         mediaOperations.getAlbums().forEach(album -> mediaOperations.getPhotos(album.getId()).forEach(fbPhoto -> {
             Photo photo = new Photo();
             photo.setSourceLink(fbPhoto.getSource());
-            photo.setAccountType(UserAccount.Type.FACEBOOK);
-            photo.setIdOnAccount(fbPhoto.getId());
             photos.add(photo);
         }));
         return photos;
@@ -81,8 +77,6 @@ public class FacebookDataProvider implements SocialDataProvider {
             org.springframework.social.facebook.api.Photo fbPhoto = restOperations.getForObject(uri, org.springframework.social.facebook.api.Photo.class);
             if (fbPhoto != null) {
                 Photo photo = new Photo();
-                photo.setIdOnAccount(fbPhoto.getId());
-                photo.setAccountType(UserAccount.Type.FACEBOOK);
                 photo.setSourceLink(fbPhoto.getSource());
                 return Optional.of(photo);
             }
@@ -154,8 +148,6 @@ public class FacebookDataProvider implements SocialDataProvider {
     private Photo buildPhoto(org.springframework.social.facebook.api.Photo facebookPhoto, User user) {
         Photo photo = new Photo();
         photo.setUser(user);
-        photo.setAccountType(UserAccount.Type.FACEBOOK);
-        photo.setIdOnAccount(facebookPhoto.getId());
         photo.setSourceLink(facebookPhoto.getSource());
         return photo;
     }
